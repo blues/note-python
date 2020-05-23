@@ -189,24 +189,32 @@ class OpenI2C(Notecard):
 
     def Reset(self):
         chunk_len = 0
-        while True:
-            time.sleep(.001)
-            reg = bytearray(2)
-            reg[0] = 0
-            reg[1] = chunk_len
-            readlen = chunk_len + 2
-            buf = bytearray(readlen)
-            if use_periphery:
-                msgs = [I2C.Message(reg), I2C.Message(buf, read=True)]
-                self.i2c.transfer(self.addr, msgs)
-                buf = msgs[1].data
-            else:
-                self.i2c.writeto(self.addr, reg, stop=False)
-                self.i2c.readfrom_into(self.addr, buf)
-            available = buf[0]
-            if available == 0:
-                break
-            chunk_len = min(available, self.max)
+
+        while not self.lock():
+            pass
+
+        try: 
+            while True:
+                time.sleep(.001)
+                reg = bytearray(2)
+                reg[0] = 0
+                reg[1] = chunk_len
+                readlen = chunk_len + 2
+                buf = bytearray(readlen)
+                if use_periphery:
+                    msgs = [I2C.Message(reg), I2C.Message(buf, read=True)]
+                    self.i2c.transfer(self.addr, msgs)
+                    buf = msgs[1].data
+                else:
+                    self.i2c.writeto(self.addr, reg, stop=False)
+                    self.i2c.readfrom_into(self.addr, buf)
+                available = buf[0]
+                if available == 0:
+                    break
+                chunk_len = min(available, self.max)
+        finally:
+            self.unlock()
+            
         pass
 
     def lock(self):
