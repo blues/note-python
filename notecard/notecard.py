@@ -134,8 +134,7 @@ class OpenI2C(Notecard):
                     msgs = [I2C.Message(reg+write_data)]
                     self.i2c.transfer(self.addr, msgs)
                 else:
-                    self.i2c.writeto(self.addr, reg, stop=False)
-                    self.i2c.writeto(self.addr, write_data, stop=True)
+                    self.i2c.writeto(self.addr, reg + write_data)
                 chunk_offset += chunk_len
                 json_left -= chunk_len
                 sent_in_seg += chunk_len
@@ -159,8 +158,7 @@ class OpenI2C(Notecard):
                     self.i2c.transfer(self.addr, msgs)
                     buf = msgs[1].data
                 else:
-                    self.i2c.writeto(self.addr, reg, stop=False)
-                    self.i2c.readfrom_into(self.addr, buf)
+                    self.i2c.writeto_then_readfrom(self.addr, reg, buf)
                 available = buf[0]
                 good = buf[1]
                 data = buf[2:2+good]
@@ -206,8 +204,7 @@ class OpenI2C(Notecard):
                     self.i2c.transfer(self.addr, msgs)
                     buf = msgs[1].data
                 else:
-                    self.i2c.writeto(self.addr, reg, stop=False)
-                    self.i2c.readfrom_into(self.addr, buf)
+                    self.i2c.writeto_then_readfrom(self.addr, reg, buf)
                 available = buf[0]
                 if available == 0:
                     break
