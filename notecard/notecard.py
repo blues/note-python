@@ -140,7 +140,7 @@ class OpenI2C(Notecard):
                 sent_in_seg += chunk_len
                 if sent_in_seg > CARD_REQUEST_SEGMENT_MAX_LEN:
                     sent_in_seg -= CARD_REQUEST_SEGMENT_MAX_LEN
-                    time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS/1000)
+                time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS/1000)
                     
             chunk_len = 0
             received_newline = False
