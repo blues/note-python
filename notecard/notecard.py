@@ -88,7 +88,7 @@ class OpenSerial(Notecard):
     def Reset(self):
         for i in range(10):
             try:
-                self.uart.write(b'\n\n')
+                self.uart.write(b'\n')
             except:
                 continue
             time.sleep(0.5)
@@ -148,8 +148,8 @@ class OpenI2C(Notecard):
                 sent_in_seg += chunk_len
                 if sent_in_seg > CARD_REQUEST_SEGMENT_MAX_LEN:
                     sent_in_seg -= CARD_REQUEST_SEGMENT_MAX_LEN
-                    time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
-
+                time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+            
             chunk_len = 0
             received_newline = False
             start = time.time()
