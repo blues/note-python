@@ -9,14 +9,15 @@ if sys.implementation.name == 'cpython':
         use_periphery = True
         from periphery import I2C
 
-NOTECARD_I2C_ADDRESS    = 0x17
-notecardDebug           = True
+NOTECARD_I2C_ADDRESS = 0x17
+notecardDebug = True
 
-# The notecard is a real-time device that has a fixed size interrupt buffer.  We can push data
-# at it far, far faster than it can process it, therefore we push it in segments with a pause
-# between each segment.
+# The notecard is a real-time device that has a fixed size interrupt buffer.
+# We can push data at it far, far faster than it can process it,
+# therefore we push it in segments with a pause between each segment.
 CARD_REQUEST_SEGMENT_MAX_LEN = 1000
 CARD_REQUEST_SEGMENT_DELAY_MS = 250
+
 
 def serialReadByte(port):
     if sys.implementation.name == 'micropython':
@@ -31,10 +32,12 @@ def serialReadByte(port):
                 return None
     return port.read(1)
 
+
 class Notecard:
 
     def __init__(self):
         self.Reset()
+
 
 class OpenSerial(Notecard):
 
@@ -46,7 +49,7 @@ class OpenSerial(Notecard):
         return self.Transaction(self, req)
 
     def Transaction(self, req):
-        req_json = json.dumps(req) 
+        req_json = json.dumps(req)
         if notecardDebug:
             print(req_json)
         req_json += "\n"
@@ -57,12 +60,13 @@ class OpenSerial(Notecard):
             seg_len = seg_left
             if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
                 seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
-            self.uart.write(req_json[seg_off:seg_off+seg_len].encode('utf-8'))
+            self.uart.write(req_json[seg_off:seg_off + seg_len]
+                            .encode('utf-8'))
             seg_off += seg_len
             seg_left -= seg_len
             if seg_left == 0:
                 break
-            time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS/1000)
+            time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
 
         rsp_json = ""
         while True:
@@ -106,6 +110,7 @@ class OpenSerial(Notecard):
         self.uart = uart_id
         super().__init__()
 
+
 class OpenI2C(Notecard):
 
     def Transaction(self, req):
@@ -129,9 +134,12 @@ class OpenI2C(Notecard):
                 chunk_len = min(json_left, self.max)
                 reg = bytearray(1)
                 reg[0] = chunk_len
-                write_data = bytes(req_json[chunk_offset:chunk_offset+chunk_len], 'utf-8')
+                write_data = bytes(req_json[
+                                   chunk_offset:
+                                   chunk_offset + chunk_len
+                                   ], 'utf-8')
                 if use_periphery:
-                    msgs = [I2C.Message(reg+write_data)]
+                    msgs = [I2C.Message(reg + write_data)]
                     self.i2c.transfer(self.addr, msgs)
                 else:
                     self.i2c.writeto(self.addr, reg + write_data)
@@ -140,8 +148,8 @@ class OpenI2C(Notecard):
                 sent_in_seg += chunk_len
                 if sent_in_seg > CARD_REQUEST_SEGMENT_MAX_LEN:
                     sent_in_seg -= CARD_REQUEST_SEGMENT_MAX_LEN
-                time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS/1000)
-                    
+                time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+
             chunk_len = 0
             received_newline = False
             start = time.time()
@@ -161,7 +169,7 @@ class OpenI2C(Notecard):
                     self.i2c.writeto_then_readfrom(self.addr, reg, buf)
                 available = buf[0]
                 good = buf[1]
-                data = buf[2:2+good]
+                data = buf[2:2 + good]
                 if good > 0 and buf[-1] == 0x0a:
                     received_newline = True
                 try:
@@ -191,7 +199,7 @@ class OpenI2C(Notecard):
         while not self.lock():
             pass
 
-        try: 
+        try:
             while True:
                 time.sleep(.001)
                 reg = bytearray(2)
@@ -211,7 +219,7 @@ class OpenI2C(Notecard):
                 chunk_len = min(available, self.max)
         finally:
             self.unlock()
-            
+
         pass
 
     def lock(self):
