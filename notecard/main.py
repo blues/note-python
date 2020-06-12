@@ -1,5 +1,7 @@
-
+# General imports
 import sys
+import time
+import notecard
 
 # Choose either UART or I2C for Notecard
 use_uart = True
@@ -22,9 +24,6 @@ elif sys.implementation.name == 'cpython':
 else:
     raise Exception("Unsupported platform: " + sys.platform)
 
-# General imports
-import time
-import notecard
 
 # Main loop
 def main():
@@ -55,17 +54,21 @@ def main():
                     if use_periphery:
                         port = Serial("/dev/serial0", 9600)
                     else:
-                        port = serial.Serial(port="/dev/serial0", baudrate=9600)
+                        port = serial.Serial(port="/dev/serial0",
+                                             baudrate=9600)
                 elif sys.platform == "darwin":
-                    port = serial.Serial(port="/dev/tty.usbmodemNote11", baudrate=9600)
+                    port = serial.Serial(port="/dev/tty.usbmodemNOTE1",
+                                         baudrate=9600)
                 elif sys.platform == "win32":
-                    port = serial.Serial(port="COM21", baudrate=9600)
+                    port = serial.Serial(port="COM21",
+                                         baudrate=9600)
             else:
                 # https://github.com/vsergeev/python-periphery#i2c
                 if use_periphery:
                     port = I2C("/dev/i2c-1")
                 else:
-                    raise Exception("I2C not supported on platform: " + sys.platform)
+                    raise Exception("I2C not supported on platform: "
+                                    + sys.platform)
     except Exception as exception:
         raise Exception("error opening port: " + ExceptionInfo(exception))
 
@@ -77,34 +80,37 @@ def main():
             card = notecard.OpenI2C(port, 0, 0)
     except Exception as exception:
         raise Exception("error opening notecard: " + ExceptionInfo(exception))
-    
+
     # If success, do a transaction loop
     print("transaction loop")
     while True:
         time.sleep(2)
         transactionTest(card)
 
+
 # Test the Notecard with a single transaction
 def transactionTest(card):
-    req = {"req":"card.status"}
+    req = {"req": "card.status"}
     req["string"] = "string"
     req["bool"] = True
     req["integer"] = 5
     req["real"] = 5.0
-    req["object"] = {"temp":18.6}
+    req["object"] = {"temp": 18.6}
     try:
         rsp = card.Transaction(req)
         print(rsp)
     except Exception as exception:
         print("transaction error: " + ExceptionInfo(exception))
         time.sleep(5)
-        
+
+
 # Format an exception string
 def ExceptionInfo(exception):
     s1 = '{}'.format(sys.exc_info()[-1].tb_lineno)
     s2 = exception.__class__.__name__
-    return "line " + s1 +  ": " + s2 + ": " + ' '.join(map(str,exception.args))
-    
+    return "line " + s1 + ": " + s2 + ": " + ' '.join(map(str, exception.args))
 
-# Invoke Main here so that we don't need to be strict about defining functions before use
+
+# Invoke Main here so that we don't need to be strict
+# about defining functions before use
 main()

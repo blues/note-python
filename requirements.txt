@@ -3,3 +3,5 @@ iso8601==0.1.12
 pyserial==3.4
 python-periphery==2.0.1
 PyYAML==5.3.1
+flake-8==3.8.3
+pytest==5.4.3
