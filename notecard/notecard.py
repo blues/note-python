@@ -84,7 +84,7 @@ class OpenSerial(Notecard):
     def Reset(self):
         for i in range(10):
             try:
-                self.uart.write(b'\n\n')
+                self.uart.write(b'\n')
             except:
                 continue
             time.sleep(0.5)
