@@ -103,8 +103,8 @@ class OpenSerial(Notecard):
                     nonControlCharFound = True
             if somethingFound and not nonControlCharFound:
                 break
-        else:
-            raise Exception("Notecard not responding")
+            else:
+                raise Exception("Notecard not responding")
 
     def __init__(self, uart_id):
         self.uart = uart_id
