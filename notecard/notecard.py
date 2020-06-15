@@ -75,6 +75,7 @@ class OpenSerial(Notecard):
                 continue
             try:
                 data_string = data.decode('utf-8')
+                print("DATA " + str(data_string))
                 if data_string == "\n":
                     break
                 rsp_json += data_string
