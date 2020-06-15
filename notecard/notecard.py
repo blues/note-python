@@ -38,6 +38,24 @@ class Notecard:
     def __init__(self):
         self.Reset()
 
+    def set(self, product, sn=None,
+            mode=None, minutes=None, hours=None, sync=False):
+        req = {"req": "service.set"}
+        if product:
+            req["product"] = product
+        if sn:
+            req["sn"] = sn
+        if mode:
+            req["mode"] = mode
+        if minutes:
+            req["minutes"] = minutes
+        if hours:
+            req["hours"] = hours
+        if sync:
+            req["sync"] = "true"
+
+        return self.Transaction(req)
+
 
 class OpenSerial(Notecard):
 
@@ -75,7 +93,6 @@ class OpenSerial(Notecard):
                 continue
             try:
                 data_string = data.decode('utf-8')
-                print("DATA " + str(data_string))
                 if data_string == "\n":
                     break
                 rsp_json += data_string

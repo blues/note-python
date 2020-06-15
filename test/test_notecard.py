@@ -31,7 +31,7 @@ def test_open_i2c():
     assert card.i2c is not None
 
 
-def test_transacion():
+def test_transaction():
     serial = Mock()  # noqa: F811
     port = serial.Serial("/dev/tty.foo", 9600)
     port.read.side_effect = [b'\r', b'\n', None]
@@ -44,3 +44,22 @@ def test_transacion():
 
     assert "connected" in response
     assert response["connected"] is True
+
+
+def test_service_set():
+    serial = Mock()  # noqa: F811
+    port = serial.Serial("/dev/tty.foo", 9600)
+    port.read.side_effect = [b'\r', b'\n', None]
+
+    card = notecard.OpenSerial(port)
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in "{}\r\n"]
+
+    response = card.set(product="com.blues.tester",
+                        sn="foo",
+                        mode="continuous",
+                        minutes=2,
+                        hours=1,
+                        sync=True)
+
+    assert response == {}
