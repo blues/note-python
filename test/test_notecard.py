@@ -1,6 +1,7 @@
 import os
 import sys
 import serial
+import periphery
 
 from unittest.mock import Mock, MagicMock, patch
 
@@ -17,3 +18,12 @@ def test_open_serial():
     card = notecard.OpenSerial(port)
     
     assert card.uart is not None
+
+def test_open_i2c():
+    periphery = Mock()
+    port = periphery.I2C("dev/i2c-foo")
+    port.try_lock.return_value = True
+    
+    card = notecard.OpenI2C(port, 0x17, 255)
+    
+    assert card.i2c is not None
