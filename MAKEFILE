@@ -1,6 +1,14 @@
-test:
-	flake8 test/ notecard/ example/ --count --ignore=E722,F401,F403,W503 --show-source --statistics
-	pytest test --cov=notecard
+VENV_NAME?=env
+VENV_ACTIVATE=. $(VENV_NAME)/bin/activate
+PYTHON=${VENV_NAME}/bin/python3
 
-coverage:
-	pytest test --doctest-modules --junitxml=junit/test-results.xml --cov=notecard --cov-report=xml --cov-report=html
+default: test
+
+venv: $(VENV_NAME)/bin/activate
+
+test: venv
+	${PYTHON} -m flake8 test/ notecard/ example/ --count --ignore=E722,F401,F403,W503 --show-source --statistics
+	${PYTHON} -m pytest test --cov=notecard
+
+coverage: venv
+	${PYTHON} -m pytest test --doctest-modules --junitxml=junit/test-results.xml --cov=notecard --cov-report=xml --cov-report=html
