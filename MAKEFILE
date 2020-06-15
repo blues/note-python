@@ -1,0 +1,6 @@
+test:
+	flake8 test/ notecard/ example/ --count --ignore=E722,F401,F403,W503 --show-source --statistics
+	pytest test --cov=notecard
+
+coverage:
+	pytest test --doctest-modules --junitxml=junit/test-results.xml --cov=notecard --cov-report=xml --cov-report=html
