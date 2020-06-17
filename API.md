@@ -35,14 +35,16 @@
 
 ## Service Commands
 
+`from notecard import service`
+
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `service.get`          | ???                |
-| `service.log`          | ???                |
-| `service.set`          | ???                |
-| `service.status`       | ???                |
-| `service.sync`         | ???                |
-| `service.sync.status`  | ???                |
+| `service.get`          | service.get        |
+| `service.log`          | service.log        |
+| `service.set`          | service.set        |
+| `service.status`       | service.status     |
+| `service.sync`         | service.sync       |
+| `service.sync.status`  | service.syncStatus |
 
 ## DFU Commands
 
