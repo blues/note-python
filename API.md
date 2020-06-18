@@ -14,9 +14,9 @@
 | `card.motion.track`    | ???                |
 | `card.restart`         | ???                |
 | `card.restore`         | ???                |
-| `card.status`          | ???                |
+| `card.status`          | card.status        |
 | `card.temp`            | ???                |
-| `card.time`            | ???                |
+| `card.time`            | card.time          |
 | `card.usage.get`       | ???                |
 | `card.usage.set`       | ???                |
 | `card.version`         | ???                |

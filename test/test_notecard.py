@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath(
                 os.path.join(os.path.dirname(__file__), '..')))
 
 import notecard  # noqa: E402
-from notecard import service  # noqa: E402
+from notecard import card, service  # noqa: E402
 
 
 def get_serial_and_port():
@@ -18,9 +18,9 @@ def get_serial_and_port():
     port = serial.Serial("/dev/tty.foo", 9600)
     port.read.side_effect = [b'\r', b'\n', None]
 
-    card = notecard.OpenSerial(port)
+    nCard = notecard.OpenSerial(port)
 
-    return (card, port)
+    return (nCard, port)
 
 
 def get_i2c_and_port():
@@ -28,42 +28,42 @@ def get_i2c_and_port():
     port = periphery.I2C("dev/i2c-foo")
     port.try_lock.return_value = True
 
-    card = notecard.OpenI2C(port, 0x17, 255)
+    nCard = notecard.OpenI2C(port, 0x17, 255)
 
-    return (card, port)
+    return (nCard, port)
 
 
 def test_open_serial():
-    card, _ = get_serial_and_port()
+    nCard, _ = get_serial_and_port()
 
-    assert card.uart is not None
+    assert nCard.uart is not None
 
 
 def test_open_i2c():
-    card, _ = get_i2c_and_port()
+    nCard, _ = get_i2c_and_port()
 
-    assert card.i2c is not None
+    assert nCard.i2c is not None
 
 
 def test_transaction():
-    card, port = get_serial_and_port()
+    nCard, port = get_serial_and_port()
 
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{\"connected\":true}\r\n"]
 
-    response = card.Transaction({"req": "service.status"})
+    response = nCard.Transaction({"req": "service.status"})
 
     assert "connected" in response
     assert response["connected"] is True
 
 
 def test_service_set():
-    card, port = get_serial_and_port()
+    nCard, port = get_serial_and_port()
 
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{}\r\n"]
 
-    response = service.set(card, product="com.blues.tester",
+    response = service.set(nCard, product="com.blues.tester",
                            sn="foo",
                            mode="continuous",
                            minutes=2,
@@ -79,59 +79,84 @@ def test_service_set_invalid_card():
 
 
 def test_service_sync():
-    card, port = get_serial_and_port()
+    nCard, port = get_serial_and_port()
 
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{}\r\n"]
 
-    response = service.sync(card)
+    response = service.sync(nCard)
 
     assert response == {}
 
 
 def test_service_sync_status():
-    card, port = get_serial_and_port()
+    nCard, port = get_serial_and_port()
 
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{\"status\":\"connected\"}\r\n"]
 
-    response = service.syncStatus(card)
+    response = service.syncStatus(nCard)
 
     assert "status" in response
     assert response["status"] == "connected"
 
 
 def test_service_status():
-    card, port = get_serial_and_port()
+    nCard, port = get_serial_and_port()
 
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{\"connected\":true}\r\n"]
 
-    response = service.status(card)
+    response = service.status(nCard)
 
     assert "connected" in response
     assert response["connected"] is True
 
 
 def test_service_log():
-    card, port = get_serial_and_port()
+    nCard, port = get_serial_and_port()
 
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{}\r\n"]
 
-    response = service.log(card, "there's been an issue!", False)
+    response = service.log(nCard, "there's been an issue!", False)
 
     assert response == {}
 
 
 def test_service_get():
-    card, port = get_serial_and_port()
+    nCard, port = get_serial_and_port()
 
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{\"mode\":\"continuous\"}\r\n"]
 
-    response = service.get(card)
+    response = service.get(nCard)
 
     assert "mode" in response
     assert response["mode"] == "continuous"
 
+
+def test_card_time():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"time\":1592490375}\r\n"]
+
+    response = card.time(nCard)
+
+    assert "time" in response
+    assert response["time"] == 1592490375
+
+
+def test_card_status():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"usb\":true,\"status\":\"{normal}\"}\r\n"]
+
+    response = card.status(nCard)
+
+    assert "status" in response
+    assert response["status"] == "{normal}"
