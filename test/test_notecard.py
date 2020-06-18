@@ -13,32 +13,41 @@ import notecard  # noqa: E402
 from notecard import service  # noqa: E402
 
 
-def test_open_serial():
+def get_serial_and_port():
     serial = Mock()  # noqa: F811
     port = serial.Serial("/dev/tty.foo", 9600)
     port.read.side_effect = [b'\r', b'\n', None]
 
     card = notecard.OpenSerial(port)
 
-    assert card.uart is not None
+    return (card, port)
 
 
-def test_open_i2c():
+def get_i2c_and_port():
     periphery = Mock()  # noqa: F811
     port = periphery.I2C("dev/i2c-foo")
     port.try_lock.return_value = True
 
     card = notecard.OpenI2C(port, 0x17, 255)
 
+    return (card, port)
+
+
+def test_open_serial():
+    card, _ = get_serial_and_port()
+
+    assert card.uart is not None
+
+
+def test_open_i2c():
+    card, _ = get_i2c_and_port()
+
     assert card.i2c is not None
 
 
 def test_transaction():
-    serial = Mock()  # noqa: F811
-    port = serial.Serial("/dev/tty.foo", 9600)
-    port.read.side_effect = [b'\r', b'\n', None]
+    card, port = get_serial_and_port()
 
-    card = notecard.OpenSerial(port)
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{\"connected\":true}\r\n"]
 
@@ -49,11 +58,8 @@ def test_transaction():
 
 
 def test_service_set():
-    serial = Mock()  # noqa: F811
-    port = serial.Serial("/dev/tty.foo", 9600)
-    port.read.side_effect = [b'\r', b'\n', None]
+    card, port = get_serial_and_port()
 
-    card = notecard.OpenSerial(port)
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{}\r\n"]
 
@@ -73,11 +79,8 @@ def test_service_set_invalid_card():
 
 
 def test_service_sync():
-    serial = Mock()  # noqa: F811
-    port = serial.Serial("/dev/tty.foo", 9600)
-    port.read.side_effect = [b'\r', b'\n', None]
+    card, port = get_serial_and_port()
 
-    card = notecard.OpenSerial(port)
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{}\r\n"]
 
@@ -87,11 +90,8 @@ def test_service_sync():
 
 
 def test_service_sync_status():
-    serial = Mock()  # noqa: F811
-    port = serial.Serial("/dev/tty.foo", 9600)
-    port.read.side_effect = [b'\r', b'\n', None]
+    card, port = get_serial_and_port()
 
-    card = notecard.OpenSerial(port)
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{\"status\":\"connected\"}\r\n"]
 
@@ -102,11 +102,8 @@ def test_service_sync_status():
 
 
 def test_service_status():
-    serial = Mock()  # noqa: F811
-    port = serial.Serial("/dev/tty.foo", 9600)
-    port.read.side_effect = [b'\r', b'\n', None]
+    card, port = get_serial_and_port()
 
-    card = notecard.OpenSerial(port)
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{\"connected\":true}\r\n"]
 
@@ -117,11 +114,8 @@ def test_service_status():
 
 
 def test_service_log():
-    serial = Mock()  # noqa: F811
-    port = serial.Serial("/dev/tty.foo", 9600)
-    port.read.side_effect = [b'\r', b'\n', None]
+    card, port = get_serial_and_port()
 
-    card = notecard.OpenSerial(port)
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{}\r\n"]
 
@@ -131,11 +125,8 @@ def test_service_log():
 
 
 def test_service_get():
-    serial = Mock()  # noqa: F811
-    port = serial.Serial("/dev/tty.foo", 9600)
-    port.read.side_effect = [b'\r', b'\n', None]
+    card, port = get_serial_and_port()
 
-    card = notecard.OpenSerial(port)
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{\"mode\":\"continuous\"}\r\n"]
 
@@ -143,3 +134,4 @@ def test_service_get():
 
     assert "mode" in response
     assert response["mode"] == "continuous"
+
