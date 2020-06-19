@@ -2,6 +2,8 @@
 
 ## Card Commands
 
+`from notecard import card`
+
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
 | `card.attn`            | ???                |
@@ -18,7 +20,7 @@
 | `card.temp`            | ???                |
 | `card.time`            | card.time          |
 | `card.usage.get`       | ???                |
-| `card.usage.set`       | ???                |
+| `card.usage.test`      | ???                |
 | `card.version`         | ???                |
 | `card.voltage`         | ???                |
 | `card.wireless`        | ???                |
@@ -50,8 +52,8 @@
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `dfu.get`              | ???                |
-| `dfu.set`              | ???                |
+| `dfu.get`              | NOT IMPLEMENTED    |
+| `dfu.set`              | NOT IMPLEMENTED    |
 
 ## Env Commands
 
@@ -66,13 +68,6 @@
 | `file.changes`         | ???                |
 | `file.delete`          | ???                |
 | `file.stats`           | ???                |
-
-## Hub Commands
-
-| Notecard API           | Python Library API |
-| -----------------------| -------------------|
-| `hub.env.get`          | ???                |
-| `hub.env.set`          | ???                |
 
 ## Web Commands
 

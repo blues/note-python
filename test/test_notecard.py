@@ -160,3 +160,16 @@ def test_card_status():
 
     assert "status" in response
     assert response["status"] == "{normal}"
+
+
+def test_card_temp():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"value\":33.625,\"calibration\":-3.0}\r\n"]
+
+    response = card.temp(nCard)
+
+    assert "value" in response
+    assert response["value"] == 33.625
