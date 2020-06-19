@@ -2,80 +2,77 @@
 
 ## Card Commands
 
+`from notecard import card`
+
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `card.attn`            | CardAttn           |
-| `card.aux`             | CardAux            |
-| `card.contact`         | CardContact        |
-| `card.location.mode`   | CardLocationMode   |
-| `card.location.track`  | CardLocationTrack  |
-| `card.motion.mode`     | CardMotionMode     |
-| `card.motion.sync`     | CardMotionSync     |
-| `card.motion.track`    | CardMotionTrack    |
-| `card.restart`         | CardRestart        |
-| `card.restore`         | CardRestore        |
-| `card.status`          | CardStatus         |
-| `card.temp`            | CardTemp           |
-| `card.time`            | CardTime           |
-| `card.usage.get`       | CardGetUsage       |
-| `card.usage.set`       | CardSetUsage       |
-| `card.version`         | CardVersion        |
-| `card.voltage`         | CardVoltage        |
-| `card.wireless`        | CardWireless       |
+| `card.attn`            | ???                |
+| `card.aux`             | ???                |
+| `card.contact`         | ???                |
+| `card.location.mode`   | ???                |
+| `card.location.track`  | ???                |
+| `card.motion.mode`     | ???                |
+| `card.motion.sync`     | ???                |
+| `card.motion.track`    | ???                |
+| `card.restart`         | ???                |
+| `card.restore`         | ???                |
+| `card.status`          | card.status        |
+| `card.temp`            | ???                |
+| `card.time`            | card.time          |
+| `card.usage.get`       | ???                |
+| `card.usage.test`      | ???                |
+| `card.version`         | ???                |
+| `card.voltage`         | ???                |
+| `card.wireless`        | ???                |
 
 ## Note Commands
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `note.add`             | AddNote            |
-| `note.changes`         | GetNoteChanges     |
-| `note.delete`          | DeleteNote         |
-| `note.get`             | GetNote            |
-| `note.update`          | UpdateNote         |
+| `note.add`             | ???                |
+| `note.changes`         | ???                |
+| `note.delete`          | ???                |
+| `note.get`             | ???                |
+| `note.update`          | ???                |
 
 ## Service Commands
 
+`from notecard import service`
+
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `service.get`          | GetService         |
-| `service.log`          | ServiceLog         |
-| `service.set`          | SetService         |
-| `service.status`       | ServiceStatus      |
-| `service.sync`         | Sync               |
-| `service.sync.status`  | SyncStatus         |
+| `service.get`          | service.get        |
+| `service.log`          | service.log        |
+| `service.set`          | service.set        |
+| `service.status`       | service.status     |
+| `service.sync`         | service.sync       |
+| `service.sync.status`  | service.syncStatus |
 
 ## DFU Commands
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `dfu.get`              | DFUGet             |
-| `dfu.set`              | DFUSet             |
+| `dfu.get`              | NOT IMPLEMENTED    |
+| `dfu.set`              | NOT IMPLEMENTED    |
 
 ## Env Commands
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `get`                  | EnvGet             |
+| `get`                  | ???                |
 
 ## File Commands
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `file.changes`         | GetFileChanges     |
-| `file.delete`          | DeleteFile         |
-| `file.stats`           | GetFileStats       |
-
-## Hub Commands
-
-| Notecard API           | Python Library API |
-| -----------------------| -------------------|
-| `hub.env.get`          | HubEnvGet          |
-| `hub.env.set`          | HubEnvSet          |
+| `file.changes`         | ???                |
+| `file.delete`          | ???                |
+| `file.stats`           | ???                |
 
 ## Web Commands
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `web.get`              | WebGet             |
-| `web.post`             | WebPost            |
-| `web.put`              | WebPut             |
+| `web.get`              | ???                |
+| `web.post`             | ???                |
+| `web.put`              | ???                |
