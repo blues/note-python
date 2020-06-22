@@ -42,11 +42,11 @@ class Notecard:
 class OpenSerial(Notecard):
 
     def Request(self, req):
-        self.Transaction(self, req)
+        self.Transaction(req)
         return True
 
     def RequestResponse(self, req):
-        return self.Transaction(self, req)
+        return self.Transaction(req)
 
     def Transaction(self, req):
         req_json = json.dumps(req)
