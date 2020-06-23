@@ -23,3 +23,14 @@ def temp(card):
 
     req = {"req": "card.temp"}
     return card.Transaction(req)
+
+
+def wireless(card, mode=None):
+    if not isinstance(card, notecard.Notecard):
+        raise Exception("Notecard object required")
+
+    req = {"req": "card.wireless"}
+    if mode:
+        req["mode"] = mode
+
+    return card.Transaction(req)

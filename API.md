@@ -17,13 +17,13 @@
 | `card.restart`         | ???                |
 | `card.restore`         | ???                |
 | `card.status`          | card.status        |
-| `card.temp`            | ???                |
+| `card.temp`            | card.temp          |
 | `card.time`            | card.time          |
 | `card.usage.get`       | ???                |
 | `card.usage.test`      | ???                |
 | `card.version`         | ???                |
 | `card.voltage`         | ???                |
-| `card.wireless`        | ???                |
+| `card.wireless`        | card.wireless      |
 
 ## Note Commands
 

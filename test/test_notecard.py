@@ -173,3 +173,16 @@ def test_card_temp():
 
     assert "value" in response
     assert response["value"] == 33.625
+
+
+def test_card_wireless():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"status\":\"{modem-off}\",\"count\":1}\r\n"]
+
+    response = card.wireless(nCard, mode="auto")
+
+    assert "status" in response
+    assert response["status"] == "{modem-off}"
