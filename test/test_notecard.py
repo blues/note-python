@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath(
                 os.path.join(os.path.dirname(__file__), '..')))
 
 import notecard  # noqa: E402
-from notecard import card, service  # noqa: E402
+from notecard import card, service, note  # noqa: E402
 
 
 def get_serial_and_port():
@@ -186,3 +186,16 @@ def test_card_wireless():
 
     assert "status" in response
     assert response["status"] == "{modem-off}"
+
+
+def test_note_get():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"note\":\"s\",\"body\":{\"s\":\"foo\"}}\r\n"]
+
+    response = note.get(nCard, file="settings.db", note_id="s")
+
+    assert "note" in response
+    assert response["note"] == "s"
