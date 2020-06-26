@@ -32,7 +32,7 @@
 | `note.add`             | ???                |
 | `note.changes`         | ???                |
 | `note.delete`          | ???                |
-| `note.get`             | ???                |
+| `note.get`             | note.get           |
 | `note.update`          | ???                |
 
 ## Service Commands
