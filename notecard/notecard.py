@@ -4,10 +4,14 @@ import json
 import time
 
 use_periphery = False
+use_serial_lock = False
 if sys.implementation.name == 'cpython':
     if sys.platform == "linux" or sys.platform == "linux2":
         use_periphery = True
         from periphery import I2C
+
+        use_serial_lock = True
+        from filelock import Timeout, FileLock
 
 NOTECARD_I2C_ADDRESS = 0x17
 notecardDebug = True
@@ -33,6 +37,67 @@ def serialReadByte(port):
     return port.read(1)
 
 
+def serialReset(port):
+    for i in range(10):
+        try:
+            port.write(b'\n')
+        except:
+            continue
+        time.sleep(0.5)
+        somethingFound = False
+        nonControlCharFound = False
+        while True:
+            data = serialReadByte(port)
+            if data is None:
+                break
+            somethingFound = True
+            if data[0] >= 0x20:
+                nonControlCharFound = True
+        if somethingFound and not nonControlCharFound:
+            break
+        else:
+            raise Exception("Notecard not responding")
+
+
+def serialTransaction(port, req):
+    req_json = json.dumps(req)
+    if notecardDebug:
+        print(req_json)
+    req_json += "\n"
+
+    seg_off = 0
+    seg_left = len(req_json)
+    while True:
+        seg_len = seg_left
+        if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
+            seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
+
+        port.write(req_json[seg_off:seg_off + seg_len]
+                   .encode('utf-8'))
+        seg_off += seg_len
+        seg_left -= seg_len
+        if seg_left == 0:
+            break
+        time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+
+    rsp_json = ""
+    while True:
+        data = serialReadByte(port)
+        if data is None:
+            continue
+        try:
+            data_string = data.decode('utf-8')
+            if data_string == "\n":
+                break
+            rsp_json += data_string
+        except:
+            pass
+    if notecardDebug:
+        print(rsp_json.rstrip())
+    rsp = json.loads(rsp_json)
+    return rsp
+
+
 class Notecard:
 
     def __init__(self):
@@ -49,65 +114,34 @@ class OpenSerial(Notecard):
         return self.Transaction(req)
 
     def Transaction(self, req):
-        req_json = json.dumps(req)
-        if notecardDebug:
-            print(req_json)
-        req_json += "\n"
-
-        seg_off = 0
-        seg_left = len(req_json)
-        while True:
-            seg_len = seg_left
-            if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
-                seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
-            self.uart.write(req_json[seg_off:seg_off + seg_len]
-                            .encode('utf-8'))
-            seg_off += seg_len
-            seg_left -= seg_len
-            if seg_left == 0:
-                break
-            time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
-
-        rsp_json = ""
-        while True:
-            data = serialReadByte(self.uart)
-            if data is None:
-                continue
+        if use_serial_lock:
             try:
-                data_string = data.decode('utf-8')
-                if data_string == "\n":
-                    break
-                rsp_json += data_string
-            except:
-                pass
-        if notecardDebug:
-            print(rsp_json.rstrip())
-        rsp = json.loads(rsp_json)
-        return rsp
+                self.lock.acquire(timeout=5)
+                return serialTransaction(self.uart, req)
+            except Timeout:
+                raise Exception("Notecard in use")
+            finally:
+                self.lock.release()
+        else:
+            return serialTransaction(self.uart, req)
 
     def Reset(self):
-        for i in range(10):
+        if use_serial_lock:
             try:
-                self.uart.write(b'\n')
-            except:
-                continue
-            time.sleep(0.5)
-            somethingFound = False
-            nonControlCharFound = False
-            while True:
-                data = serialReadByte(self.uart)
-                if data is None:
-                    break
-                somethingFound = True
-                if data[0] >= 0x20:
-                    nonControlCharFound = True
-            if somethingFound and not nonControlCharFound:
-                break
-            else:
-                raise Exception("Notecard not responding")
+                self.lock.acquire(timeout=5)
+                serialReset(self.uart)
+            except Timeout:
+                raise Exception("Notecard in use")
+            finally:
+                self.lock.release()
+        else:
+            serialReset(self.uart)
 
     def __init__(self, uart_id):
         self.uart = uart_id
+
+        if use_serial_lock:
+            self.lock = FileLock('serial.lock', timeout=1)
         super().__init__()
 
 
