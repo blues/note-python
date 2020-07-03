@@ -6,7 +6,7 @@
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `card.attn`            | ???                |
+| `card.attn`            | card.attn          |
 | `card.aux`             | ???                |
 | `card.contact`         | ???                |
 | `card.location.mode`   | ???                |
@@ -27,9 +27,11 @@
 
 ## Note Commands
 
+`from notecard import note`
+
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `note.add`             | ???                |
+| `note.add`             | note.add           |
 | `note.changes`         | ???                |
 | `note.delete`          | ???                |
 | `note.get`             | note.get           |
