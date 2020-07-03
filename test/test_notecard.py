@@ -173,3 +173,23 @@ def test_card_temp():
 
     assert "value" in response
     assert response["value"] == 33.625
+
+
+def test_debug_mode_on_serial():
+    serial = Mock()  # noqa: F811
+    port = serial.Serial("/dev/tty.foo", 9600)
+    port.read.side_effect = [b'\r', b'\n', None]
+
+    nCard = notecard.OpenSerial(port, debug=True)
+
+    assert nCard._debug
+
+
+def test_debug_mode_on_i2c():
+    periphery = Mock()  # noqa: F811
+    port = periphery.I2C("dev/i2c-foo")
+    port.try_lock.return_value = True
+
+    nCard = notecard.OpenI2C(port, 0x17, 255, debug=True)
+
+    assert nCard._debug
