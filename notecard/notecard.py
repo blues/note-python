@@ -14,7 +14,6 @@ if sys.implementation.name == 'cpython':
         from filelock import Timeout, FileLock
 
 NOTECARD_I2C_ADDRESS = 0x17
-notecardDebug = True
 
 # The notecard is a real-time device that has a fixed size interrupt buffer.
 # We can push data at it far, far faster than it can process it,
@@ -59,9 +58,9 @@ def serialReset(port):
             raise Exception("Notecard not responding")
 
 
-def serialTransaction(port, req):
+def serialTransaction(port, req, debug):
     req_json = json.dumps(req)
-    if notecardDebug:
+    if debug:
         print(req_json)
     req_json += "\n"
 
@@ -92,7 +91,7 @@ def serialTransaction(port, req):
             rsp_json += data_string
         except:
             pass
-    if notecardDebug:
+    if debug:
         print(rsp_json.rstrip())
     rsp = json.loads(rsp_json)
     return rsp
@@ -117,13 +116,13 @@ class OpenSerial(Notecard):
         if use_serial_lock:
             try:
                 self.lock.acquire(timeout=5)
-                return serialTransaction(self.uart, req)
+                return serialTransaction(self.uart, req, self._debug)
             except Timeout:
                 raise Exception("Notecard in use")
             finally:
                 self.lock.release()
         else:
-            return serialTransaction(self.uart, req)
+            return serialTransaction(self.uart, req, self._debug)
 
     def Reset(self):
         if use_serial_lock:
@@ -137,8 +136,9 @@ class OpenSerial(Notecard):
         else:
             serialReset(self.uart)
 
-    def __init__(self, uart_id):
+    def __init__(self, uart_id, debug=False):
         self.uart = uart_id
+        self._debug = debug
 
         if use_serial_lock:
             self.lock = FileLock('serial.lock', timeout=1)
@@ -150,7 +150,7 @@ class OpenI2C(Notecard):
     def Transaction(self, req):
 
         req_json = json.dumps(req)
-        if notecardDebug:
+        if self._debug:
             print(req_json)
 
         req_json += "\n"
@@ -222,7 +222,7 @@ class OpenI2C(Notecard):
         finally:
             self.unlock()
 
-        if notecardDebug:
+        if self._debug:
             print(rsp_json.rstrip())
         rsp = json.loads(rsp_json)
         return rsp
@@ -266,8 +266,9 @@ class OpenI2C(Notecard):
             return self.i2c.unlock()
         return True
 
-    def __init__(self, i2c, address, max_transfer):
+    def __init__(self, i2c, address, max_transfer, debug=False):
         self.i2c = i2c
+        self._debug = debug
         if address == 0:
             self.addr = NOTECARD_I2C_ADDRESS
         else:
