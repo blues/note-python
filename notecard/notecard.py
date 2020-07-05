@@ -18,7 +18,7 @@ NOTECARD_I2C_ADDRESS = 0x17
 # The notecard is a real-time device that has a fixed size interrupt buffer.
 # We can push data at it far, far faster than it can process it,
 # therefore we push it in segments with a pause between each segment.
-CARD_REQUEST_SEGMENT_MAX_LEN = 1000
+CARD_REQUEST_SEGMENT_MAX_LEN = 250
 CARD_REQUEST_SEGMENT_DELAY_MS = 250
 
 
