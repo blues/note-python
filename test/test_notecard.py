@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath(
                 os.path.join(os.path.dirname(__file__), '..')))
 
 import notecard  # noqa: E402
-from notecard import card, service  # noqa: E402
+from notecard import card, hub, note  # noqa: E402
 
 
 def get_serial_and_port():
@@ -51,7 +51,7 @@ def test_transaction():
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{\"connected\":true}\r\n"]
 
-    response = nCard.Transaction({"req": "service.status"})
+    response = nCard.Transaction({"req": "hub.status"})
 
     assert "connected" in response
     assert response["connected"] is True
@@ -63,19 +63,19 @@ def test_service_set():
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{}\r\n"]
 
-    response = service.set(nCard, product="com.blues.tester",
-                           sn="foo",
-                           mode="continuous",
-                           minutes=2,
-                           hours=1,
-                           sync=True)
+    response = hub.set(nCard, product="com.blues.tester",
+                       sn="foo",
+                       mode="continuous",
+                       minutes=2,
+                       hours=1,
+                       sync=True)
 
     assert response == {}
 
 
 def test_service_set_invalid_card():
     with pytest.raises(Exception, match="Notecard object required"):
-        service.set(None, product="com.blues.tester")
+        hub.set(None, product="com.blues.tester")
 
 
 def test_service_sync():
@@ -84,7 +84,7 @@ def test_service_sync():
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{}\r\n"]
 
-    response = service.sync(nCard)
+    response = hub.sync(nCard)
 
     assert response == {}
 
@@ -95,7 +95,7 @@ def test_service_sync_status():
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{\"status\":\"connected\"}\r\n"]
 
-    response = service.syncStatus(nCard)
+    response = hub.syncStatus(nCard)
 
     assert "status" in response
     assert response["status"] == "connected"
@@ -107,7 +107,7 @@ def test_service_status():
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{\"connected\":true}\r\n"]
 
-    response = service.status(nCard)
+    response = hub.status(nCard)
 
     assert "connected" in response
     assert response["connected"] is True
@@ -119,7 +119,7 @@ def test_service_log():
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{}\r\n"]
 
-    response = service.log(nCard, "there's been an issue!", False)
+    response = hub.log(nCard, "there's been an issue!", False)
 
     assert response == {}
 
@@ -130,7 +130,7 @@ def test_service_get():
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{\"mode\":\"continuous\"}\r\n"]
 
-    response = service.get(nCard)
+    response = hub.get(nCard)
 
     assert "mode" in response
     assert response["mode"] == "continuous"
@@ -173,6 +173,32 @@ def test_card_temp():
 
     assert "value" in response
     assert response["value"] == 33.625
+
+
+def test_card_wireless():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"status\":\"{modem-off}\",\"count\":1}\r\n"]
+
+    response = card.wireless(nCard, mode="auto")
+
+    assert "status" in response
+    assert response["status"] == "{modem-off}"
+
+
+def test_note_get():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"note\":\"s\",\"body\":{\"s\":\"foo\"}}\r\n"]
+
+    response = note.get(nCard, file="settings.db", note_id="s")
+
+    assert "note" in response
+    assert response["note"] == "s"
 
 
 def test_debug_mode_on_serial():

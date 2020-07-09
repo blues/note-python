@@ -6,7 +6,7 @@
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `card.attn`            | ???                |
+| `card.attn`            | card.attn          |
 | `card.aux`             | ???                |
 | `card.contact`         | ???                |
 | `card.location.mode`   | ???                |
@@ -17,22 +17,24 @@
 | `card.restart`         | ???                |
 | `card.restore`         | ???                |
 | `card.status`          | card.status        |
-| `card.temp`            | ???                |
+| `card.temp`            | card.temp          |
 | `card.time`            | card.time          |
 | `card.usage.get`       | ???                |
 | `card.usage.test`      | ???                |
 | `card.version`         | ???                |
 | `card.voltage`         | ???                |
-| `card.wireless`        | ???                |
+| `card.wireless`        | card.wireless      |
 
 ## Note Commands
 
+`from notecard import note`
+
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `note.add`             | ???                |
+| `note.add`             | note.add           |
 | `note.changes`         | ???                |
 | `note.delete`          | ???                |
-| `note.get`             | ???                |
+| `note.get`             | note.get           |
 | `note.update`          | ???                |
 
 ## Service Commands
