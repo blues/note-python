@@ -7,22 +7,22 @@
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
 | `card.attn`            | card.attn          |
-| `card.aux`             | ???                |
-| `card.contact`         | ???                |
-| `card.location.mode`   | ???                |
-| `card.location.track`  | ???                |
-| `card.motion.mode`     | ???                |
-| `card.motion.sync`     | ???                |
-| `card.motion.track`    | ???                |
-| `card.restart`         | ???                |
-| `card.restore`         | ???                |
+| `card.aux`             | NOT IMPLEMENTED                |
+| `card.contact`         | NOT IMPLEMENTED                 |
+| `card.location.mode`   | NOT IMPLEMENTED                 |
+| `card.location.track`  | NOT IMPLEMENTED                 |
+| `card.motion.mode`     | NOT IMPLEMENTED                 |
+| `card.motion.sync`     | NOT IMPLEMENTED                 |
+| `card.motion.track`    | NOT IMPLEMENTED                 |
+| `card.restart`         | NOT IMPLEMENTED                 |
+| `card.restore`         | NOT IMPLEMENTED                 |
 | `card.status`          | card.status        |
 | `card.temp`            | card.temp          |
 | `card.time`            | card.time          |
-| `card.usage.get`       | ???                |
-| `card.usage.test`      | ???                |
-| `card.version`         | ???                |
-| `card.voltage`         | ???                |
+| `card.usage.get`       | NOT IMPLEMENTED                 |
+| `card.usage.test`      | NOT IMPLEMENTED                 |
+| `card.version`         | NOT IMPLEMENTED                 |
+| `card.voltage`         | NOT IMPLEMENTED                 |
 | `card.wireless`        | card.wireless      |
 
 ## Note Commands
@@ -32,23 +32,23 @@
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
 | `note.add`             | note.add           |
-| `note.changes`         | ???                |
-| `note.delete`          | ???                |
+| `note.changes`         | NOT IMPLEMENTED                 |
+| `note.delete`          | NOT IMPLEMENTED                 |
 | `note.get`             | note.get           |
-| `note.update`          | ???                |
+| `note.update`          | NOT IMPLEMENTED                 |
 
-## Service Commands
+## Hub Commands
 
-`from notecard import service`
+`from notecard import hub`
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `service.get`          | service.get        |
-| `service.log`          | service.log        |
-| `service.set`          | service.set        |
-| `service.status`       | service.status     |
-| `service.sync`         | service.sync       |
-| `service.sync.status`  | service.syncStatus |
+| `hub.get`          | hub.get        |
+| `hub.log`          | hub.log        |
+| `hub.set`          | hub.set        |
+| `hub.status`       | hub.status     |
+| `hub.sync`         | hub.sync       |
+| `hub.sync.status`  | hub.syncStatus |
 
 ## DFU Commands
 
@@ -61,20 +61,20 @@
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `get`                  | ???                |
+| `get`                  | NOT IMPLEMENTED                 |
 
 ## File Commands
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `file.changes`         | ???                |
-| `file.delete`          | ???                |
-| `file.stats`           | ???                |
+| `file.changes`         | NOT IMPLEMENTED                 |
+| `file.delete`          | NOT IMPLEMENTED                 |
+| `file.stats`           | NOT IMPLEMENTED                 |
 
 ## Web Commands
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `web.get`              | ???                |
-| `web.post`             | ???                |
-| `web.put`              | ???                |
+| `web.get`              | NOT IMPLEMENTED                 |
+| `web.post`             | NOT IMPLEMENTED                 |
+| `web.put`              | NOT IMPLEMENTED                 |
