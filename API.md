@@ -21,8 +21,8 @@
 | `card.time`            | card.time          |
 | `card.usage.get`       | NOT IMPLEMENTED                 |
 | `card.usage.test`      | NOT IMPLEMENTED                 |
-| `card.version`         | NOT IMPLEMENTED                 |
-| `card.voltage`         | NOT IMPLEMENTED                 |
+| `card.version`         | card.version                 |
+| `card.voltage`         | card.voltage                 |
 | `card.wireless`        | card.wireless      |
 
 ## Note Commands
@@ -32,10 +32,10 @@
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
 | `note.add`             | note.add           |
-| `note.changes`         | NOT IMPLEMENTED                 |
-| `note.delete`          | NOT IMPLEMENTED                 |
+| `note.changes`         | note.changes       |
+| `note.delete`          | note.delete        |
 | `note.get`             | note.get           |
-| `note.update`          | NOT IMPLEMENTED                 |
+| `note.update`          | note.update        |
 
 ## Hub Commands
 
@@ -43,12 +43,12 @@
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `hub.get`          | hub.get        |
-| `hub.log`          | hub.log        |
-| `hub.set`          | hub.set        |
-| `hub.status`       | hub.status     |
-| `hub.sync`         | hub.sync       |
-| `hub.sync.status`  | hub.syncStatus |
+| `hub.get`              | hub.get            |
+| `hub.log`              | hub.log            |
+| `hub.set`              | hub.set            |
+| `hub.status`           | hub.status         |
+| `hub.sync`             | hub.sync           |
+| `hub.sync.status`      | hub.syncStatus     |
 
 ## DFU Commands
 
@@ -59,22 +59,25 @@
 
 ## Env Commands
 
+`from notecard import env`
+
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `get`                  | NOT IMPLEMENTED                 |
+| `get`                  | env.get            |
 
 ## File Commands
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `file.changes`         | NOT IMPLEMENTED                 |
-| `file.delete`          | NOT IMPLEMENTED                 |
-| `file.stats`           | NOT IMPLEMENTED                 |
+| `file.changes`         | file.changes       |
+| `file.delete`          | file.delete        |
+| `file.stats`           | file.stats         |
+| `file.changes.pending` | file.pendingChanges|
 
 ## Web Commands
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `web.get`              | NOT IMPLEMENTED                 |
-| `web.post`             | NOT IMPLEMENTED                 |
-| `web.put`              | NOT IMPLEMENTED                 |
+| `web.get`              | NOT IMPLEMENTED    |
+| `web.post`             | NOT IMPLEMENTED    |
+| `web.put`              | NOT IMPLEMENTED    |

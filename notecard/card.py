@@ -39,6 +39,30 @@ def temp(card):
     return card.Transaction(req)
 
 
+def version(card):
+    if not isinstance(card, notecard.Notecard):
+        raise Exception("Notecard object required")
+
+    req = {"req": "card.version"}
+    return card.Transaction(req)
+
+
+def voltage(card, hours=None, offset=None, vmax=None, vmin=None):
+    if not isinstance(card, notecard.Notecard):
+        raise Exception("Notecard object required")
+
+    req = {"req": "card.voltage"}
+    if hours:
+        req["hours"] = hours
+    if offset:
+        req["offset"] = offset
+    if vmax:
+        req["vmax"] = vmax
+    if vmin:
+        req["vmin"] = vmin
+    return card.Transaction(req)
+
+
 def wireless(card, mode=None):
     if not isinstance(card, notecard.Notecard):
         raise Exception("Notecard object required")

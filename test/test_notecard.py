@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath(
                 os.path.join(os.path.dirname(__file__), '..')))
 
 import notecard  # noqa: E402
-from notecard import card, hub, note  # noqa: E402
+from notecard import card, hub, note, env, file  # noqa: E402
 
 
 def get_serial_and_port():
@@ -57,7 +57,30 @@ def test_transaction():
     assert response["connected"] is True
 
 
-def test_service_set():
+def test_request_response():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in "{\"connected\":true}\r\n"]
+
+    response = nCard.RequestResponse({"req": "hub.status"})
+
+    assert "connected" in response
+    assert response["connected"] is True
+
+
+def test_request():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in "{\"connected\":true}\r\n"]
+
+    response = nCard.Request({"req": "hub.status"})
+
+    assert response is True
+
+
+def test_hub_set():
     nCard, port = get_serial_and_port()
 
     port.read.side_effect = [char.encode('utf-8')
@@ -73,12 +96,12 @@ def test_service_set():
     assert response == {}
 
 
-def test_service_set_invalid_card():
+def test_hub_set_invalid_card():
     with pytest.raises(Exception, match="Notecard object required"):
         hub.set(None, product="com.blues.tester")
 
 
-def test_service_sync():
+def test_hub_sync():
     nCard, port = get_serial_and_port()
 
     port.read.side_effect = [char.encode('utf-8')
@@ -89,7 +112,7 @@ def test_service_sync():
     assert response == {}
 
 
-def test_service_sync_status():
+def test_hub_sync_status():
     nCard, port = get_serial_and_port()
 
     port.read.side_effect = [char.encode('utf-8')
@@ -101,7 +124,7 @@ def test_service_sync_status():
     assert response["status"] == "connected"
 
 
-def test_service_status():
+def test_hub_status():
     nCard, port = get_serial_and_port()
 
     port.read.side_effect = [char.encode('utf-8')
@@ -113,7 +136,7 @@ def test_service_status():
     assert response["connected"] is True
 
 
-def test_service_log():
+def test_hub_log():
     nCard, port = get_serial_and_port()
 
     port.read.side_effect = [char.encode('utf-8')
@@ -124,7 +147,7 @@ def test_service_log():
     assert response == {}
 
 
-def test_service_get():
+def test_hub_get():
     nCard, port = get_serial_and_port()
 
     port.read.side_effect = [char.encode('utf-8')
@@ -175,6 +198,34 @@ def test_card_temp():
     assert response["value"] == 33.625
 
 
+def test_card_attn():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"set\":true}\r\n"]
+
+    response = card.attn(nCard, mode="arm, files",
+                         files=["sensors.qo"],
+                         seconds=10)
+
+    assert "set" in response
+    assert response["set"] is True
+
+
+def test_card_voltage():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"hours\":707}\r\n"]
+
+    response = card.voltage(nCard, hours=24, offset=5, vmax=4, vmin=3)
+
+    assert "hours" in response
+    assert response["hours"] == 707
+
+
 def test_card_wireless():
     nCard, port = get_serial_and_port()
 
@@ -188,6 +239,19 @@ def test_card_wireless():
     assert response["status"] == "{modem-off}"
 
 
+def test_card_version():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"version\":\"notecard-1.2.3.9950\"}\r\n"]
+
+    response = card.version(nCard)
+
+    assert "version" in response
+    assert response["version"] == "notecard-1.2.3.9950"
+
+
 def test_note_get():
     nCard, port = get_serial_and_port()
 
@@ -195,10 +259,57 @@ def test_note_get():
                              for char in
                              "{\"note\":\"s\",\"body\":{\"s\":\"foo\"}}\r\n"]
 
-    response = note.get(nCard, file="settings.db", note_id="s")
+    response = note.get(nCard, file="settings.db",
+                        note_id="s",
+                        delete=True,
+                        deleted=False)
 
     assert "note" in response
     assert response["note"] == "s"
+
+
+def test_note_delete():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{}\r\n"]
+
+    response = note.delete(nCard, file="settings.db", note_id="s")
+
+    assert response == {}
+
+
+def test_note_update():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{}\r\n"]
+
+    response = note.update(nCard, file="settings.db", note_id="s",
+                           body={}, payload="123dfb==")
+
+    assert response == {}
+
+
+def test_note_changes():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"changes\":5,\"total\":15}\r\n"]
+
+    response = note.changes(nCard, file="sensors.qo",
+                            tracker="123",
+                            max=10,
+                            start=True,
+                            stop=False,
+                            deleted=False,
+                            delete=True)
+
+    assert "changes" in response
+    assert response["changes"] == 5
 
 
 def test_debug_mode_on_serial():
@@ -219,3 +330,66 @@ def test_debug_mode_on_i2c():
     nCard = notecard.OpenI2C(port, 0x17, 255, debug=True)
 
     assert nCard._debug
+
+
+def test_env_get():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{}\r\n"]
+
+    response = env.get(nCard, name="pump")
+
+    assert response == {}
+
+
+def test_file_delete():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{}\r\n"]
+
+    response = file.delete(nCard, files=["sensors.qo"])
+
+    assert response == {}
+
+
+def test_file_changes():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"total\":5}\r\n"]
+
+    response = file.changes(nCard, tracker="123", files=["sensors.qo"])
+
+    assert "total" in response
+    assert response["total"] == 5
+
+
+def test_file_stats():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"total\":24}\r\n"]
+
+    response = file.stats(nCard)
+
+    assert "total" in response
+    assert response["total"] == 24
+
+
+def test_file_pendingChanges():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"changes\":1}\r\n"]
+
+    response = file.pendingChanges(nCard)
+
+    assert "changes" in response
+    assert response["changes"] == 1
