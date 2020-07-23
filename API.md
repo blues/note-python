@@ -67,6 +67,8 @@
 
 ## File Commands
 
+`from notecard import file`
+
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
 | `file.changes`         | file.changes       |
