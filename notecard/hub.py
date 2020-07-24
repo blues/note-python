@@ -4,8 +4,10 @@ This module contains helper methods for calling hub.*
 Notecard API commands.
 """
 import notecard
+from .validators import validate_card_object
 
 
+@validate_card_object
 def set(card, product, sn=None,
         mode=None, minutes=None, hours=None, sync=False):
     """Configure Notehub behavior on the Notecard.
@@ -22,9 +24,6 @@ def set(card, product, sn=None,
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "hub.set"}
     if product:
         req["product"] = product
@@ -42,45 +41,40 @@ def set(card, product, sn=None,
     return card.Transaction(req)
 
 
+@validate_card_object
 def sync(card):
     """Initiate a sync of the Notecard to Notehub.
 
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "hub.sync"}
     return card.Transaction(req)
 
 
+@validate_card_object
 def syncStatus(card):
     """Retrive the status of a sync request.
 
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "hub.sync.status"}
     return card.Transaction(req)
 
 
+@validate_card_object
 def status(card):
     """Retrieve the status of the Notecard's connection.
 
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "hub.status"}
     return card.Transaction(req)
 
 
+@validate_card_object
 def log(card, text, sync=False):
     """Send a log request to the Notecard.
 
@@ -91,23 +85,18 @@ def log(card, text, sync=False):
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "hub.log"}
     req["text"] = text
     req["sync"] = sync
     return card.Transaction(req)
 
 
+@validate_card_object
 def get(card):
     """Retrive the current Notehub configuration parameters.
 
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "hub.get"}
     return card.Transaction(req)

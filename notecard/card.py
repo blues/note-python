@@ -4,8 +4,10 @@ This module contains helper methods for calling card.*
 Notecard API commands.
 """
 import notecard
+from .validators import validate_card_object
 
 
+@validate_card_object
 def attn(card, mode=None, files=None, seconds=None):
     """Configure interrupt detection between a host and Notecard.
 
@@ -17,9 +19,6 @@ def attn(card, mode=None, files=None, seconds=None):
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "card.attn"}
     if mode:
         req["mode"] = mode
@@ -30,58 +29,51 @@ def attn(card, mode=None, files=None, seconds=None):
     return card.Transaction(req)
 
 
+@validate_card_object
 def time(card):
     """Retrieve the current time and date from the Notecard.
 
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "card.time"}
     return card.Transaction(req)
 
 
+@validate_card_object
 def status(card):
     """Retrieve the status of the Notecard.
 
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "card.status"}
     return card.Transaction(req)
 
 
+@validate_card_object
 def temp(card):
     """Retrieve the current temperature from the Notecard.
 
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "card.temp"}
     return card.Transaction(req)
 
 
+@validate_card_object
 def version(card):
     """Retrieve firmware version] information from the Notecard.
 
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "card.version"}
     return card.Transaction(req)
 
 
+@validate_card_object
 def voltage(card, hours=None, offset=None, vmax=None, vmin=None):
     """Retrive current and historical voltage info from the Notecard.
 
@@ -94,9 +86,6 @@ def voltage(card, hours=None, offset=None, vmax=None, vmin=None):
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "card.voltage"}
     if hours:
         req["hours"] = hours
@@ -109,6 +98,7 @@ def voltage(card, hours=None, offset=None, vmax=None, vmin=None):
     return card.Transaction(req)
 
 
+@validate_card_object
 def wireless(card, mode=None):
     """Retrive wireless modem info or customize modem behavior.
 
@@ -118,9 +108,6 @@ def wireless(card, mode=None):
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "card.wireless"}
     if mode:
         req["mode"] = mode

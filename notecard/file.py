@@ -4,8 +4,10 @@ This module contains helper methods for calling file.*
 Notecard API commands.
 """
 import notecard
+from .validators import validate_card_object
 
 
+@validate_card_object
 def changes(card, tracker=None, files=None):
     """Perform individual or batch queries on Notefiles.
 
@@ -16,9 +18,6 @@ def changes(card, tracker=None, files=None):
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "file.changes"}
     if tracker:
         req["tracker"] = tracker
@@ -27,6 +26,7 @@ def changes(card, tracker=None, files=None):
     return card.Transaction(req)
 
 
+@validate_card_object
 def delete(card, files=None):
     """Delete individual notefiles and their contents.
 
@@ -36,38 +36,31 @@ def delete(card, files=None):
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "file.delete"}
     if files:
         req["files"] = files
     return card.Transaction(req)
 
 
+@validate_card_object
 def stats(card):
     """Obtain statistics about local notefiles.
 
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "file.stats"}
 
     return card.Transaction(req)
 
 
+@validate_card_object
 def pendingChanges(card):
     """Retrive information about pending Notehub changes.
 
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "file.changes.pending"}
 
     return card.Transaction(req)

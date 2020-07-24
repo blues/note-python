@@ -213,6 +213,11 @@ def test_card_attn():
     assert response["set"] is True
 
 
+def test_card_attn_with_invalid_card():
+    with pytest.raises(Exception, match="Notecard object required"):
+        card.attn(None, mode="arm")
+
+
 def test_card_voltage():
     nCard, port = get_serial_and_port()
 

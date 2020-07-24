@@ -4,8 +4,10 @@ This module contains helper methods for calling env.*
 Notecard API commands.
 """
 import notecard
+from .validators import validate_card_object
 
 
+@validate_card_object
 def get(card, name=None):
     """Perform an env.get request against a Notecard.
 
@@ -15,9 +17,6 @@ def get(card, name=None):
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "env.get"}
     if name:
         req["name"] = name

@@ -4,8 +4,10 @@ This module contains helper methods for calling note.*
 Notecard API commands.
 """
 import notecard
+from .validators import validate_card_object
 
 
+@validate_card_object
 def changes(card, file=None, tracker=None, max=None,
             start=None, stop=None, deleted=None, delete=None):
     """Incrementally retrieve changes within a Notefile.
@@ -23,9 +25,6 @@ def changes(card, file=None, tracker=None, max=None,
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "note.changes"}
     if file:
         req["file"] = file
@@ -44,6 +43,7 @@ def changes(card, file=None, tracker=None, max=None,
     return card.Transaction(req)
 
 
+@validate_card_object
 def get(card, file="data.qi", note_id=None, delete=None, deleted=None):
     """Retrive a note from an inbound or DB Notefile.
 
@@ -58,9 +58,6 @@ def get(card, file="data.qi", note_id=None, delete=None, deleted=None):
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "note.get"}
     req["file"] = file
     if note_id:
@@ -72,6 +69,7 @@ def get(card, file="data.qi", note_id=None, delete=None, deleted=None):
     return card.Transaction(req)
 
 
+@validate_card_object
 def delete(card, file=None, note_id=None):
     """Delete a DB note in a Notefile by its ID.
 
@@ -82,9 +80,6 @@ def delete(card, file=None, note_id=None):
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "note.delete"}
     if file:
         req["file"] = file
@@ -93,6 +88,7 @@ def delete(card, file=None, note_id=None):
     return card.Transaction(req)
 
 
+@validate_card_object
 def update(card, file=None, note_id=None, body=None, payload=None):
     """Update a note in a DB Notefile by ID.
 
@@ -106,9 +102,6 @@ def update(card, file=None, note_id=None, body=None, payload=None):
     Returns:
         string: The result of the Notecard request.
     """
-    if not isinstance(card, notecard.Notecard):
-        raise Exception("Notecard object required")
-
     req = {"req": "note.get"}
     if file:
         req["file"] = file
