@@ -1,7 +1,21 @@
+"""file Fluent API Helper.
+
+This module contains helper methods for calling file.*
+Notecard API commands.
+"""
 import notecard
 
 
 def changes(card, tracker=None, files=None):
+    """Perform individual or batch queries on Notefiles.
+
+    Args:
+        tracker (string): A developer-defined tracker ID.
+        files (array): A list of Notefiles to retrieve changes for.
+
+    Returns:
+        string: The result of the Notecard request.
+    """
     if not isinstance(card, notecard.Notecard):
         raise Exception("Notecard object required")
 
@@ -14,6 +28,14 @@ def changes(card, tracker=None, files=None):
 
 
 def delete(card, files=None):
+    """Delete individual notefiles and their contents.
+
+    Args:
+        files (array): A list of Notefiles to delete.
+
+    Returns:
+        string: The result of the Notecard request.
+    """
     if not isinstance(card, notecard.Notecard):
         raise Exception("Notecard object required")
 
@@ -24,6 +46,11 @@ def delete(card, files=None):
 
 
 def stats(card):
+    """Obtain statistics about local notefiles.
+
+    Returns:
+        string: The result of the Notecard request.
+    """
     if not isinstance(card, notecard.Notecard):
         raise Exception("Notecard object required")
 
@@ -33,6 +60,11 @@ def stats(card):
 
 
 def pendingChanges(card):
+    """Retrive information about pending Notehub changes.
+
+    Returns:
+        string: The result of the Notecard request.
+    """
     if not isinstance(card, notecard.Notecard):
         raise Exception("Notecard object required")
 

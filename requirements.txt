@@ -7,3 +7,4 @@ flake8==3.8.3
 pytest==5.4.3
 pytest-cov==2.8.1
 filelock==3.0.12
+pydocstyle==5.0.2

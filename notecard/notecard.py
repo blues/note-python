@@ -1,4 +1,9 @@
+"""Main module for note-python.
 
+This module contains the core functionality for running the
+note-python library, including the main Notecard class, and
+Serial and I2C sub-classes.
+"""
 import sys
 import json
 import time
@@ -23,6 +28,7 @@ CARD_REQUEST_SEGMENT_DELAY_MS = 250
 
 
 def serialReadByte(port):
+    """Read a single byte from a Notecard."""
     if sys.implementation.name == 'micropython':
         if not port.any():
             return None
@@ -37,6 +43,7 @@ def serialReadByte(port):
 
 
 def serialReset(port):
+    """Send a reset command to a Notecard."""
     for i in range(10):
         try:
             port.write(b'\n')
@@ -59,6 +66,7 @@ def serialReset(port):
 
 
 def serialTransaction(port, req, debug):
+    """Perform a single write to a read from a Notecard."""
     req_json = json.dumps(req)
     if debug:
         print(req_json)
@@ -98,21 +106,31 @@ def serialTransaction(port, req, debug):
 
 
 class Notecard:
+    """Base Notecard class.
+
+    Primary Notecard Class, which provides a shared __init__
+    to reset the Notecard via Serial or I2C.
+    """
 
     def __init__(self):
+        """Initialize the Notecard through a reset."""
         self.Reset()
 
 
 class OpenSerial(Notecard):
+    """Notecard class for Serial communication."""
 
     def Request(self, req):
+        """Call the Transaction method and discard the result."""
         self.Transaction(req)
         return True
 
     def RequestResponse(self, req):
+        """Call the Transaction method and return the result."""
         return self.Transaction(req)
 
     def Transaction(self, req):
+        """Perform a Notecard transaction discard the result."""
         if use_serial_lock:
             try:
                 self.lock.acquire(timeout=5)
@@ -125,6 +143,7 @@ class OpenSerial(Notecard):
             return serialTransaction(self.uart, req, self._debug)
 
     def Reset(self):
+        """Reset the Notecard."""
         if use_serial_lock:
             try:
                 self.lock.acquire(timeout=5)
@@ -137,6 +156,7 @@ class OpenSerial(Notecard):
             serialReset(self.uart)
 
     def __init__(self, uart_id, debug=False):
+        """Initialize the Notecard before a reset."""
         self.uart = uart_id
         self._debug = debug
 
@@ -146,9 +166,10 @@ class OpenSerial(Notecard):
 
 
 class OpenI2C(Notecard):
+    """Notecard class for I2C communication."""
 
     def Transaction(self, req):
-
+        """Perform a Notecard transaction discard the result."""
         req_json = json.dumps(req)
         if self._debug:
             print(req_json)
@@ -228,6 +249,7 @@ class OpenI2C(Notecard):
         return rsp
 
     def Reset(self):
+        """Reset the Notecard."""
         chunk_len = 0
 
         while not self.lock():
@@ -257,16 +279,19 @@ class OpenI2C(Notecard):
         pass
 
     def lock(self):
+        """Lock the I2C port so the host can interact with the Notecard."""
         if not use_periphery:
             return self.i2c.try_lock()
         return True
 
     def unlock(self):
+        """Unlock the I2C port."""
         if not use_periphery:
             return self.i2c.unlock()
         return True
 
     def __init__(self, i2c, address, max_transfer, debug=False):
+        """Initialize the Notecard before a reset."""
         self.i2c = i2c
         self._debug = debug
         if address == 0:

@@ -1,3 +1,8 @@
+"""note-python CircuitPython example.
+
+This file contains a complete working sample for using the note-python
+library on a CircuitPython device.
+"""
 import sys
 import time
 import notecard
@@ -13,12 +18,26 @@ import busio  # noqa: E402
 
 
 def NotecardExceptionInfo(exception):
+    """Construct a formatted Exception string.
+
+    Args:
+        exception (Exception): An exception object.
+
+    Returns:
+        string: a summary of the exception with line number and details.
+    """
     name = exception.__class__.__name__
     return sys.platform + ": " + name \
         + ": " + ' '.join(map(str, exception.args))
 
 
 def transactionTest(card):
+    """Submit a simple JSON-based request to the Notecard.
+
+    Args:
+        card (object): An instance of the Notecard class
+
+    """
     req = {"req": "card.status"}
     req["string"] = "string"
     req["bool"] = True
@@ -34,6 +53,7 @@ def transactionTest(card):
 
 
 def main():
+    """Connect to Notcard and run a transaction test."""
     print("Opening port...")
     try:
         if use_uart:

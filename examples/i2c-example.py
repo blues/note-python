@@ -1,3 +1,8 @@
+"""note-python I2C example.
+
+This file contains a complete working sample for using the note-python
+library with an I2C Notecard connection.
+"""
 import sys
 import os
 import time
@@ -14,12 +19,26 @@ from periphery import I2C  # noqa: E402
 
 
 def NotecardExceptionInfo(exception):
+    """Construct a formatted Exception string.
+
+    Args:
+        exception (Exception): An exception object.
+
+    Returns:
+        string: a summary of the exception with line number and details.
+    """
     s1 = '{}'.format(sys.exc_info()[-1].tb_lineno)
     s2 = exception.__class__.__name__
     return "line " + s1 + ": " + s2 + ": " + ' '.join(map(str, exception.args))
 
 
 def transactionTest(card):
+    """Submit a simple JSON-based request to the Notecard.
+
+    Args:
+        card (object): An instance of the Notecard class
+
+    """
     req = {"req": "card.status"}
     req["string"] = "string"
     req["bool"] = True
@@ -35,6 +54,7 @@ def transactionTest(card):
 
 
 def main():
+    """Connect to Notcard and run a transaction test."""
     print("Opening port...")
     try:
         port = I2C("/dev/i2c-1")
