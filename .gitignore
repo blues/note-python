@@ -42,6 +42,7 @@ pip-delete-this-directory.txt
 
 # Unit test / coverage reports
 htmlcov/
+junit/
 .tox/
 .nox/
 .coverage
@@ -97,6 +98,7 @@ ipython_config.py
 #   having no cross-platform support, pipenv may install dependencies that don't work, or not
 #   install all needed dependencies.
 #Pipfile.lock
+.pypirc
 
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow
 __pypackages__/

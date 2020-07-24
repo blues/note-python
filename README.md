@@ -3,6 +3,9 @@
 Python library for communicating with the Blues Wireless Notecard over serial or I²C.
 
 ![Build](https://github.com/blues/note-python/workflows/Python%20package/badge.svg)
+![Pyton Version Support](https://img.shields.io/pypi/pyversions/note-python)
+![PyPi Version](https://img.shields.io/pypi/v/note-python)
+![Wheel Support](https://img.shields.io/pypi/wheel/note-python)
 
 This library allows you to control a Notecard by coding in Python and works in a desktop setting, on Single-Board Computers like the Raspberry Pi, and on Microcontrollers with MicroPython or CircuitPython support.
 

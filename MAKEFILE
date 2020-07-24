@@ -13,3 +13,9 @@ test: venv
 
 coverage: venv
 	${PYTHON} -m pytest test --doctest-modules --junitxml=junit/test-results.xml --cov=notecard --cov-report=xml --cov-report=html
+
+run_build:
+	${PYTHON} -m setup sdist bdist_wheel
+
+deploy:
+	${PYTHON} -m twine upload -r "pypi" --config-file .pypirc 'dist/*'
