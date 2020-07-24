@@ -8,7 +8,7 @@ from .validators import validate_card_object
 
 
 @validate_card_object
-def changes(card, file=None, tracker=None, max=None,
+def changes(card, file=None, tracker=None, maximum=None,
             start=None, stop=None, deleted=None, delete=None):
     """Incrementally retrieve changes within a Notefile.
 
@@ -30,15 +30,15 @@ def changes(card, file=None, tracker=None, max=None,
         req["file"] = file
     if tracker:
         req["tracker"] = tracker
-    if max:
-        req["max"] = max
-    if start:
+    if maximum:
+        req["max"] = maximum
+    if start is not None:
         req["start"] = start
-    if stop:
+    if stop is not None:
         req["stop"] = stop
-    if deleted:
+    if deleted is not None:
         req["deleted"] = deleted
-    if delete:
+    if delete is not None:
         req["delete"] = delete
     return card.Transaction(req)
 
@@ -62,9 +62,9 @@ def get(card, file="data.qi", note_id=None, delete=None, deleted=None):
     req["file"] = file
     if note_id:
         req["note"] = note_id
-    if delete:
+    if delete is not None:
         req["delete"] = delete
-    if deleted:
+    if deleted is not None:
         req["deleted"] = deleted
     return card.Transaction(req)
 

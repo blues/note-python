@@ -91,7 +91,11 @@ def test_hub_set():
                        mode="continuous",
                        minutes=2,
                        hours=1,
-                       sync=True)
+                       sync=True,
+                       align=True,
+                       vminutes="2.3",
+                       vhours="3.3",
+                       host="http://hub.blues.foo")
 
     assert response == {}
 
@@ -118,7 +122,7 @@ def test_hub_sync_status():
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{\"status\":\"connected\"}\r\n"]
 
-    response = hub.syncStatus(nCard)
+    response = hub.syncStatus(nCard, True)
 
     assert "status" in response
     assert response["status"] == "connected"
@@ -293,7 +297,7 @@ def test_note_update():
                              "{}\r\n"]
 
     response = note.update(nCard, file="settings.db", note_id="s",
-                           body={}, payload="123dfb==")
+                           body={"foo": "bar"}, payload="123dfb==")
 
     assert response == {}
 
@@ -307,7 +311,7 @@ def test_note_changes():
 
     response = note.changes(nCard, file="sensors.qo",
                             tracker="123",
-                            max=10,
+                            maximum=10,
                             start=True,
                             stop=False,
                             deleted=False,
