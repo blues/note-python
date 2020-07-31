@@ -3,7 +3,7 @@
 Python library for communicating with the Blues Wireless Notecard over serial or I²C.
 
 ![Build](https://github.com/blues/note-python/workflows/Python%20package/badge.svg)
-![Pyton Version Support](https://img.shields.io/pypi/pyversions/note-python)
+![Python Version Support](https://img.shields.io/pypi/pyversions/note-python)
 ![PyPi Version](https://img.shields.io/pypi/v/note-python)
 ![Wheel Support](https://img.shields.io/pypi/wheel/note-python)
 
@@ -11,7 +11,7 @@ This library allows you to control a Notecard by coding in Python and works in a
 
 ## Installation
 
-With pi-py:
+With `pip` via PyPi:
 
 ```bash
 pip install note-python
@@ -37,12 +37,13 @@ port = Serial("/dev/serial0", 9600)
 card = notecard.OpenSerial(port)
 ```
 
-### I2C Confgiguration
+### I2C Configuration
 
 ```python
 # Use python-periphery on a desktop or Raspberry Pi 
-from periphery import Serial
+from periphery import I2C
 port = I2C("/dev/i2c-1")
+
 card = notecard.OpenI2C(port, 0, 0)
 ```
 
@@ -103,7 +104,7 @@ The [examples](examples/) directory contains examples for using this library wit
 
 We love issues, fixes, and pull requests from everyone. By participating in this project, you agree to abide by the Blues Inc [code of conduct].
 
-For details on contributions we accept and the process for contributing, see our [contribution guide](CONTRIBUTING.md)
+For details on contributions we accept and the process for contributing, see our [contribution guide](CONTRIBUTING.md).
 
 ## Running the Tests
 
