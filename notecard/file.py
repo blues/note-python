@@ -12,6 +12,7 @@ def changes(card, tracker=None, files=None):
     """Perform individual or batch queries on Notefiles.
 
     Args:
+        card (Notecard): The current Notecard object.
         tracker (string): A developer-defined tracker ID.
         files (array): A list of Notefiles to retrieve changes for.
 
@@ -31,6 +32,7 @@ def delete(card, files=None):
     """Delete individual notefiles and their contents.
 
     Args:
+        card (Notecard): The current Notecard object.
         files (array): A list of Notefiles to delete.
 
     Returns:
@@ -46,6 +48,9 @@ def delete(card, files=None):
 def stats(card):
     """Obtain statistics about local notefiles.
 
+    Args:
+        card (Notecard): The current Notecard object.
+
     Returns:
         string: The result of the Notecard request.
     """
@@ -57,6 +62,9 @@ def stats(card):
 @validate_card_object
 def pendingChanges(card):
     """Retrive information about pending Notehub changes.
+
+    Args:
+        card (Notecard): The current Notecard object.
 
     Returns:
         string: The result of the Notecard request.

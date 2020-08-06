@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classnotecard_1_1notecard_1_1_notecard.html" title="Base Notecard class." alt="" coords="5,31,188,57"/>
+<area shape="rect" id="node2" href="$classnotecard_1_1notecard_1_1_open_i2_c.html" title="Notecard class for I2C communication." alt="" coords="242,5,425,32"/>
+<area shape="rect" id="node3" href="$classnotecard_1_1notecard_1_1_open_serial.html" title="Notecard class for Serial communication." alt="" coords="236,56,431,83"/>
+</map>

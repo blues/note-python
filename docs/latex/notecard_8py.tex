@@ -1,0 +1,38 @@
+\hypertarget{notecard_8py}{}\doxysection{notecard/notecard.py File Reference}
+\label{notecard_8py}\index{notecard/notecard.py@{notecard/notecard.py}}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classnotecard_1_1notecard_1_1_notecard}{notecard.\+notecard.\+Notecard}}
+\begin{DoxyCompactList}\small\item\em Base \mbox{\hyperlink{classnotecard_1_1notecard_1_1_notecard}{Notecard}} class. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classnotecard_1_1notecard_1_1_open_serial}{notecard.\+notecard.\+Open\+Serial}}
+\begin{DoxyCompactList}\small\item\em \mbox{\hyperlink{classnotecard_1_1notecard_1_1_notecard}{Notecard}} class for Serial communication. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classnotecard_1_1notecard_1_1_open_i2_c}{notecard.\+notecard.\+Open\+I2C}}
+\begin{DoxyCompactList}\small\item\em \mbox{\hyperlink{classnotecard_1_1notecard_1_1_notecard}{Notecard}} class for I2C communication. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \mbox{\hyperlink{namespacenotecard_1_1notecard}{notecard.\+notecard}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{namespacenotecard_1_1notecard_a86722827e14af53ddcd38c47ff9a119a}{notecard.\+notecard.\+serial\+Read\+Byte}} (port)
+\begin{DoxyCompactList}\small\item\em Read a single byte from a \mbox{\hyperlink{classnotecard_1_1notecard_1_1_notecard}{Notecard}}. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{namespacenotecard_1_1notecard_aa1badb3c10bdc0321b9a556e8cd49148}{notecard.\+notecard.\+serial\+Reset}} (port)
+\begin{DoxyCompactList}\small\item\em Send a reset command to a \mbox{\hyperlink{classnotecard_1_1notecard_1_1_notecard}{Notecard}}. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{namespacenotecard_1_1notecard_aee094fc03befdcbe4ee4a9d658d09841}{notecard.\+notecard.\+serial\+Transaction}} (port, req, debug)
+\begin{DoxyCompactList}\small\item\em Perform a single write to a read from a \mbox{\hyperlink{classnotecard_1_1notecard_1_1_notecard}{Notecard}}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespacenotecard_1_1notecard_a6f988b1a4e24bf560ca638c3611c45c3}{notecard.\+notecard.\+use\+\_\+periphery}} = False
+\item 
+bool \mbox{\hyperlink{namespacenotecard_1_1notecard_af1d48223a00cde961576a0414bf7996d}{notecard.\+notecard.\+use\+\_\+serial\+\_\+lock}} = False
+\item 
+int \mbox{\hyperlink{namespacenotecard_1_1notecard_abee945eb97de598771385aea3ccaf2ac}{notecard.\+notecard.\+N\+O\+T\+E\+C\+A\+R\+D\+\_\+\+I2\+C\+\_\+\+A\+D\+D\+R\+E\+SS}} = 0x17
+\item 
+int \mbox{\hyperlink{namespacenotecard_1_1notecard_a308bcfab82f6f9ba28b134f4f91334a8}{notecard.\+notecard.\+C\+A\+R\+D\+\_\+\+R\+E\+Q\+U\+E\+S\+T\+\_\+\+S\+E\+G\+M\+E\+N\+T\+\_\+\+M\+A\+X\+\_\+\+L\+EN}} = 250
+\item 
+int \mbox{\hyperlink{namespacenotecard_1_1notecard_a1bf40532c5d6444a59d27ff4c8bcaac8}{notecard.\+notecard.\+C\+A\+R\+D\+\_\+\+R\+E\+Q\+U\+E\+S\+T\+\_\+\+S\+E\+G\+M\+E\+N\+T\+\_\+\+D\+E\+L\+A\+Y\+\_\+\+MS}} = 250
+\end{DoxyCompactItemize}

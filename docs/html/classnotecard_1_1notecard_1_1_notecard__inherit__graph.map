@@ -1,0 +1,5 @@
+<map id="notecard.notecard.Notecard" name="notecard.notecard.Notecard">
+<area shape="rect" id="node1" title="Base Notecard class." alt="" coords="112,5,295,32"/>
+<area shape="rect" id="node2" href="$classnotecard_1_1notecard_1_1_open_i2_c.html" title="Notecard class for I2C communication." alt="" coords="5,80,188,107"/>
+<area shape="rect" id="node3" href="$classnotecard_1_1notecard_1_1_open_serial.html" title="Notecard class for Serial communication." alt="" coords="213,80,407,107"/>
+</map>

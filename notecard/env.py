@@ -12,6 +12,7 @@ def get(card, name=None):
     """Perform an env.get request against a Notecard.
 
     Args:
+        card (Notecard): The current Notecard object.
         name (string): The name of an environment variable to get.
 
     Returns:

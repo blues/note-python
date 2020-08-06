@@ -14,6 +14,7 @@ def set(card, product, sn=None, mode=None, minutes=None,
     """Configure Notehub behavior on the Notecard.
 
     Args:
+        card (Notecard): The current Notecard object.
         product (string): The ProductUID of the project.
         sn (string): The Serial Number of the device.
         mode (string): The sync mode to use.
@@ -59,6 +60,9 @@ def set(card, product, sn=None, mode=None, minutes=None,
 def sync(card):
     """Initiate a sync of the Notecard to Notehub.
 
+    Args:
+        card (Notecard): The current Notecard object.
+
     Returns:
         string: The result of the Notecard request.
     """
@@ -71,6 +75,7 @@ def syncStatus(card, sync=None):
     """Retrive the status of a sync request.
 
     Args:
+        card (Notecard): The current Notecard object.
         sync (bool): True if sync should be auto-initiated pending
             outbound data.
 
@@ -88,6 +93,9 @@ def syncStatus(card, sync=None):
 def status(card):
     """Retrieve the status of the Notecard's connection.
 
+    Args:
+        card (Notecard): The current Notecard object.
+
     Returns:
         string: The result of the Notecard request.
     """
@@ -100,6 +108,7 @@ def log(card, text, alert=False, sync=False):
     """Send a log request to the Notecard.
 
     Args:
+        card (Notecard): The current Notecard object.
         text (string): The ProductUID of the project.
         alert (bool): True if the message is urgent.
         sync (bool): Whether to sync right away.
@@ -117,6 +126,9 @@ def log(card, text, alert=False, sync=False):
 @validate_card_object
 def get(card):
     """Retrive the current Notehub configuration parameters.
+
+    Args:
+        card (Notecard): The current Notecard object.
 
     Returns:
         string: The result of the Notecard request.

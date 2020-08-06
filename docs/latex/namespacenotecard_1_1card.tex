@@ -1,0 +1,178 @@
+\hypertarget{namespacenotecard_1_1card}{}\doxysection{notecard.\+card Namespace Reference}
+\label{namespacenotecard_1_1card}\index{notecard.card@{notecard.card}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{namespacenotecard_1_1card_a66d11c5cf97cea66c5399ddeafa683ff}{attn}} (card, mode=None, files=None, seconds=None)
+\begin{DoxyCompactList}\small\item\em Configure interrupt detection between a host and Notecard. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{namespacenotecard_1_1card_a0de0f6e72a2387d09aaaa4a719383313}{time}} (card)
+\begin{DoxyCompactList}\small\item\em Retrieve the current time and date from the Notecard. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{namespacenotecard_1_1card_a13f03abe1576ab81ea8190e3074576ce}{status}} (card)
+\begin{DoxyCompactList}\small\item\em Retrieve the status of the Notecard. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{namespacenotecard_1_1card_a11263797d8e80f242ff7738989d7de53}{temp}} (card)
+\begin{DoxyCompactList}\small\item\em Retrieve the current temperature from the Notecard. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{namespacenotecard_1_1card_ac0a7ef1176b55152d42de04d39dfac54}{version}} (card)
+\begin{DoxyCompactList}\small\item\em Retrieve firmware version\mbox{]} information from the Notecard. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{namespacenotecard_1_1card_a1f9f65c34f1bd959d7902285a7537ce6}{voltage}} (card, hours=None, offset=None, vmax=None, vmin=None)
+\begin{DoxyCompactList}\small\item\em Retrive current and historical voltage info from the Notecard. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{namespacenotecard_1_1card_a6a33968774db1f252c5ab18c6a7b7af9}{wireless}} (card, mode=None)
+\begin{DoxyCompactList}\small\item\em Retrive wireless modem info or customize modem behavior. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{namespacenotecard_1_1card_a66d11c5cf97cea66c5399ddeafa683ff}\label{namespacenotecard_1_1card_a66d11c5cf97cea66c5399ddeafa683ff}} 
+\index{notecard.card@{notecard.card}!attn@{attn}}
+\index{attn@{attn}!notecard.card@{notecard.card}}
+\doxysubsubsection{\texorpdfstring{attn()}{attn()}}
+{\footnotesize\ttfamily def notecard.\+card.\+attn (\begin{DoxyParamCaption}\item[{}]{card,  }\item[{}]{mode = {\ttfamily None},  }\item[{}]{files = {\ttfamily None},  }\item[{}]{seconds = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Configure interrupt detection between a host and Notecard. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em card} & The current Notecard object. \\
+\hline
+{\em mode} & The attn mode to set. \\
+\hline
+{\em files} & A collection of notefiles to watch. \\
+\hline
+{\em seconds} & A timeout to use when arming attn mode.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+
+string The result of the Notecard request. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacenotecard_1_1card_a13f03abe1576ab81ea8190e3074576ce}\label{namespacenotecard_1_1card_a13f03abe1576ab81ea8190e3074576ce}} 
+\index{notecard.card@{notecard.card}!status@{status}}
+\index{status@{status}!notecard.card@{notecard.card}}
+\doxysubsubsection{\texorpdfstring{status()}{status()}}
+{\footnotesize\ttfamily def notecard.\+card.\+status (\begin{DoxyParamCaption}\item[{}]{card }\end{DoxyParamCaption})}
+
+
+
+Retrieve the status of the Notecard. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em card} & The current Notecard object.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+
+string The result of the Notecard request. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacenotecard_1_1card_a11263797d8e80f242ff7738989d7de53}\label{namespacenotecard_1_1card_a11263797d8e80f242ff7738989d7de53}} 
+\index{notecard.card@{notecard.card}!temp@{temp}}
+\index{temp@{temp}!notecard.card@{notecard.card}}
+\doxysubsubsection{\texorpdfstring{temp()}{temp()}}
+{\footnotesize\ttfamily def notecard.\+card.\+temp (\begin{DoxyParamCaption}\item[{}]{card }\end{DoxyParamCaption})}
+
+
+
+Retrieve the current temperature from the Notecard. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em card} & The current Notecard object.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+
+string The result of the Notecard request. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacenotecard_1_1card_a0de0f6e72a2387d09aaaa4a719383313}\label{namespacenotecard_1_1card_a0de0f6e72a2387d09aaaa4a719383313}} 
+\index{notecard.card@{notecard.card}!time@{time}}
+\index{time@{time}!notecard.card@{notecard.card}}
+\doxysubsubsection{\texorpdfstring{time()}{time()}}
+{\footnotesize\ttfamily def notecard.\+card.\+time (\begin{DoxyParamCaption}\item[{}]{card }\end{DoxyParamCaption})}
+
+
+
+Retrieve the current time and date from the Notecard. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em card} & The current Notecard object.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+
+string The result of the Notecard request. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacenotecard_1_1card_ac0a7ef1176b55152d42de04d39dfac54}\label{namespacenotecard_1_1card_ac0a7ef1176b55152d42de04d39dfac54}} 
+\index{notecard.card@{notecard.card}!version@{version}}
+\index{version@{version}!notecard.card@{notecard.card}}
+\doxysubsubsection{\texorpdfstring{version()}{version()}}
+{\footnotesize\ttfamily def notecard.\+card.\+version (\begin{DoxyParamCaption}\item[{}]{card }\end{DoxyParamCaption})}
+
+
+
+Retrieve firmware version\mbox{]} information from the Notecard. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em card} & The current Notecard object.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+
+string The result of the Notecard request. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacenotecard_1_1card_a1f9f65c34f1bd959d7902285a7537ce6}\label{namespacenotecard_1_1card_a1f9f65c34f1bd959d7902285a7537ce6}} 
+\index{notecard.card@{notecard.card}!voltage@{voltage}}
+\index{voltage@{voltage}!notecard.card@{notecard.card}}
+\doxysubsubsection{\texorpdfstring{voltage()}{voltage()}}
+{\footnotesize\ttfamily def notecard.\+card.\+voltage (\begin{DoxyParamCaption}\item[{}]{card,  }\item[{}]{hours = {\ttfamily None},  }\item[{}]{offset = {\ttfamily None},  }\item[{}]{vmax = {\ttfamily None},  }\item[{}]{vmin = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Retrive current and historical voltage info from the Notecard. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em card} & The current Notecard object. \\
+\hline
+{\em hours} & Number of hours to analyze. \\
+\hline
+{\em offset} & Number of hours to offset. \\
+\hline
+{\em vmax} & max voltage level to report. \\
+\hline
+{\em vmin} & min voltage level to report.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+
+string The result of the Notecard request. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacenotecard_1_1card_a6a33968774db1f252c5ab18c6a7b7af9}\label{namespacenotecard_1_1card_a6a33968774db1f252c5ab18c6a7b7af9}} 
+\index{notecard.card@{notecard.card}!wireless@{wireless}}
+\index{wireless@{wireless}!notecard.card@{notecard.card}}
+\doxysubsubsection{\texorpdfstring{wireless()}{wireless()}}
+{\footnotesize\ttfamily def notecard.\+card.\+wireless (\begin{DoxyParamCaption}\item[{}]{card,  }\item[{}]{mode = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Retrive wireless modem info or customize modem behavior. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em card} & The current Notecard object. \\
+\hline
+{\em mode} & The wireless module mode to set.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+
+string The result of the Notecard request. 
+\end{DoxyReturn}

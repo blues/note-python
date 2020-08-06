@@ -13,9 +13,10 @@ def changes(card, file=None, tracker=None, maximum=None,
     """Incrementally retrieve changes within a Notefile.
 
     Args:
+        card (Notecard): The current Notecard object.
         file (string): The name of the file.
         tracker (string): A developer-defined tracker ID.
-        max (int): Maximum number of notes to return.
+        maximum (int): Maximum number of notes to return.
         start (bool): Should tracker be reset to the beginning
             before a get.
         stop (bool): Should tracker be deleted after get.
@@ -48,10 +49,10 @@ def get(card, file="data.qi", note_id=None, delete=None, deleted=None):
     """Retrive a note from an inbound or DB Notefile.
 
     Args:
+        card (Notecard): The current Notecard object.
         file (string): The inbound or DB notefile to retrive a
             Notefile from.
-        note_id (string): (DB files only) The ID of the note to
-            retrive.
+        note_id (string): (DB files only) The ID of the note to retrive.
         delete (bool): Whether to delete the note after retrieval.
         deleted (bool): Whether to allow retrival of a deleted note.
 
@@ -74,8 +75,9 @@ def delete(card, file=None, note_id=None):
     """Delete a DB note in a Notefile by its ID.
 
     Args:
+        card (Notecard): The current Notecard object.
         file (string): The file name of the DB notefile.
-        note (string): The id of the note to delete.
+        note_id (string): The id of the note to delete.
 
     Returns:
         string: The result of the Notecard request.
@@ -93,8 +95,9 @@ def update(card, file=None, note_id=None, body=None, payload=None):
     """Update a note in a DB Notefile by ID.
 
     Args:
+        card (Notecard): The current Notecard object.
         file (string): The file name of the DB notefile.
-        note (string): The id of the note to update.
+        note_id (string): The id of the note to update.
         body (JSON): The JSON object to add to the note.
         payload (string): The base64-encoded JSON payload to
             add to the note.

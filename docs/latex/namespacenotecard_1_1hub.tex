@@ -1,0 +1,168 @@
+\hypertarget{namespacenotecard_1_1hub}{}\doxysection{notecard.\+hub Namespace Reference}
+\label{namespacenotecard_1_1hub}\index{notecard.hub@{notecard.hub}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{namespacenotecard_1_1hub_a64543bf3333e6576dfb3859d8759872b}{set}} (card, product, sn=None, mode=None, minutes=None, hours=None, \mbox{\hyperlink{namespacenotecard_1_1hub_a614f01eb985b28a45706183f7a7a20ea}{sync}}=False, align=None, vminutes=None, vhours=None, host=None)
+\begin{DoxyCompactList}\small\item\em Configure Notehub behavior on the Notecard. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{namespacenotecard_1_1hub_a614f01eb985b28a45706183f7a7a20ea}{sync}} (card)
+\begin{DoxyCompactList}\small\item\em Initiate a sync of the Notecard to Notehub. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{namespacenotecard_1_1hub_adeec5dd54d3ce966f7e08bee81105d2b}{sync\+Status}} (card, \mbox{\hyperlink{namespacenotecard_1_1hub_a614f01eb985b28a45706183f7a7a20ea}{sync}}=None)
+\begin{DoxyCompactList}\small\item\em Retrive the status of a sync request. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{namespacenotecard_1_1hub_a5c44efc254a08e2f8eb6d6b2d3d9ab82}{status}} (card)
+\begin{DoxyCompactList}\small\item\em Retrieve the status of the Notecard\textquotesingle{}s connection. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{namespacenotecard_1_1hub_aa78d6e2e3028e6022b3b9405527937b2}{log}} (card, text, alert=False, \mbox{\hyperlink{namespacenotecard_1_1hub_a614f01eb985b28a45706183f7a7a20ea}{sync}}=False)
+\begin{DoxyCompactList}\small\item\em Send a log request to the Notecard. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{namespacenotecard_1_1hub_a5c2687d0e446715d54c1dd7b4ac4c682}{get}} (card)
+\begin{DoxyCompactList}\small\item\em Retrive the current Notehub configuration parameters. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{namespacenotecard_1_1hub_a5c2687d0e446715d54c1dd7b4ac4c682}\label{namespacenotecard_1_1hub_a5c2687d0e446715d54c1dd7b4ac4c682}} 
+\index{notecard.hub@{notecard.hub}!get@{get}}
+\index{get@{get}!notecard.hub@{notecard.hub}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def notecard.\+hub.\+get (\begin{DoxyParamCaption}\item[{}]{card }\end{DoxyParamCaption})}
+
+
+
+Retrive the current Notehub configuration parameters. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em card} & The current Notecard object.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+
+string The result of the Notecard request. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacenotecard_1_1hub_aa78d6e2e3028e6022b3b9405527937b2}\label{namespacenotecard_1_1hub_aa78d6e2e3028e6022b3b9405527937b2}} 
+\index{notecard.hub@{notecard.hub}!log@{log}}
+\index{log@{log}!notecard.hub@{notecard.hub}}
+\doxysubsubsection{\texorpdfstring{log()}{log()}}
+{\footnotesize\ttfamily def notecard.\+hub.\+log (\begin{DoxyParamCaption}\item[{}]{card,  }\item[{}]{text,  }\item[{}]{alert = {\ttfamily False},  }\item[{}]{sync = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Send a log request to the Notecard. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em card} & The current Notecard object. \\
+\hline
+{\em text} & The Product\+U\+ID of the project. \\
+\hline
+{\em alert} & True if the message is urgent. \\
+\hline
+{\em sync} & Whether to sync right away.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+
+string The result of the Notecard request. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacenotecard_1_1hub_a64543bf3333e6576dfb3859d8759872b}\label{namespacenotecard_1_1hub_a64543bf3333e6576dfb3859d8759872b}} 
+\index{notecard.hub@{notecard.hub}!set@{set}}
+\index{set@{set}!notecard.hub@{notecard.hub}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}}
+{\footnotesize\ttfamily def notecard.\+hub.\+set (\begin{DoxyParamCaption}\item[{}]{card,  }\item[{}]{product,  }\item[{}]{sn = {\ttfamily None},  }\item[{}]{mode = {\ttfamily None},  }\item[{}]{minutes = {\ttfamily None},  }\item[{}]{hours = {\ttfamily None},  }\item[{}]{sync = {\ttfamily False},  }\item[{}]{align = {\ttfamily None},  }\item[{}]{vminutes = {\ttfamily None},  }\item[{}]{vhours = {\ttfamily None},  }\item[{}]{host = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Configure Notehub behavior on the Notecard. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em card} & The current Notecard object. \\
+\hline
+{\em product} & The Product\+U\+ID of the project. \\
+\hline
+{\em sn} & The Serial Number of the device. \\
+\hline
+{\em mode} & The sync mode to use. \\
+\hline
+{\em minutes} & Max time to wait to sync outgoing data. \\
+\hline
+{\em hours} & Max time to wait to sync incoming data. \\
+\hline
+{\em sync} & If in continuous mode, whether to automatically sync each time a change is detected on the device or Notehub. \\
+\hline
+{\em align} & To align syncs to a regular time-\/interval, as opposed to using max time values. \\
+\hline
+{\em vminutes} & Overrides \char`\"{}minutes\char`\"{} with a voltage-\/variable value. \\
+\hline
+{\em vhours} & Overrides \char`\"{}hours\char`\"{} with a voltage-\/variable value. \\
+\hline
+{\em host} & U\+RL of an alternative or private Notehub instance.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+
+string The result of the Notecard request. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacenotecard_1_1hub_a5c44efc254a08e2f8eb6d6b2d3d9ab82}\label{namespacenotecard_1_1hub_a5c44efc254a08e2f8eb6d6b2d3d9ab82}} 
+\index{notecard.hub@{notecard.hub}!status@{status}}
+\index{status@{status}!notecard.hub@{notecard.hub}}
+\doxysubsubsection{\texorpdfstring{status()}{status()}}
+{\footnotesize\ttfamily def notecard.\+hub.\+status (\begin{DoxyParamCaption}\item[{}]{card }\end{DoxyParamCaption})}
+
+
+
+Retrieve the status of the Notecard\textquotesingle{}s connection. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em card} & The current Notecard object.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+
+string The result of the Notecard request. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacenotecard_1_1hub_a614f01eb985b28a45706183f7a7a20ea}\label{namespacenotecard_1_1hub_a614f01eb985b28a45706183f7a7a20ea}} 
+\index{notecard.hub@{notecard.hub}!sync@{sync}}
+\index{sync@{sync}!notecard.hub@{notecard.hub}}
+\doxysubsubsection{\texorpdfstring{sync()}{sync()}}
+{\footnotesize\ttfamily def notecard.\+hub.\+sync (\begin{DoxyParamCaption}\item[{}]{card }\end{DoxyParamCaption})}
+
+
+
+Initiate a sync of the Notecard to Notehub. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em card} & The current Notecard object.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+
+string The result of the Notecard request. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacenotecard_1_1hub_adeec5dd54d3ce966f7e08bee81105d2b}\label{namespacenotecard_1_1hub_adeec5dd54d3ce966f7e08bee81105d2b}} 
+\index{notecard.hub@{notecard.hub}!syncStatus@{syncStatus}}
+\index{syncStatus@{syncStatus}!notecard.hub@{notecard.hub}}
+\doxysubsubsection{\texorpdfstring{syncStatus()}{syncStatus()}}
+{\footnotesize\ttfamily def notecard.\+hub.\+sync\+Status (\begin{DoxyParamCaption}\item[{}]{card,  }\item[{}]{sync = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Retrive the status of a sync request. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em card} & The current Notecard object. \\
+\hline
+{\em sync} & True if sync should be auto-\/initiated pending outbound data.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+
+string The result of the Notecard request. 
+\end{DoxyReturn}
