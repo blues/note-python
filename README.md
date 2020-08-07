@@ -1,4 +1,4 @@
-#note-python {#mainpage}
+# note-python
 
 Python library for communicating with the Blues Wireless Notecard over serial or I²C.
 
