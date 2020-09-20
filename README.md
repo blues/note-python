@@ -30,7 +30,7 @@ The `note-python` library requires a pointer to a serial or i2c object that you 
 ### Serial Configuration
 
 ```python
-# Use python-periphery on a desktop or Raspberry Pi 
+# Use python-periphery on a desktop or Raspberry Pi
 from periphery import Serial
 port = Serial("/dev/serial0", 9600)
 
@@ -40,7 +40,7 @@ card = notecard.OpenSerial(port)
 ### I2C Configuration
 
 ```python
-# Use python-periphery on a desktop or Raspberry Pi 
+# Use python-periphery on a desktop or Raspberry Pi
 from periphery import I2C
 port = I2C("/dev/i2c-1")
 
@@ -132,13 +132,17 @@ For additional Notecard SDKs and Libraries, see:
 
 ## To learn more about Blues Wireless, the Notecard and Notehub, see:
 
-* [blues.com](https://blues.com)
+* [blues.com](https://blues.io)
 * [notehub.io][Notehub]
 * [wireless.dev](https://wireless.dev)
 
 ## License
 
-Copyright (c) 2019 Blues Inc. Released under the MIT license. See [LICENSE](LICENSE) for details.
+Copyright (c) 2019 Blues Inc. Released under the MIT license. See
+[LICENSE](LICENSE) for details.
 
 [code of conduct]: https://blues.github.io/opensource/code-of-conduct
 [Notehub]: https://notehub.io
+[note-c]: https://github.com/blues/note-c
+[note-go]: https://github.com/blues/note-go
+[note-arduino]: https://github.com/blues/note-arduino

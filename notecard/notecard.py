@@ -1,4 +1,40 @@
-"""Main module for note-python.
+"""@mainpage Python Library for the Notecard
+
+   @section intro_sec Introduction
+
+   The note-python library for communicating with the
+   <a href="https://blues.io">Blues Wireless</a>
+   Notecard via serial or I2C.
+
+   This library allows you to control a Notecard by writing a Python,
+   CircuitPython, or MicroPython program. You may programmatically
+   configure Notecard and send Notes to <a href="https://notehub.io">Notehub.io</a>.
+
+   @section dependencies Dependencies
+
+   When used in a Python program, this library depends on the
+   <a href="https://pypi.org/project/python-periphery/">periphery</a>
+   and <a href="https://pypi.org/project/filelock/">filelock</a> modules.
+
+   In addition, this library requires a physical
+   connection to a Notecard over I2C or Serial to be functional.
+
+   @section author Author
+
+   Written by the Blues Inc. Contributors.
+
+   @section license License
+
+   Copyright (c) 2019 Blues Inc. MIT License. Use of this source code is
+   governed by licenses granted by the copyright holder including that found in
+   the
+   <a href="https://github.com/blues/note-python/blob/master/LICENSE">LICENSE</a>
+   file.
+"""
+
+"""@package notecard
+
+Main module for note-python.
 
 This module contains the core functionality for running the
 note-python library, including the main Notecard class, and
