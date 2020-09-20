@@ -147,3 +147,4 @@ cython_debug/
 .vscode
 
 .DS_Store
+Doxyfile.bak

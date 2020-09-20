@@ -88,7 +88,8 @@ print(rsp) # {}
 
 ## Documentation
 
-The documentation for this library can be found at the Blues Wireless [wireless.dev](https//wireless.dev/reference/note-python) site.
+The documentation for this library can be found
+[here](https://blues.github.io/note-python/docs/html/index.html).
 
 ## Examples
 
