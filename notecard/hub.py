@@ -1,8 +1,14 @@
-"""hub Fluent API Helper.
+"""hub Fluent API Helper."""
 
-This module contains helper methods for calling hub.*
-Notecard API commands.
-"""
+##
+# @file hub.py
+#
+# @brief hub Fluent API Helper.
+#
+# @section description Description
+# This module contains helper methods for calling hub.* Notecard API commands.
+# This module is optional and not required for use with the Notecard.
+
 import notecard
 from .validators import validate_card_object
 

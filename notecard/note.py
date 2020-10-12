@@ -1,8 +1,14 @@
-"""note Fluent API Helper.
+"""note Fluent API Helper."""
 
-This module contains helper methods for calling note.*
-Notecard API commands.
-"""
+##
+# @file note.py
+#
+# @brief note Fluent API Helper.
+#
+# @section description Description
+# This module contains helper methods for calling note.* Notecard API commands.
+# This module is optional and not required for use with the Notecard.
+
 import notecard
 from .validators import validate_card_object
 
