@@ -8,9 +8,9 @@ from .validators import validate_card_object
 
 
 @validate_card_object
-def set(card, product, sn=None, mode=None, minutes=None,
-        hours=None, sync=False, align=None, vminutes=None,
-        vhours=None, host=None):
+def set(card, product, sn=None, mode=None, outbound=None,
+        inbound=None, sync=False, align=None, voutbound=None,
+        vinbound=None, host=None):
     """Configure Notehub behavior on the Notecard.
 
     Args:
@@ -18,14 +18,14 @@ def set(card, product, sn=None, mode=None, minutes=None,
         product (string): The ProductUID of the project.
         sn (string): The Serial Number of the device.
         mode (string): The sync mode to use.
-        minutes (int): Max time to wait to sync outgoing data.
-        hours (int): Max time to wait to sync incoming data.
+        outbound (int): Max time to wait to sync outgoing data.
+        inbound (int): Max time to wait to sync incoming data.
         sync (bool): If in continuous mode, whether to automatically
             sync each time a change is detected on the device or Notehub.
         align (bool): To align syncs to a regular time-interval, as opposed
             to using max time values.
-        vminutes (string): Overrides "minutes" with a voltage-variable value.
-        vhours (string): Overrides "hours" with a voltage-variable value.
+        voutbound (string): Overrides "outbound" with a voltage-variable value.
+        vinbound (string): Overrides "inbound" with a voltage-variable value.
         host (string): URL of an alternative or private Notehub instance.
 
     Returns:
@@ -38,18 +38,18 @@ def set(card, product, sn=None, mode=None, minutes=None,
         req["sn"] = sn
     if mode:
         req["mode"] = mode
-    if minutes:
-        req["minutes"] = minutes
-    if hours:
-        req["hours"] = hours
+    if outbound:
+        req["outbound"] = outbound
+    if inbound:
+        req["inbound"] = inbound
     if sync is not None:
         req["sync"] = sync
     if align is not None:
         req["align"] = align
-    if vminutes:
-        req["vminutes"] = vminutes
-    if vhours:
-        req["vhours"] = vhours
+    if voutbound:
+        req["voutbound"] = voutbound
+    if vinbound:
+        req["vinbound"] = vinbound
     if host:
         req["host"] = host
 

@@ -89,12 +89,12 @@ def test_hub_set():
     response = hub.set(nCard, product="com.blues.tester",
                        sn="foo",
                        mode="continuous",
-                       minutes=2,
-                       hours=1,
+                       outbound=2,
+                       inbound=60,
                        sync=True,
                        align=True,
-                       vminutes="2.3",
-                       vhours="3.3",
+                       voutbound="2.3",
+                       vinbound="3.3",
                        host="http://hub.blues.foo")
 
     assert response == {}
