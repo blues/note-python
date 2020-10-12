@@ -1,8 +1,14 @@
-"""env Fluent API Helper.
+"""env Fluent API Helper."""
 
-This module contains helper methods for calling env.*
-Notecard API commands.
-"""
+##
+# @file env.py
+#
+# @brief env Fluent API Helper.
+#
+# @section description Description
+# This module contains helper methods for calling env.* Notecard API commands.
+# This module is optional and not required for use with the Notecard.
+
 import notecard
 from .validators import validate_card_object
 

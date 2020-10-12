@@ -1,4 +1,9 @@
-"""Validation decorators for note-python."""
+"""Main Validation decorators for note-python."""
+
+##
+# @file validators.py
+#
+# @brief Validation decorators for note-python.
 import functools
 import notecard
 

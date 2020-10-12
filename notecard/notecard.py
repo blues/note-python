@@ -1,9 +1,35 @@
-"""Main module for note-python.
+"""Main module for note-python."""
 
-This module contains the core functionality for running the
-note-python library, including the main Notecard class, and
-Serial and I2C sub-classes.
-"""
+##
+# @mainpage Python Library for the Notecard
+#
+# @section intro_sec Introduction
+# This module contains the core functionality for running the
+# note-python library, including the main Notecard class, and
+# Serial and I2C sub-classes.
+#
+# @section dependencies Dependencies
+#
+# this library requires a physical connection to a Notecard over I2C or
+# Serial to be functional.
+# @section author Author
+#
+# Written by Ray Ozzie and Brandon Satrom for Blues Inc.
+# @section license License
+#
+# Copyright (c) 2019 Blues Inc. MIT License. Use of this source code is
+# governed by licenses granted by the copyright holder including that found in
+# the
+# <a href="https://github.com/blues/note-python/blob/master/LICENSE">
+#   LICENSE
+# </a>
+# file.
+
+##
+# @file notecard.py
+#
+# @brief Main module for note-python. Contains core library functionality.
+
 import sys
 import json
 import time

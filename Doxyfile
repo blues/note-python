@@ -5,9 +5,9 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = note-python
-PROJECT_NUMBER         = v1.1.1
+PROJECT_NUMBER         = v1.1.2
 PROJECT_BRIEF          = "Python library for communicating with the Blues Wireless Notecard over serial or I²C."
-PROJECT_LOGO           =
+PROJECT_LOGO           = assets/blues-wireless.png
 OUTPUT_DIRECTORY       = docs
 CREATE_SUBDIRS         = NO
 ALLOW_UNICODE_NAMES    = NO
@@ -116,7 +116,6 @@ WARN_LOGFILE           =
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
 INPUT                  = notecard
-INPUT                 += README.md
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cc \
