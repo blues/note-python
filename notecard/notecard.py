@@ -80,7 +80,7 @@ def serialReset(port):
         nonControlCharFound = False
         while True:
             data = serialReadByte(port)
-            if data is None:
+            if (data is None) or (data == b''):
                 break
             somethingFound = True
             if data[0] >= 0x20:
