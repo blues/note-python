@@ -52,15 +52,15 @@ def changes(card, file=None, tracker=None, maximum=None,
 
 @validate_card_object
 def get(card, file="data.qi", note_id=None, delete=None, deleted=None):
-    """Retrive a note from an inbound or DB Notefile.
+    """Retrieve a note from an inbound or DB Notefile.
 
     Args:
         card (Notecard): The current Notecard object.
-        file (string): The inbound or DB notefile to retrive a
+        file (string): The inbound or DB notefile to retrieve a
             Notefile from.
-        note_id (string): (DB files only) The ID of the note to retrive.
+        note_id (string): (DB files only) The ID of the note to retrieve.
         delete (bool): Whether to delete the note after retrieval.
-        deleted (bool): Whether to allow retrival of a deleted note.
+        deleted (bool): Whether to allow retrieval of a deleted note.
 
     Returns:
         string: The result of the Notecard request.

@@ -10,7 +10,7 @@
 #
 # @section dependencies Dependencies
 #
-# this library requires a physical connection to a Notecard over I2C or
+# This library requires a physical connection to a Notecard over I2C or
 # Serial to be functional.
 # @section author Author
 #
@@ -156,7 +156,7 @@ class OpenSerial(Notecard):
         return self.Transaction(req)
 
     def Transaction(self, req):
-        """Perform a Notecard transaction discard the result."""
+        """Perform a Notecard transaction and return the result."""
         if use_serial_lock:
             try:
                 self.lock.acquire(timeout=5)
@@ -195,7 +195,7 @@ class OpenI2C(Notecard):
     """Notecard class for I2C communication."""
 
     def Transaction(self, req):
-        """Perform a Notecard transaction discard the result."""
+        """Perform a Notecard transaction and return the result."""
         req_json = json.dumps(req)
         if self._debug:
             print(req_json)
