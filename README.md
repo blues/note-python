@@ -80,7 +80,7 @@ from notecard import card, hub, note
 port = busio.I2C(board.SCL, board.SDA)
 nCard = notecard.OpenI2C(port, 0, 0, debug=True)
 
-productUID  = "com.blues.brandon.tester"
+productUID = "com.blues.brandon.tester"
 rsp = hub.set(nCard, productUID, mode="continuous", sync=True)
 
 print(rsp) # {}
@@ -127,9 +127,9 @@ Alternatively, you can inspect the contents of the [MAKEFILE](MAKEFILE) and run 
 
 For additional Notecard SDKs and Libraries, see:
 
-* [note-c](note-c) for Standard C support
-* [note-go](note-go) for Go
-* [note-arduino](note-arduino) for Arduino 
+* [note-c](https://github.com/blues/note-c) for Standard C support
+* [note-go](https://github.com/blues/note-go) for Go
+* [note-arduino](https://github.com/blues/note-arduino) for Arduino 
 
 ## To learn more about Blues Wireless, the Notecard and Notehub, see:
 

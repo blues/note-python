@@ -67,7 +67,7 @@ def stats(card):
 
 @validate_card_object
 def pendingChanges(card):
-    """Retrive information about pending Notehub changes.
+    """Retrieve information about pending Notehub changes.
 
     Args:
         card (Notecard): The current Notecard object.

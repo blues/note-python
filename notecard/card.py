@@ -80,7 +80,7 @@ def temp(card):
 
 @validate_card_object
 def version(card):
-    """Retrieve firmware version] information from the Notecard.
+    """Retrieve firmware version information from the Notecard.
 
     Args:
         card (Notecard): The current Notecard object.
@@ -94,7 +94,7 @@ def version(card):
 
 @validate_card_object
 def voltage(card, hours=None, offset=None, vmax=None, vmin=None):
-    """Retrive current and historical voltage info from the Notecard.
+    """Retrieve current and historical voltage info from the Notecard.
 
     Args:
         card (Notecard): The current Notecard object.
@@ -120,7 +120,7 @@ def voltage(card, hours=None, offset=None, vmax=None, vmin=None):
 
 @validate_card_object
 def wireless(card, mode=None):
-    """Retrive wireless modem info or customize modem behavior.
+    """Retrieve wireless modem info or customize modem behavior.
 
     Args:
         card (Notecard): The current Notecard object.

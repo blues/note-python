@@ -78,7 +78,7 @@ def sync(card):
 
 @validate_card_object
 def syncStatus(card, sync=None):
-    """Retrive the status of a sync request.
+    """Retrieve the status of a sync request.
 
     Args:
         card (Notecard): The current Notecard object.
@@ -131,7 +131,7 @@ def log(card, text, alert=False, sync=False):
 
 @validate_card_object
 def get(card):
-    """Retrive the current Notehub configuration parameters.
+    """Retrieve the current Notehub configuration parameters.
 
     Args:
         card (Notecard): The current Notecard object.
