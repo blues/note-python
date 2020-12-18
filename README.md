@@ -17,6 +17,13 @@ With `pip` via PyPi:
 pip install note-python
 ```
 
+or 
+
+
+```bash
+pip3 install note-python
+```
+
 For use with MicroPython or CircuitPython, copy the contents of the `notecard` directory into the `lib` directory of your device.
 
 ## Usage
