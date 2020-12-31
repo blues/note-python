@@ -18,6 +18,13 @@ jobs:
         python-version: [3.5, 3.6, 3.7, 3.8]
 
     steps:
+    - name: Send building notification
+      run: |
+        curl --request POST \
+        --url 'https://api.notefile.net/?product=${{ secrets.NOTEHUB_PRODUCT_UID }}&device=${{ secrets.NOTECARD_DEVICE_ID }}' \
+        --header 'Content-Type: application/json' \
+        --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
+        --data '{"req":"note.add","file":"build_results.qi","body":{"result":"building"}}'
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -38,3 +45,19 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+    - name: Check if the job has succeeded
+      if: ${{ success() }}
+      run: |
+        curl --request POST \
+        --url 'https://api.notefile.net/?product=${{ secrets.NOTEHUB_PRODUCT_UID }}&device=${{ secrets.NOTECARD_DEVICE_ID }}' \
+        --header 'Content-Type: application/json' \
+        --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
+        --data '{"req":"note.add","file":"build_results.qi","body":{"result":"success"}}'
+    - name: Chck if the job has failed
+      if: ${{ failure() }}
+      run: |
+        curl --request POST \
+        --url 'https://api.notefile.net/?product=${{ secrets.NOTEHUB_PRODUCT_UID }}&device=${{ secrets.NOTECARD_DEVICE_ID }}' \
+        --header 'Content-Type: application/json' \
+        --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
+        --data '{"req":"note.add","file":"build_results.qi","body":{"result":"tests_failed"}}'
