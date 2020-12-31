@@ -30,3 +30,12 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
         twine upload dist/*
+    - name: Chck if the job has failed
+      if: ${{ failure() }}
+      run: |
+        curl --request POST \
+        --url 'https://api.notefile.net/?product=${{ secrets.NOTEHUB_PRODUCT_UID }}&device=${{ secrets.NOTECARD_DEVICE_ID }}' \
+        --header 'Content-Type: application/json' \
+        --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
+        --data '{"req":"note.add","file":"build_results.qi","body":{"result":"upload_failed"}}'
+
