@@ -30,7 +30,7 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
         twine upload dist/*
-    - name: Chck if the job has failed
+    - name: Check if the job has failed
       if: ${{ failure() }}
       run: |
         curl --request POST \

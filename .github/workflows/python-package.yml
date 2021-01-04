@@ -53,7 +53,7 @@ jobs:
         --header 'Content-Type: application/json' \
         --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
         --data '{"req":"note.add","file":"build_results.qi","body":{"result":"success"}}'
-    - name: Chck if the job has failed
+    - name: Check if the job has failed
       if: ${{ failure() }}
       run: |
         curl --request POST \
