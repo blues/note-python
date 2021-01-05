@@ -42,7 +42,7 @@ jobs:
     - name: Lint Docs with Pydocstyle
       run: |
         pydocstyle notecard/ examples/
-    - name: Send building notification
+    - name: Send running tests notification
       run: |
         curl --request POST \
         --url 'https://api.notefile.net/?product=${{ secrets.NOTEHUB_PRODUCT_UID }}&device=${{ secrets.NOTECARD_DEVICE_ID }}' \
