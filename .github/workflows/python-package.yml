@@ -42,6 +42,13 @@ jobs:
     - name: Lint Docs with Pydocstyle
       run: |
         pydocstyle notecard/ examples/
+    - name: Send building notification
+      run: |
+        curl --request POST \
+        --url 'https://api.notefile.net/?product=${{ secrets.NOTEHUB_PRODUCT_UID }}&device=${{ secrets.NOTECARD_DEVICE_ID }}' \
+        --header 'Content-Type: application/json' \
+        --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
+        --data '{"req":"note.add","file":"build_results.qi","body":{"result":"running_tests"}}'
     - name: Test with pytest
       run: |
         pytest
