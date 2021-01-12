@@ -3,6 +3,7 @@
 This file contains a complete working sample for using the note-python
 library with an I2C Notecard connection.
 """
+import json
 import sys
 import os
 import time
@@ -40,11 +41,7 @@ def transactionTest(card):
 
     """
     req = {"req": "card.status"}
-    req["string"] = "string"
-    req["bool"] = True
-    req["integer"] = 5
-    req["real"] = 5.0
-    req["object"] = {"temp": 18.6}
+
     try:
         rsp = card.Transaction(req)
         print(rsp)
