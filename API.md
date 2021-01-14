@@ -63,7 +63,10 @@
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
+| `default`        | env.default            |
 | `get`                  | env.get            |
+| `modified`        | env.modified          |
+| `set`                  | env.set            |
 
 ## File Commands
 

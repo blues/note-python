@@ -106,6 +106,7 @@ def test_hub_set():
                        mode="continuous",
                        outbound=2,
                        inbound=60,
+                       duration=5,
                        sync=True,
                        align=True,
                        voutbound="2.3",
@@ -211,7 +212,7 @@ def test_card_temp():
                              for char in
                              "{\"value\":33.625,\"calibration\":-3.0}\r\n"]
 
-    response = card.temp(nCard)
+    response = card.temp(nCard, minutes=20)
 
     assert "value" in response
     assert response["value"] == 33.625
@@ -226,7 +227,8 @@ def test_card_attn():
 
     response = card.attn(nCard, mode="arm, files",
                          files=["sensors.qo"],
-                         seconds=10)
+                         seconds=10, payload={"foo": "bar"},
+                         start=True)
 
     assert "set" in response
     assert response["set"] is True
@@ -257,7 +259,7 @@ def test_card_wireless():
                              for char in
                              "{\"status\":\"{modem-off}\",\"count\":1}\r\n"]
 
-    response = card.wireless(nCard, mode="auto")
+    response = card.wireless(nCard, mode="auto", apn="-")
 
     assert "status" in response
     assert response["status"] == "{modem-off}"
@@ -336,6 +338,21 @@ def test_note_changes():
     assert response["changes"] == 5
 
 
+def test_note_template():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"bytes\":40}\r\n"]
+
+    response = note.template(nCard, file="sensors.qo",
+                             body={"temp": 1.1, "hu": 1},
+                             length=5)
+
+    assert "bytes" in response
+    assert response["bytes"] == 40
+
+
 def test_debug_mode_on_serial():
     serial = Mock()  # noqa: F811
     port = serial.Serial("/dev/tty.foo", 9600)
@@ -356,6 +373,30 @@ def test_debug_mode_on_i2c():
     assert nCard._debug
 
 
+def test_env_default():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{}\r\n"]
+
+    response = env.default(nCard, name="pump", text="on")
+
+    assert response == {}
+
+
+def test_env_set():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{}\r\n"]
+
+    response = env.set(nCard, name="pump", text="on")
+
+    assert response == {}
+
+
 def test_env_get():
     nCard, port = get_serial_and_port()
 
@@ -366,6 +407,19 @@ def test_env_get():
     response = env.get(nCard, name="pump")
 
     assert response == {}
+
+
+def test_env_modified():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"time\": 1605814493}\r\n"]
+
+    response = env.modified(nCard)
+
+    assert "time" in response
+    assert response["time"] == 1605814493
 
 
 def test_file_delete():
