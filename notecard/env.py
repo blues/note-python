@@ -19,8 +19,7 @@ def default(card, name=None, text=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        name (string): The name of an environment variable to set a default
-            for.
+        name (string): The name of an environment var to set a default for.
         text (optional): The default value. Omit to delete the default.
 
     Returns:

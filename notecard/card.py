@@ -79,9 +79,8 @@ def temp(card, minutes=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        mintues (int): If specified, creates a templated _temp.qo file that
-            gathers Notecard temperature value at the specified minutes
-            interval.
+        minutes (int): If specified, creates a templated _temp.qo file that
+            gathers Notecard temperature value at the specified interval.
 
     Returns:
         string: The result of the Notecard request.

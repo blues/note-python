@@ -16,17 +16,17 @@
 
  Members                        | Descriptions                                
 --------------------------------|---------------------------------------------
-`public def `[`attn`](#namespacenotecard_1_1card_1a66d11c5cf97cea66c5399ddeafa683ff)`(card,mode,files,seconds)`            | Configure interrupt detection between a host and Notecard.
+`public def `[`attn`](#namespacenotecard_1_1card_1ad11e82dd52c3c9f5ae3f1de5f7f5a9b9)`(card,mode,files,seconds,payload,start)`            | Configure interrupt detection between a host and Notecard.
 `public def `[`time`](#namespacenotecard_1_1card_1a0de0f6e72a2387d09aaaa4a719383313)`(card)`            | Retrieve the current time and date from the Notecard.
 `public def `[`status`](#namespacenotecard_1_1card_1a13f03abe1576ab81ea8190e3074576ce)`(card)`            | Retrieve the status of the Notecard.
-`public def `[`temp`](#namespacenotecard_1_1card_1a11263797d8e80f242ff7738989d7de53)`(card)`            | Retrieve the current temperature from the Notecard.
+`public def `[`temp`](#namespacenotecard_1_1card_1aa15a26b60d8f8be7f994338f0af563cf)`(card,minutes)`            | Retrieve the current temperature from the Notecard.
 `public def `[`version`](#namespacenotecard_1_1card_1ac0a7ef1176b55152d42de04d39dfac54)`(card)`            | Retrieve firmware version information from the Notecard.
 `public def `[`voltage`](#namespacenotecard_1_1card_1a1f9f65c34f1bd959d7902285a7537ce6)`(card,hours,offset,vmax,vmin)`            | Retrieve current and historical voltage info from the Notecard.
-`public def `[`wireless`](#namespacenotecard_1_1card_1a6a33968774db1f252c5ab18c6a7b7af9)`(card,mode)`            | Retrieve wireless modem info or customize modem behavior.
+`public def `[`wireless`](#namespacenotecard_1_1card_1a10f5f4667d80f47674d1876df69b8e22)`(card,mode,apn)`            | Retrieve wireless modem info or customize modem behavior.
 
 ## Members
 
-#### `public def `[`attn`](#namespacenotecard_1_1card_1a66d11c5cf97cea66c5399ddeafa683ff)`(card,mode,files,seconds)` 
+#### `public def `[`attn`](#namespacenotecard_1_1card_1ad11e82dd52c3c9f5ae3f1de5f7f5a9b9)`(card,mode,files,seconds,payload,start)` 
 
 Configure interrupt detection between a host and Notecard.
 
@@ -37,7 +37,11 @@ Configure interrupt detection between a host and Notecard.
 
 * `files` A collection of notefiles to watch. 
 
-* `seconds` A timeout to use when arming attn mode.
+* `seconds` A timeout to use when arming attn mode. 
+
+* `payload` When using sleep mode, a payload of data from the host that the Notecard should hold in memory until retrieved by the host. 
+
+* `start` When using sleep mode and the host has reawakened, request the Notecard to return the stored payload.
 
 #### Returns
 
@@ -68,12 +72,14 @@ Retrieve the status of the Notecard.
 #### Returns
 string The result of the Notecard request.
 
-#### `public def `[`temp`](#namespacenotecard_1_1card_1a11263797d8e80f242ff7738989d7de53)`(card)` 
+#### `public def `[`temp`](#namespacenotecard_1_1card_1aa15a26b60d8f8be7f994338f0af563cf)`(card,minutes)` 
 
 Retrieve the current temperature from the Notecard.
 
 #### Parameters
-* `card` The current Notecard object.
+* `card` The current Notecard object. 
+
+* `minutes` If specified, creates a templated _temp.qo file that gathers Notecard temperature value at the specified interval.
 
 #### Returns
 
@@ -112,14 +118,16 @@ Retrieve current and historical voltage info from the Notecard.
 #### Returns
 string The result of the Notecard request.
 
-#### `public def `[`wireless`](#namespacenotecard_1_1card_1a6a33968774db1f252c5ab18c6a7b7af9)`(card,mode)` 
+#### `public def `[`wireless`](#namespacenotecard_1_1card_1a10f5f4667d80f47674d1876df69b8e22)`(card,mode,apn)` 
 
 Retrieve wireless modem info or customize modem behavior.
 
 #### Parameters
 * `card` The current Notecard object. 
 
-* `mode` The wireless module mode to set.
+* `mode` The wireless module mode to set. 
+
+* `apn` Access Point Name (APN) when using an external SIM.
 
 #### Returns
 
@@ -132,9 +140,28 @@ string The result of the Notecard request.
 
  Members                        | Descriptions                                
 --------------------------------|---------------------------------------------
+`public def `[`default`](#namespacenotecard_1_1env_1a6ff91175ae591e8a3a87c2a4ef9c5a13)`(card,name,text)`            | Perform an [env.default](#namespacenotecard_1_1env_1a6ff91175ae591e8a3a87c2a4ef9c5a13) request against a Notecard.
 `public def `[`get`](#namespacenotecard_1_1env_1a28ed0423d0aff1d109371427139e0a73)`(card,name)`            | Perform an [env.get](#namespacenotecard_1_1env_1a28ed0423d0aff1d109371427139e0a73) request against a Notecard.
+`public def `[`modified`](#namespacenotecard_1_1env_1aa672554b72786c9ec1e5f76b3e11eb34)`(card)`            | Perform an [env.modified](#namespacenotecard_1_1env_1aa672554b72786c9ec1e5f76b3e11eb34) request against a Notecard.
+`public def `[`set`](#namespacenotecard_1_1env_1a848e61d00dc69d8d143b4a5a92c41e45)`(card,name,text)`            | Perform an [env.set](#namespacenotecard_1_1env_1a848e61d00dc69d8d143b4a5a92c41e45) request against a Notecard.
 
 ## Members
+
+#### `public def `[`default`](#namespacenotecard_1_1env_1a6ff91175ae591e8a3a87c2a4ef9c5a13)`(card,name,text)` 
+
+Perform an [env.default](#namespacenotecard_1_1env_1a6ff91175ae591e8a3a87c2a4ef9c5a13) request against a Notecard.
+
+#### Parameters
+* `card` The current Notecard object. 
+
+* `name` The name of an environment var to set a default for. 
+
+* `text` The default value. Omit to delete the default.
+
+#### Returns
+
+#### Returns
+string The result of the Notecard request.
 
 #### `public def `[`get`](#namespacenotecard_1_1env_1a28ed0423d0aff1d109371427139e0a73)`(card,name)` 
 
@@ -144,6 +171,34 @@ Perform an [env.get](#namespacenotecard_1_1env_1a28ed0423d0aff1d109371427139e0a7
 * `card` The current Notecard object. 
 
 * `name` The name of an environment variable to get.
+
+#### Returns
+
+#### Returns
+string The result of the Notecard request.
+
+#### `public def `[`modified`](#namespacenotecard_1_1env_1aa672554b72786c9ec1e5f76b3e11eb34)`(card)` 
+
+Perform an [env.modified](#namespacenotecard_1_1env_1aa672554b72786c9ec1e5f76b3e11eb34) request against a Notecard.
+
+#### Parameters
+* `card` The current Notecard object.
+
+#### Returns
+
+#### Returns
+string The result of the Notecard request.
+
+#### `public def `[`set`](#namespacenotecard_1_1env_1a848e61d00dc69d8d143b4a5a92c41e45)`(card,name,text)` 
+
+Perform an [env.set](#namespacenotecard_1_1env_1a848e61d00dc69d8d143b4a5a92c41e45) request against a Notecard.
+
+#### Parameters
+* `card` The current Notecard object. 
+
+* `name` The name of an environment variable to set. 
+
+* `text` The variable value. Omit to delete.
 
 #### Returns
 
@@ -223,7 +278,7 @@ string The result of the Notecard request.
 
  Members                        | Descriptions                                
 --------------------------------|---------------------------------------------
-`public def `[`set`](#namespacenotecard_1_1hub_1ad3e2550e7f15c0cff7f97c003dad0149)`(card,product,sn,mode,outbound,inbound,`[`sync`](#namespacenotecard_1_1hub_1a614f01eb985b28a45706183f7a7a20ea)`,align,voutbound,vinbound,host)`            | Configure Notehub behavior on the Notecard.
+`public def `[`set`](#namespacenotecard_1_1hub_1a73cf5906caf41a3342c8838ad0bb8d48)`(card,product,sn,mode,outbound,inbound,duration,`[`sync`](#namespacenotecard_1_1hub_1a614f01eb985b28a45706183f7a7a20ea)`,align,voutbound,vinbound,host)`            | Configure Notehub behavior on the Notecard.
 `public def `[`sync`](#namespacenotecard_1_1hub_1a614f01eb985b28a45706183f7a7a20ea)`(card)`            | Initiate a sync of the Notecard to Notehub.
 `public def `[`syncStatus`](#namespacenotecard_1_1hub_1adeec5dd54d3ce966f7e08bee81105d2b)`(card,`[`sync`](#namespacenotecard_1_1hub_1a614f01eb985b28a45706183f7a7a20ea)`)`            | Retrieve the status of a sync request.
 `public def `[`status`](#namespacenotecard_1_1hub_1a5c44efc254a08e2f8eb6d6b2d3d9ab82)`(card)`            | Retrieve the status of the Notecard's connection.
@@ -232,7 +287,7 @@ string The result of the Notecard request.
 
 ## Members
 
-#### `public def `[`set`](#namespacenotecard_1_1hub_1ad3e2550e7f15c0cff7f97c003dad0149)`(card,product,sn,mode,outbound,inbound,`[`sync`](#namespacenotecard_1_1hub_1a614f01eb985b28a45706183f7a7a20ea)`,align,voutbound,vinbound,host)` 
+#### `public def `[`set`](#namespacenotecard_1_1hub_1a73cf5906caf41a3342c8838ad0bb8d48)`(card,product,sn,mode,outbound,inbound,duration,`[`sync`](#namespacenotecard_1_1hub_1a614f01eb985b28a45706183f7a7a20ea)`,align,voutbound,vinbound,host)` 
 
 Configure Notehub behavior on the Notecard.
 
@@ -248,6 +303,8 @@ Configure Notehub behavior on the Notecard.
 * `outbound` Max time to wait to sync outgoing data. 
 
 * `inbound` Max time to wait to sync incoming data. 
+
+* `duration` If in continuous mode, the amount of time, in minutes, of each session. 
 
 * `sync` If in continuous mode, whether to automatically sync each time a change is detected on the device or Notehub. 
 
@@ -342,6 +399,7 @@ string The result of the Notecard request.
 `public def `[`get`](#namespacenotecard_1_1note_1ad7a4c296382c14a8efb54278c127d73b)`(card,file,note_id,`[`delete`](#namespacenotecard_1_1note_1a591ece0048b58f38acf22d97a533577f)`,deleted)`            | Retrieve a note from an inbound or DB Notefile.
 `public def `[`delete`](#namespacenotecard_1_1note_1a591ece0048b58f38acf22d97a533577f)`(card,file,note_id)`            | Delete a DB note in a Notefile by its ID.
 `public def `[`update`](#namespacenotecard_1_1note_1a149f30ef24735181e7d55477a50bd9d5)`(card,file,note_id,body,payload)`            | Update a note in a DB Notefile by ID.
+`public def `[`template`](#namespacenotecard_1_1note_1a1e625660366b3766ec9efa8270a7f5bb)`(card,file,body,length)`            | Create a template for new Notes in a Notefile.
 
 ## Members
 
@@ -427,6 +485,24 @@ Update a note in a DB Notefile by ID.
 #### Returns
 string The result of the Notecard request.
 
+#### `public def `[`template`](#namespacenotecard_1_1note_1a1e625660366b3766ec9efa8270a7f5bb)`(card,file,body,length)` 
+
+Create a template for new Notes in a Notefile.
+
+#### Parameters
+* `card` The current Notecard object. 
+
+* `file` The file name of the notefile. 
+
+* `body` A sample JSON body that specifies field names and values as "hints" for the data type. 
+
+* `length` If provided, the maximum length of a payload that can be sent in Notes for the template Notefile.
+
+#### Returns
+
+#### Returns
+string The result of the Notecard request.
+
 # namespace `notecard::notecard` 
 
 ## Summary
@@ -435,7 +511,8 @@ string The result of the Notecard request.
 --------------------------------|---------------------------------------------
 `public def `[`serialReadByte`](#namespacenotecard_1_1notecard_1a86722827e14af53ddcd38c47ff9a119a)`(port)`            | Read a single byte from a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
 `public def `[`serialReset`](#namespacenotecard_1_1notecard_1aa1badb3c10bdc0321b9a556e8cd49148)`(port)`            | Send a reset command to a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
-`public def `[`serialTransaction`](#namespacenotecard_1_1notecard_1aee094fc03befdcbe4ee4a9d658d09841)`(port,req,debug)`            | Perform a single write to a read from a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
+`public def `[`serialTransaction`](#namespacenotecard_1_1notecard_1aee094fc03befdcbe4ee4a9d658d09841)`(port,req,debug)`            | Perform a single write to and read from a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
+`public def `[`serialCommand`](#namespacenotecard_1_1notecard_1af2b5752d8f67ffcebeda99511e37e7a1)`(port,req,debug)`            | Perform a single write to and read from a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
 `class `[`notecard::notecard::Notecard`](#classnotecard_1_1notecard_1_1_notecard) | Base [Notecard](#classnotecard_1_1notecard_1_1_notecard) class.
 `class `[`notecard::notecard::OpenI2C`](#classnotecard_1_1notecard_1_1_open_i2_c) | [Notecard](#classnotecard_1_1notecard_1_1_notecard) class for I2C communication.
 `class `[`notecard::notecard::OpenSerial`](#classnotecard_1_1notecard_1_1_open_serial) | [Notecard](#classnotecard_1_1notecard_1_1_notecard) class for Serial communication.
@@ -452,7 +529,11 @@ Send a reset command to a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
 
 #### `public def `[`serialTransaction`](#namespacenotecard_1_1notecard_1aee094fc03befdcbe4ee4a9d658d09841)`(port,req,debug)` 
 
-Perform a single write to a read from a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
+Perform a single write to and read from a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
+
+#### `public def `[`serialCommand`](#namespacenotecard_1_1notecard_1af2b5752d8f67ffcebeda99511e37e7a1)`(port,req,debug)` 
+
+Perform a single write to and read from a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
 
 # class `notecard::notecard::Notecard` 
 
@@ -539,6 +620,7 @@ class notecard::notecard::OpenSerial
 `public  `[`lock`](#classnotecard_1_1notecard_1_1_open_serial_1afbc7e0e12502762f8d7a205085ec9deb) | 
 `public def `[`Request`](#classnotecard_1_1notecard_1_1_open_serial_1aed3df72d86f07f5960500b811213db68)`(self,req)` | Call the Transaction method and discard the result.
 `public def `[`RequestResponse`](#classnotecard_1_1notecard_1_1_open_serial_1aec9d0d2754f4d8744c4db8d9488c859f)`(self,req)` | Call the Transaction method and return the result.
+`public def `[`Command`](#classnotecard_1_1notecard_1_1_open_serial_1aa6f70223bc2bfdaf9da2667f4181d4ad)`(self,req)` | Perform a [Notecard](#classnotecard_1_1notecard_1_1_notecard) command and exit with no response.
 `public def `[`Transaction`](#classnotecard_1_1notecard_1_1_open_serial_1aeb9a39cf7f794a38e8aadd1d9db6f7c7)`(self,req)` | Perform a [Notecard](#classnotecard_1_1notecard_1_1_notecard) transaction and return the result.
 `public def `[`Reset`](#classnotecard_1_1notecard_1_1_open_serial_1a849ee6e929c9dd79438f0fa6df78a3c0)`(self)` | Reset the [Notecard](#classnotecard_1_1notecard_1_1_notecard).
 `public def `[`__init__`](#classnotecard_1_1notecard_1_1_open_serial_1a917a4086f15fe6b83e5342a36a1b2dbc)`(self,uart_id,debug)` | Initialize the [Notecard](#classnotecard_1_1notecard_1_1_notecard) before a reset.
@@ -556,6 +638,10 @@ Call the Transaction method and discard the result.
 #### `public def `[`RequestResponse`](#classnotecard_1_1notecard_1_1_open_serial_1aec9d0d2754f4d8744c4db8d9488c859f)`(self,req)` 
 
 Call the Transaction method and return the result.
+
+#### `public def `[`Command`](#classnotecard_1_1notecard_1_1_open_serial_1aa6f70223bc2bfdaf9da2667f4181d4ad)`(self,req)` 
+
+Perform a [Notecard](#classnotecard_1_1notecard_1_1_notecard) command and exit with no response.
 
 #### `public def `[`Transaction`](#classnotecard_1_1notecard_1_1_open_serial_1aeb9a39cf7f794a38e8aadd1d9db6f7c7)`(self,req)` 
 

@@ -131,8 +131,7 @@ def template(card, file=None, body=None, length=None):
         card (Notecard): The current Notecard object.
         file (string): The file name of the notefile.
         body (JSON): A sample JSON body that specifies field names and
-            values as "hints" for the data type. Possible data types
-            are: boolean, integer, float, and string.
+            values as "hints" for the data type.
         length (int): If provided, the maximum length of a payload that
             can be sent in Notes for the template Notefile.
 
