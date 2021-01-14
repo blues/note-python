@@ -5,9 +5,9 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="note-python",
-    version="1.1.2",
+    version="1.2.0",
     author="Blues Inc.",
-    author_email="hello@blues.io",
+    author_email="support@blues.com",
     description="Cross-platform Python Library for the Blues Wireless Notecard,",
     long_description=long_description,
     long_description_content_type="text/markdown",
