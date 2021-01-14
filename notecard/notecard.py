@@ -92,7 +92,7 @@ def serialReset(port):
 
 
 def serialTransaction(port, req, debug):
-    """Perform a single write to a read from a Notecard."""
+    """Perform a single write to and read from a Notecard."""
     req_json = json.dumps(req)
     if debug:
         print(req_json)
@@ -131,6 +131,29 @@ def serialTransaction(port, req, debug):
     return rsp
 
 
+def serialCommand(port, req, debug):
+    """Perform a single write to and read from a Notecard."""
+    req_json = json.dumps(req)
+    if debug:
+        print(req_json)
+    req_json += "\n"
+
+    seg_off = 0
+    seg_left = len(req_json)
+    while True:
+        seg_len = seg_left
+        if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
+            seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
+
+        port.write(req_json[seg_off:seg_off + seg_len]
+                   .encode('utf-8'))
+        seg_off += seg_len
+        seg_left -= seg_len
+        if seg_left == 0:
+            break
+        time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+
+
 class Notecard:
     """Base Notecard class.
 
@@ -154,6 +177,22 @@ class OpenSerial(Notecard):
     def RequestResponse(self, req):
         """Call the Transaction method and return the result."""
         return self.Transaction(req)
+
+    def Command(self, req):
+        """Perform a Notecard command and exit with no response."""
+        if 'cmd' not in req:
+            raise Exception("Please use 'cmd' instead of 'req'")
+
+        if use_serial_lock:
+            try:
+                self.lock.acquire(timeout=5)
+                serialCommand(self.uart, req, self._debug)
+            except Timeout:
+                raise Exception("Notecard in use")
+            finally:
+                self.lock.release()
+        else:
+            serialCommand(self.uart, req, self._debug)
 
     def Transaction(self, req):
         """Perform a Notecard transaction and return the result."""
