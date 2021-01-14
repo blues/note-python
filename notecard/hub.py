@@ -15,7 +15,7 @@ from .validators import validate_card_object
 
 @validate_card_object
 def set(card, product, sn=None, mode=None, outbound=None,
-        inbound=None, sync=False, align=None, voutbound=None,
+        inbound=None, duration=None, sync=False, align=None, voutbound=None,
         vinbound=None, host=None):
     """Configure Notehub behavior on the Notecard.
 
@@ -26,6 +26,8 @@ def set(card, product, sn=None, mode=None, outbound=None,
         mode (string): The sync mode to use.
         outbound (int): Max time to wait to sync outgoing data.
         inbound (int): Max time to wait to sync incoming data.
+        duration (int): If in continuous mode, the amount of time, in minutes,
+            of each session.
         sync (bool): If in continuous mode, whether to automatically
             sync each time a change is detected on the device or Notehub.
         align (bool): To align syncs to a regular time-interval, as opposed
@@ -48,6 +50,8 @@ def set(card, product, sn=None, mode=None, outbound=None,
         req["outbound"] = outbound
     if inbound:
         req["inbound"] = inbound
+    if duration:
+        req["duration"] = duration
     if sync is not None:
         req["sync"] = sync
     if align is not None:

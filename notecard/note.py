@@ -121,3 +121,29 @@ def update(card, file=None, note_id=None, body=None, payload=None):
     if payload:
         req["payload"] = payload
     return card.Transaction(req)
+
+
+@validate_card_object
+def template(card, file=None, body=None, length=None):
+    """Create a template for new Notes in a Notefile.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        file (string): The file name of the notefile.
+        body (JSON): A sample JSON body that specifies field names and
+            values as "hints" for the data type. Possible data types
+            are: boolean, integer, float, and string.
+        length (int): If provided, the maximum length of a payload that
+            can be sent in Notes for the template Notefile.
+
+    Returns:
+        string: The result of the Notecard request.
+    """
+    req = {"req": "note.get"}
+    if file:
+        req["file"] = file
+    if body:
+        req["body"] = body
+    if length:
+        req["length"] = length
+    return card.Transaction(req)
