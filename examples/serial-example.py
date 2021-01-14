@@ -46,11 +46,7 @@ def transactionTest(card):
 
     """
     req = {"req": "card.status"}
-    req["string"] = "string"
-    req["bool"] = True
-    req["integer"] = 5
-    req["real"] = 5.0
-    req["object"] = {"temp": 18.6}
+
     try:
         rsp = card.Transaction(req)
         print(rsp)

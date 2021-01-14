@@ -14,7 +14,7 @@ from .validators import validate_card_object
 
 
 @validate_card_object
-def attn(card, mode=None, files=None, seconds=None):
+def attn(card, mode=None, files=None, seconds=None, payload=None, start=None):
     """Configure interrupt detection between a host and Notecard.
 
     Args:
@@ -22,6 +22,11 @@ def attn(card, mode=None, files=None, seconds=None):
         mode (string): The attn mode to set.
         files (array): A collection of notefiles to watch.
         seconds (int): A timeout to use when arming attn mode.
+        payload (int): When using sleep mode, a payload of data from the host
+            that the Notecard should hold in memory until retrieved by
+            the host.
+        start (bool): When using sleep mode and the host has reawakened,
+            request the Notecard to return the stored payload.
 
     Returns:
         string: The result of the Notecard request.
@@ -33,6 +38,10 @@ def attn(card, mode=None, files=None, seconds=None):
         req["files"] = files
     if seconds:
         req["seconds"] = seconds
+    if payload:
+        req["payload"] = payload
+    if start:
+        req["start"] = start
     return card.Transaction(req)
 
 
@@ -65,16 +74,21 @@ def status(card):
 
 
 @validate_card_object
-def temp(card):
+def temp(card, minutes=None):
     """Retrieve the current temperature from the Notecard.
 
     Args:
         card (Notecard): The current Notecard object.
+        mintues (int): If specified, creates a templated _temp.qo file that
+            gathers Notecard temperature value at the specified minutes
+            interval.
 
     Returns:
         string: The result of the Notecard request.
     """
     req = {"req": "card.temp"}
+    if minutes:
+        req["minutes"] = minutes
     return card.Transaction(req)
 
 
@@ -119,12 +133,13 @@ def voltage(card, hours=None, offset=None, vmax=None, vmin=None):
 
 
 @validate_card_object
-def wireless(card, mode=None):
+def wireless(card, mode=None, apn=None):
     """Retrieve wireless modem info or customize modem behavior.
 
     Args:
         card (Notecard): The current Notecard object.
         mode (string): The wireless module mode to set.
+        apn (string): Access Point Name (APN) when using an external SIM.
 
     Returns:
         string: The result of the Notecard request.
@@ -132,5 +147,7 @@ def wireless(card, mode=None):
     req = {"req": "card.wireless"}
     if mode:
         req["mode"] = mode
+    if apn:
+        req["apn"] = apn
 
     return card.Transaction(req)
