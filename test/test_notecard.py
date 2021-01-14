@@ -57,6 +57,21 @@ def test_transaction():
     assert response["connected"] is True
 
 
+def test_command():
+    nCard, port = get_serial_and_port()
+
+    response = nCard.Command({"cmd": "card.sleep"})
+
+    assert response is None
+
+
+def test_command_fail_if_req():
+    nCard, port = get_serial_and_port()
+
+    with pytest.raises(Exception, match="Please use 'cmd' instead of 'req'"):
+        nCard.Command({"req": "card.sleep"})
+
+
 def test_request_response():
     nCard, port = get_serial_and_port()
 
