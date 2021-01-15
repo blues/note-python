@@ -169,15 +169,6 @@ class Notecard:
 class OpenSerial(Notecard):
     """Notecard class for Serial communication."""
 
-    def Request(self, req):
-        """Call the Transaction method and discard the result."""
-        self.Transaction(req)
-        return True
-
-    def RequestResponse(self, req):
-        """Call the Transaction method and return the result."""
-        return self.Transaction(req)
-
     def Command(self, req):
         """Perform a Notecard command and exit with no response."""
         if 'cmd' not in req:
@@ -232,6 +223,22 @@ class OpenSerial(Notecard):
 
 class OpenI2C(Notecard):
     """Notecard class for I2C communication."""
+
+    def Command(self, req):
+        """Perform a Notecard command and exit with no response."""
+        if 'cmd' not in req:
+            raise Exception("Please use 'cmd' instead of 'req'")
+
+        if use_serial_lock:
+            try:
+                self.lock.acquire(timeout=5)
+                serialCommand(self.uart, req, self._debug)
+            except Timeout:
+                raise Exception("Notecard in use")
+            finally:
+                self.lock.release()
+        else:
+            serialCommand(self.uart, req, self._debug)
 
     def Transaction(self, req):
         """Perform a Notecard transaction and return the result."""

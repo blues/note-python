@@ -72,29 +72,6 @@ def test_command_fail_if_req():
         nCard.Command({"req": "card.sleep"})
 
 
-def test_request_response():
-    nCard, port = get_serial_and_port()
-
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in "{\"connected\":true}\r\n"]
-
-    response = nCard.RequestResponse({"req": "hub.status"})
-
-    assert "connected" in response
-    assert response["connected"] is True
-
-
-def test_request():
-    nCard, port = get_serial_and_port()
-
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in "{\"connected\":true}\r\n"]
-
-    response = nCard.Request({"req": "hub.status"})
-
-    assert response is True
-
-
 def test_hub_set():
     nCard, port = get_serial_and_port()
 
