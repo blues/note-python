@@ -96,7 +96,7 @@ print(rsp) # {}
 ## Documentation
 
 The documentation for this library can be found
-[here](https://blues.github.io/note-python/docs/html/index.html).
+[here](https://dev.blues.io/tools-and-sdks/python-library/).
 
 ## Examples
 
