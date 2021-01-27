@@ -35,6 +35,7 @@ import json
 import time
 
 use_periphery = False
+use_micropython = False
 use_serial_lock = False
 if sys.implementation.name == 'cpython':
     if sys.platform == "linux" or sys.platform == "linux2":
@@ -43,6 +44,8 @@ if sys.implementation.name == 'cpython':
 
         use_serial_lock = True
         from filelock import Timeout, FileLock
+elif sys.implementation.name == 'micropython':
+    use_micropython = True
 
 NOTECARD_I2C_ADDRESS = 0x17
 
@@ -268,6 +271,9 @@ class OpenI2C(Notecard):
                 if use_periphery:
                     msgs = [I2C.Message(reg + write_data)]
                     self.i2c.transfer(self.addr, msgs)
+                elif use_micropython:
+                    self.i2c.writeto(self.addr, reg, False)
+                    self.i2c.writeto(self.addr, write_data, True)
                 else:
                     self.i2c.writeto(self.addr, reg + write_data)
                 chunk_offset += chunk_len
@@ -292,6 +298,9 @@ class OpenI2C(Notecard):
                     msgs = [I2C.Message(reg), I2C.Message(buf, read=True)]
                     self.i2c.transfer(self.addr, msgs)
                     buf = msgs[1].data
+                elif use_micropython:
+                    self.i2c.writeto(self.addr, reg, False)
+                    self.i2c.readfrom_into(self.addr, buf)
                 else:
                     self.i2c.writeto_then_readfrom(self.addr, reg, buf)
                 available = buf[0]
@@ -339,6 +348,9 @@ class OpenI2C(Notecard):
                     msgs = [I2C.Message(reg), I2C.Message(buf, read=True)]
                     self.i2c.transfer(self.addr, msgs)
                     buf = msgs[1].data
+                elif use_micropython:
+                    self.i2c.writeto(self.addr, reg, False)
+                    self.i2c.readfrom_into(self.addr, buf)
                 else:
                     self.i2c.writeto_then_readfrom(self.addr, reg, buf)
                 available = buf[0]
@@ -352,13 +364,13 @@ class OpenI2C(Notecard):
 
     def lock(self):
         """Lock the I2C port so the host can interact with the Notecard."""
-        if not use_periphery:
+        if not use_periphery and not use_micropython:
             return self.i2c.try_lock()
         return True
 
     def unlock(self):
         """Unlock the I2C port."""
-        if not use_periphery:
+        if not use_periphery and not use_micropython:
             return self.i2c.unlock()
         return True
 
