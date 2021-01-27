@@ -5,18 +5,18 @@ agree to abide by the Blues Inc [code of conduct].
 
 [code of conduct]: https://blues.github.io/opensource/code-of-conduct
 
-Here are some ways *you* can contribute:
+Here are some ways *you* can contribute by:
 
-* by using alpha, beta, and prerelease versions
-* by reporting bugs
-* by suggesting new features
-* by writing or editing documentation
-* by writing specifications
-* by writing code ( **no patch is too small** : fix typos, add comments,
+* using alpha, beta, and prerelease versions
+* reporting bugs
+* suggesting new features
+* writing or editing documentation
+* writing specifications
+* writing code ( **no patch is too small** : fix typos, add comments,
 clean up inconsistent whitespace )
-* by refactoring code
-* by closing [issues][]
-* by reviewing patches
+* refactoring code
+* closing [issues][]
+* reviewing patches
 
 [issues]: https://blues.github.com/note-python/issues
 
@@ -49,8 +49,8 @@ clean up inconsistent whitespace )
 5. [Submit a pull request.][pr]
 
 ## Notes
-* Please add tests if you changed code. Contributions without tests won't be
-* accepted. If you don't know how to add tests, please put in a PR and leave a
+* Please add tests if you changed code. Contributions without tests won't be accepted.
+* If you don't know how to add tests, please put in a PR and leave a
 * comment asking for help. We love helping!
 
 [repo]: https://github.com/blues/note-python/tree/master
