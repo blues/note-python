@@ -271,9 +271,6 @@ class OpenI2C(Notecard):
                 if use_periphery:
                     msgs = [I2C.Message(reg + write_data)]
                     self.i2c.transfer(self.addr, msgs)
-                elif use_micropython:
-                    self.i2c.writeto(self.addr, reg, False)
-                    self.i2c.writeto(self.addr, write_data, True)
                 else:
                     self.i2c.writeto(self.addr, reg + write_data)
                 chunk_offset += chunk_len
