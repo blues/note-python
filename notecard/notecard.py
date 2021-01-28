@@ -56,6 +56,16 @@ CARD_REQUEST_SEGMENT_MAX_LEN = 250
 CARD_REQUEST_SEGMENT_DELAY_MS = 250
 
 
+def prepareRequest(req, debug=False):
+    """Format the request string as a JSON object and add a newline."""
+    req_json = json.dumps(req)
+    if debug:
+        print(req_json)
+
+    req_json += "\n"
+    return req_json
+
+
 def serialReadByte(port):
     """Read a single byte from a Notecard."""
     if sys.implementation.name == 'micropython':
@@ -96,10 +106,7 @@ def serialReset(port):
 
 def serialTransaction(port, req, debug):
     """Perform a single write to and read from a Notecard."""
-    req_json = json.dumps(req)
-    if debug:
-        print(req_json)
-    req_json += "\n"
+    req_json = prepareRequest(req, debug)
 
     seg_off = 0
     seg_left = len(req_json)
@@ -136,10 +143,7 @@ def serialTransaction(port, req, debug):
 
 def serialCommand(port, req, debug):
     """Perform a single write to and read from a Notecard."""
-    req_json = json.dumps(req)
-    if debug:
-        print(req_json)
-    req_json += "\n"
+    req_json = prepareRequest(req, debug)
 
     seg_off = 0
     seg_left = len(req_json)
@@ -227,61 +231,56 @@ class OpenSerial(Notecard):
 class OpenI2C(Notecard):
     """Notecard class for I2C communication."""
 
+    def _sendPayload(self, json):
+        chunk_offset = 0
+        json_left = len(json)
+        sent_in_seg = 0
+        while json_left > 0:
+            time.sleep(.001)
+            chunk_len = min(json_left, self.max)
+            reg = bytearray(1)
+            reg[0] = chunk_len
+            write_data = bytes(json[
+                               chunk_offset:
+                               chunk_offset + chunk_len
+                               ], 'utf-8')
+            if use_periphery:
+                msgs = [I2C.Message(reg + write_data)]
+                self.i2c.transfer(self.addr, msgs)
+            else:
+                self.i2c.writeto(self.addr, reg + write_data)
+            chunk_offset += chunk_len
+            json_left -= chunk_len
+            sent_in_seg += chunk_len
+            if sent_in_seg > CARD_REQUEST_SEGMENT_MAX_LEN:
+                sent_in_seg -= CARD_REQUEST_SEGMENT_MAX_LEN
+            time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+
     def Command(self, req):
         """Perform a Notecard command and exit with no response."""
         if 'cmd' not in req:
             raise Exception("Please use 'cmd' instead of 'req'")
 
-        if use_serial_lock:
-            try:
-                self.lock.acquire(timeout=5)
-                serialCommand(self.uart, req, self._debug)
-            except Timeout:
-                raise Exception("Notecard in use")
-            finally:
-                self.lock.release()
-        else:
-            serialCommand(self.uart, req, self._debug)
+        req_json = prepareRequest(req, self._debug)
+
+        while not self.lock():
+            pass
+
+        try:
+            self._sendPayload(req_json)
+        finally:
+            self.unlock()
 
     def Transaction(self, req):
         """Perform a Notecard transaction and return the result."""
-        req_json = json.dumps(req)
-        if self._debug:
-            print(req_json)
-
-        req_json += "\n"
+        req_json = prepareRequest(req, self._debug)
         rsp_json = ""
 
         while not self.lock():
             pass
 
         try:
-            chunk_offset = 0
-            json_left = len(req_json)
-            sent_in_seg = 0
-            while json_left > 0:
-                time.sleep(.001)
-                chunk_len = min(json_left, self.max)
-                reg = bytearray(1)
-                reg[0] = chunk_len
-                write_data = bytes(req_json[
-                                   chunk_offset:
-                                   chunk_offset + chunk_len
-                                   ], 'utf-8')
-                if use_periphery:
-                    msgs = [I2C.Message(reg + write_data)]
-                    self.i2c.transfer(self.addr, msgs)
-                elif use_micropython:
-                    self.i2c.writeto(self.addr, reg, False)
-                    self.i2c.writeto(self.addr, write_data, True)
-                else:
-                    self.i2c.writeto(self.addr, reg + write_data)
-                chunk_offset += chunk_len
-                json_left -= chunk_len
-                sent_in_seg += chunk_len
-                if sent_in_seg > CARD_REQUEST_SEGMENT_MAX_LEN:
-                    sent_in_seg -= CARD_REQUEST_SEGMENT_MAX_LEN
-                time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+            self._sendPayload(req_json)
 
             chunk_len = 0
             received_newline = False
