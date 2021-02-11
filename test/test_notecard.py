@@ -255,6 +255,22 @@ def test_card_version():
     assert response["version"] == "notecard-1.2.3.9950"
 
 
+def test_note_add():
+    nCard, port = get_serial_and_port()
+
+    port.read.side_effect = [char.encode('utf-8')
+                             for char in
+                             "{\"total\":1}\r\n"]
+
+    response = note.add(nCard, file="sensors.qo",
+                        body={"temp": 72.22},
+                        payload="b64==",
+                        sync=True)
+
+    assert "total" in response
+    assert response["total"] == 1
+
+
 def test_note_get():
     nCard, port = get_serial_and_port()
 

@@ -14,6 +14,32 @@ from .validators import validate_card_object
 
 
 @validate_card_object
+def add(card, file=None, body=None, payload=None, sync=None):
+    """Add a Note to a Notefile.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        file (string): The name of the file.
+        body (JSON object): A developer-defined tracker ID.
+        payload (string): An optional base64-encoded string.
+        sync (bool): Perform an immediate sync after adding.
+
+    Returns:
+        string: The result of the Notecard request.
+    """
+    req = {"req": "note.add"}
+    if file:
+        req["file"] = file
+    if body:
+        req["body"] = body
+    if payload:
+        req["payload"] = payload
+    if sync is not None:
+        req["sync"] = sync
+    return card.Transaction(req)
+
+
+@validate_card_object
 def changes(card, file=None, tracker=None, maximum=None,
             start=None, stop=None, deleted=None, delete=None):
     """Incrementally retrieve changes within a Notefile.
