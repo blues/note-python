@@ -17,6 +17,7 @@ def get_serial_and_port():
     serial = Mock()  # noqa: F811
     port = serial.Serial("/dev/tty.foo", 9600)
     port.read.side_effect = [b'\r', b'\n', None]
+    port.read.side_effect = [b'\r', b'\n', None]
 
     nCard = notecard.OpenSerial(port)
 
@@ -51,6 +52,8 @@ def test_transaction():
     port.read.side_effect = [char.encode('utf-8')
                              for char in "{\"connected\":true}\r\n"]
 
+    port.readline.side_effect = "{\"connected\":true}\r\n"
+    print(port.readline())
     response = nCard.Transaction({"req": "hub.status"})
 
     assert "connected" in response
