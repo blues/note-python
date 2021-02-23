@@ -17,6 +17,7 @@ def get_serial_and_port():
     serial = Mock()  # noqa: F811
     port = serial.Serial("/dev/tty.foo", 9600)
     port.read.side_effect = [b'\r', b'\n', None]
+    port.readline.return_value = "\r\n"
 
     nCard = notecard.OpenSerial(port)
 
@@ -48,9 +49,8 @@ def test_open_i2c():
 def test_transaction():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in "{\"connected\":true}\r\n"]
-
+    port.readline.return_value = "{\"connected\":true}\r\n"
+    print(port.readline())
     response = nCard.Transaction({"req": "hub.status"})
 
     assert "connected" in response
@@ -75,9 +75,7 @@ def test_command_fail_if_req():
 def test_hub_set():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in "{}\r\n"]
-
+    port.readline.return_value = "{}\r\n"
     response = hub.set(nCard, product="com.blues.tester",
                        sn="foo",
                        mode="continuous",
@@ -101,9 +99,7 @@ def test_hub_set_invalid_card():
 def test_hub_sync():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in "{}\r\n"]
-
+    port.readline.return_value = "{}\r\n"
     response = hub.sync(nCard)
 
     assert response == {}
@@ -112,8 +108,7 @@ def test_hub_sync():
 def test_hub_sync_status():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in "{\"status\":\"connected\"}\r\n"]
+    port.readline.return_value = "{\"status\":\"connected\"}\r\n"
 
     response = hub.syncStatus(nCard, True)
 
@@ -124,8 +119,7 @@ def test_hub_sync_status():
 def test_hub_status():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in "{\"connected\":true}\r\n"]
+    port.readline.return_value = "{\"connected\":true}\r\n"
 
     response = hub.status(nCard)
 
@@ -136,8 +130,7 @@ def test_hub_status():
 def test_hub_log():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in "{}\r\n"]
+    port.readline.return_value = "{}\r\n"
 
     response = hub.log(nCard, "there's been an issue!", False)
 
@@ -147,8 +140,7 @@ def test_hub_log():
 def test_hub_get():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in "{\"mode\":\"continuous\"}\r\n"]
+    port.readline.return_value = "{\"mode\":\"continuous\"}\r\n"
 
     response = hub.get(nCard)
 
@@ -159,9 +151,7 @@ def test_hub_get():
 def test_card_time():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{\"time\":1592490375}\r\n"]
+    port.readline.return_value = "{\"time\":1592490375}\r\n"
 
     response = card.time(nCard)
 
@@ -172,9 +162,7 @@ def test_card_time():
 def test_card_status():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{\"usb\":true,\"status\":\"{normal}\"}\r\n"]
+    port.readline.return_value = "{\"usb\":true,\"status\":\"{normal}\"}\r\n"
 
     response = card.status(nCard)
 
@@ -185,9 +173,7 @@ def test_card_status():
 def test_card_temp():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{\"value\":33.625,\"calibration\":-3.0}\r\n"]
+    port.readline.return_value = "{\"value\":33.625,\"calibration\":-3.0}\r\n"
 
     response = card.temp(nCard, minutes=20)
 
@@ -198,9 +184,7 @@ def test_card_temp():
 def test_card_attn():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{\"set\":true}\r\n"]
+    port.readline.return_value = "{\"set\":true}\r\n"
 
     response = card.attn(nCard, mode="arm, files",
                          files=["sensors.qo"],
@@ -219,9 +203,7 @@ def test_card_attn_with_invalid_card():
 def test_card_voltage():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{\"hours\":707}\r\n"]
+    port.readline.return_value = "{\"hours\":707}\r\n"
 
     response = card.voltage(nCard, hours=24, offset=5, vmax=4, vmin=3)
 
@@ -232,9 +214,7 @@ def test_card_voltage():
 def test_card_wireless():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{\"status\":\"{modem-off}\",\"count\":1}\r\n"]
+    port.readline.return_value = "{\"status\":\"{modem-off}\",\"count\":1}\r\n"
 
     response = card.wireless(nCard, mode="auto", apn="-")
 
@@ -245,9 +225,7 @@ def test_card_wireless():
 def test_card_version():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{\"version\":\"notecard-1.2.3.9950\"}\r\n"]
+    port.readline.return_value = "{\"version\":\"notecard-1.2.3.9950\"}\r\n"
 
     response = card.version(nCard)
 
@@ -258,9 +236,7 @@ def test_card_version():
 def test_note_add():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{\"total\":1}\r\n"]
+    port.readline.return_value = "{\"total\":1}\r\n"
 
     response = note.add(nCard, file="sensors.qo",
                         body={"temp": 72.22},
@@ -274,9 +250,8 @@ def test_note_add():
 def test_note_get():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{\"note\":\"s\",\"body\":{\"s\":\"foo\"}}\r\n"]
+    port.readline.return_value = \
+        "{\"note\":\"s\",\"body\":{\"s\":\"foo\"}}\r\n"
 
     response = note.get(nCard, file="settings.db",
                         note_id="s",
@@ -290,9 +265,7 @@ def test_note_get():
 def test_note_delete():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{}\r\n"]
+    port.readline.return_value = "{}\r\n"
 
     response = note.delete(nCard, file="settings.db", note_id="s")
 
@@ -302,9 +275,7 @@ def test_note_delete():
 def test_note_update():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{}\r\n"]
+    port.readline.return_value = "{}\r\n"
 
     response = note.update(nCard, file="settings.db", note_id="s",
                            body={"foo": "bar"}, payload="123dfb==")
@@ -315,9 +286,7 @@ def test_note_update():
 def test_note_changes():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{\"changes\":5,\"total\":15}\r\n"]
+    port.readline.return_value = "{\"changes\":5,\"total\":15}\r\n"
 
     response = note.changes(nCard, file="sensors.qo",
                             tracker="123",
@@ -334,9 +303,7 @@ def test_note_changes():
 def test_note_template():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{\"bytes\":40}\r\n"]
+    port.readline.return_value = "{\"bytes\":40}\r\n"
 
     response = note.template(nCard, file="sensors.qo",
                              body={"temp": 1.1, "hu": 1},
@@ -369,9 +336,7 @@ def test_debug_mode_on_i2c():
 def test_env_default():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{}\r\n"]
+    port.readline.return_value = "{}\r\n"
 
     response = env.default(nCard, name="pump", text="on")
 
@@ -381,9 +346,7 @@ def test_env_default():
 def test_env_set():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{}\r\n"]
+    port.readline.return_value = "{}\r\n"
 
     response = env.set(nCard, name="pump", text="on")
 
@@ -393,9 +356,7 @@ def test_env_set():
 def test_env_get():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{}\r\n"]
+    port.readline.return_value = "{}\r\n"
 
     response = env.get(nCard, name="pump")
 
@@ -405,9 +366,7 @@ def test_env_get():
 def test_env_modified():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{\"time\": 1605814493}\r\n"]
+    port.readline.return_value = "{\"time\": 1605814493}\r\n"
 
     response = env.modified(nCard)
 
@@ -418,9 +377,7 @@ def test_env_modified():
 def test_file_delete():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{}\r\n"]
+    port.readline.return_value = "{}\r\n"
 
     response = file.delete(nCard, files=["sensors.qo"])
 
@@ -430,9 +387,7 @@ def test_file_delete():
 def test_file_changes():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{\"total\":5}\r\n"]
+    port.readline.return_value = "{\"total\":5}\r\n"
 
     response = file.changes(nCard, tracker="123", files=["sensors.qo"])
 
@@ -443,9 +398,7 @@ def test_file_changes():
 def test_file_stats():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{\"total\":24}\r\n"]
+    port.readline.return_value = "{\"total\":24}\r\n"
 
     response = file.stats(nCard)
 
@@ -456,9 +409,7 @@ def test_file_stats():
 def test_file_pendingChanges():
     nCard, port = get_serial_and_port()
 
-    port.read.side_effect = [char.encode('utf-8')
-                             for char in
-                             "{\"changes\":1}\r\n"]
+    port.readline.return_value = "{\"changes\":1}\r\n"
 
     response = file.pendingChanges(nCard)
 
