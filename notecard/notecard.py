@@ -123,10 +123,8 @@ def serialTransaction(port, req, debug):
             break
         time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
 
-    #rsp_json = ""
     rsp_json = port.readline()
-    #rsp_json = data.decode('utf-8')
-    print(rsp_json)
+
     if debug:
         print(rsp_json.rstrip())
 

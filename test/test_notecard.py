@@ -130,7 +130,7 @@ def test_hub_status():
 def test_hub_log():
     nCard, port = get_serial_and_port()
 
-    port.readline.return_value = "{}\r\n"    
+    port.readline.return_value = "{}\r\n"
 
     response = hub.log(nCard, "there's been an issue!", False)
 
@@ -151,7 +151,7 @@ def test_hub_get():
 def test_card_time():
     nCard, port = get_serial_and_port()
 
-    port.readline.return_value ="{\"time\":1592490375}\r\n"
+    port.readline.return_value = "{\"time\":1592490375}\r\n"
 
     response = card.time(nCard)
 
@@ -250,7 +250,8 @@ def test_note_add():
 def test_note_get():
     nCard, port = get_serial_and_port()
 
-    port.readline.return_value = "{\"note\":\"s\",\"body\":{\"s\":\"foo\"}}\r\n"
+    port.readline.return_value = \
+        "{\"note\":\"s\",\"body\":{\"s\":\"foo\"}}\r\n"
 
     response = note.get(nCard, file="settings.db",
                         note_id="s",
