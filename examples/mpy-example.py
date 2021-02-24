@@ -54,7 +54,8 @@ def main():
     try:
         if use_uart:
             port = UART(2, 9600)
-            port.init(9600, bits=8, parity=None, stop=1)
+            port.init(9600, bits=8, parity=None, stop=1,
+                      timeout=3000, timeout_char=100)
         else:
             port = I2C()
     except Exception as exception:
