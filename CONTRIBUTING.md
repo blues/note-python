@@ -18,7 +18,7 @@ clean up inconsistent whitespace )
 * closing [issues][]
 * reviewing patches
 
-[issues]: https://blues.github.com/note-python/issues
+[issues]: https://github.com/blues/note-python/issues
 
 ## Submitting an Issue
 
