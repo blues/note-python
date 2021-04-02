@@ -18,7 +18,7 @@ else:
 
 
 @validate_card_object
-def set(card, product, sn=None, mode=None, outbound=None,
+def set(card, product=None, sn=None, mode=None, outbound=None,
         inbound=None, duration=None, sync=False, align=None, voutbound=None,
         vinbound=None, host=None):
     """Configure Notehub behavior on the Notecard.
