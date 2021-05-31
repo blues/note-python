@@ -12,6 +12,8 @@ sys.path.insert(0, os.path.abspath(
 
 import notecard  # noqa: E402
 
+productUID = "com.your-company.your-project"
+
 # For UART and I2C IO
 use_periphery = False
 if sys.implementation.name != 'cpython':
@@ -38,21 +40,47 @@ def NotecardExceptionInfo(exception):
     return "line " + s1 + ": " + s2 + ": " + ' '.join(map(str, exception.args))
 
 
-def transactionTest(card):
+def configure_notecard(card):
     """Submit a simple JSON-based request to the Notecard.
 
     Args:
         card (object): An instance of the Notecard class
 
     """
-    req = {"req": "card.status"}
+    req = {"req": "hub.set"}
+    req["product"] = productUID
+    req["mode"] = "continuous"
 
     try:
-        rsp = card.Transaction(req)
-        print(rsp)
+        card.Transaction(req)
     except Exception as exception:
         print("Transaction error: " + NotecardExceptionInfo(exception))
         time.sleep(5)
+
+
+def get_temp_and_voltage(card):
+    """Submit a simple JSON-based request to the Notecard.
+
+    Args:
+        card (object): An instance of the Notecard class
+
+    """
+    temp = 0
+    voltage = 0
+
+    try:
+        req = {"req": "card.temp"}
+        rsp = card.Transaction(req)
+        temp = rsp["value"]
+
+        req = {"req": "card.voltage"}
+        rsp = card.Transaction(req)
+        voltage = rsp["value"]
+    except Exception as exception:
+        print("Transaction error: " + NotecardExceptionInfo(exception))
+        time.sleep(5)
+
+    return temp, voltage
 
 
 def main():
@@ -82,11 +110,19 @@ def main():
         raise Exception("error opening notecard: "
                         + NotecardExceptionInfo(exception))
 
-    # If success, do a transaction loop
-    print("Performing Transactions...")
-    while True:
-        time.sleep(2)
-        transactionTest(card)
+    # If success, configure the Notecard and send some data
+    configure_notecard(card)
+    temp, voltage = get_temp_and_voltage(card)
+
+    req = {"req": "note.add"}
+    req["sync"] = True
+    req["body"] = {"temp": temp, "voltage": voltage}
+
+    try:
+        card.Transaction(req)
+    except Exception as exception:
+        print("Transaction error: " + NotecardExceptionInfo(exception))
+        time.sleep(5)
 
 
 main()

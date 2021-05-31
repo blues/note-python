@@ -17,7 +17,7 @@ With `pip` via PyPi:
 pip install note-python
 ```
 
-or 
+or
 
 
 ```bash
@@ -102,11 +102,11 @@ The documentation for this library can be found
 
 The [examples](examples/) directory contains examples for using this library with:
 
-- [Serial](examples/serial-example.py)
-- [I2C](examples/i2c-example.py)
-- [RaspberryPi](examples/rpi-example.py)
-- [CircuitPython](examples/cpy-example.py)
-- [MicroPython](examples/mpy-example.py)
+- [Serial](examples/notecard-basics/serial-example.py)
+- [I2C](examples/notecard-basics/i2c-example.py)
+- [RaspberryPi](examples/notecard-basics/rpi-example.py)
+- [CircuitPython](examples/notecard-basics/cpy-example.py)
+- [MicroPython](examples/notecard-basics/mpy-example.py)
 
 ## Contributing
 
