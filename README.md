@@ -36,18 +36,36 @@ The `note-python` library requires a pointer to a serial or i2c object that you 
 
 ### Serial Configuration
 
+
+#### Linux and Raspberry Pi
 ```python
-# Use python-periphery on a desktop or Raspberry Pi 
+# Use python-periphery on a Linux desktop or Raspberry Pi 
 from periphery import Serial
 port = Serial("/dev/serial0", 9600)
 
 card = notecard.OpenSerial(port)
 ```
 
+#### macOS and Windows
+
+```python
+# Use PySerial on a desktop 
+import serial
+#macOS
+port = serial.Serial(port="/dev/tty.usbmodemNOTE1",
+                     baudrate=9600)
+# Windows
+# port = serial.Serial(port="COM4",
+#                     baudrate=9600)
+
+card = notecard.OpenSerial(port)
+```
+
+
 ### I2C Configuration
 
 ```python
-# Use python-periphery on a desktop or Raspberry Pi 
+# Use python-periphery on a Linux desktop or Raspberry Pi 
 from periphery import I2C
 port = I2C("/dev/i2c-1")
 
