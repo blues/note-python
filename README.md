@@ -46,12 +46,12 @@ port = Serial("/dev/serial0", 9600)
 card = notecard.OpenSerial(port)
 ```
 
-#### OSX and Windows
+#### macOS and Windows
 
 ```python
 # Use PySerial on a desktop 
 import serial
-#OSX
+#macOS
 port = serial.Serial(port="/dev/tty.usbmodemNOTE1",
                      baudrate=9600)
 # Windows
