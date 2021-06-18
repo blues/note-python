@@ -26,6 +26,12 @@ pip3 install note-python
 
 For use with MicroPython or CircuitPython, copy the contents of the `notecard` directory into the `lib` directory of your device.
 
+### Compatibility Considerations
+When running on Linux and Raspberry Pi, this library is compatible with `python-periphery v2.0`.  It is *not* compatible with `python-periphery v2.3`
+```bash
+pip install 'python-periphery==2.0.1'
+```
+
 ## Usage
 
 ```python
