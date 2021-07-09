@@ -15,15 +15,10 @@ import notecard  # noqa: E402
 productUID = "com.your-company.your-project"
 
 # For UART and I2C IO
-use_periphery = False
 if sys.implementation.name != 'cpython':
     raise Exception("Please run this example in a CPython environment.")
 
-if sys.platform == "linux" or sys.platform == "linux2":
-    use_periphery = True
-    from periphery import Serial  # noqa: E402
-else:
-    import serial  # noqa: E402
+import serial  # noqa: E402
 
 
 def NotecardExceptionInfo(exception):
@@ -88,11 +83,8 @@ def main():
     print("Opening port...")
     try:
         if sys.platform == "linux" or sys.platform == "linux2":
-            if use_periphery:
-                port = Serial("/dev/serial0", 9600)
-            else:
-                port = serial.Serial(port="/dev/serial0",
-                                     baudrate=9600)
+            port = serial.Serial(port="/dev/serial0",
+                                 baudrate=9600)
         elif sys.platform == "darwin":
             port = serial.Serial(port="/dev/tty.usbmodemNOTE1",
                                  baudrate=9600)
