@@ -22,7 +22,7 @@ if sys.implementation.name != 'cpython':
                     Raspberry Pi or CPython environment.")
 
 from periphery import I2C  # noqa: E402
-from periphery import Serial  # noqa: E402
+import serial  # noqa: E402
 
 
 def NotecardExceptionInfo(exception):
@@ -87,7 +87,7 @@ def main():
     print("Opening port...")
     try:
         if use_uart:
-            port = Serial("/dev/serial0", 9600)
+            port = serial.Serial("/dev/serial0", 9600)
         else:
             port = I2C("/dev/i2c-1")
     except Exception as exception:

@@ -26,12 +26,6 @@ pip3 install note-python
 
 For use with MicroPython or CircuitPython, copy the contents of the `notecard` directory into the `lib` directory of your device.
 
-### Compatibility Considerations
-When running on Linux and Raspberry Pi, this library is compatible with `python-periphery v2.0`.  It is *not* compatible with `python-periphery v2.3` or later.
-```bash
-pip install 'python-periphery==2.0.1'
-```
-
 ## Usage
 
 ```python
@@ -45,8 +39,8 @@ The `note-python` library requires a pointer to a serial or i2c object that you 
 
 #### Linux and Raspberry Pi
 ```python
-# Use python-periphery on a Linux desktop or Raspberry Pi 
-from periphery import Serial
+# Use PySerial on a Linux desktop or Raspberry Pi
+import serial
 port = Serial("/dev/serial0", 9600)
 
 card = notecard.OpenSerial(port)
@@ -55,7 +49,7 @@ card = notecard.OpenSerial(port)
 #### macOS and Windows
 
 ```python
-# Use PySerial on a desktop 
+# Use PySerial on a desktop
 import serial
 #macOS
 port = serial.Serial(port="/dev/tty.usbmodemNOTE1",
@@ -71,7 +65,7 @@ card = notecard.OpenSerial(port)
 ### I2C Configuration
 
 ```python
-# Use python-periphery on a Linux desktop or Raspberry Pi 
+# Use python-periphery on a Linux desktop or Raspberry Pi
 from periphery import I2C
 port = I2C("/dev/i2c-1")
 

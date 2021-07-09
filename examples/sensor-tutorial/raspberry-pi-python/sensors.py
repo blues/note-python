@@ -6,7 +6,8 @@ and send those values to the Notecard.
 """
 import json
 import notecard
-from periphery import I2C, Serial
+from periphery import I2C
+import serial
 import time
 import bme680
 
@@ -25,7 +26,7 @@ card = None
 
 # Configure the serial connection to the Notecard
 if use_uart:
-    serial = Serial('/dev/ttyS0', 9600)
+    serial = serial.Serial('/dev/ttyS0', 9600)
     card = notecard.OpenSerial(serial, debug=True)
 else:
     port = I2C("/dev/i2c-1")

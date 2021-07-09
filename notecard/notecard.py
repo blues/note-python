@@ -72,12 +72,8 @@ def serialReadByte(port):
         if not port.any():
             return None
     elif sys.implementation.name == 'cpython':
-        if use_periphery:
-            if port.input_waiting() == 0:
-                return None
-        else:
-            if port.in_waiting == 0:
-                return None
+        if port.in_waiting == 0:
+            return None
     return port.read(1)
 
 
