@@ -47,7 +47,7 @@ consult the [examples](examples/) directory for platform-specific guidance.
 ```python
 # Use PySerial on a Linux desktop or Raspberry Pi
 import serial
-port = Serial("/dev/serial0", 9600)
+port = serial.Serial("/dev/serial0", 9600)
 
 card = notecard.OpenSerial(port)
 ```
