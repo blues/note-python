@@ -54,7 +54,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         coverage run -m pytest
-        coveralls
+        coveralls --service=github
     - name: Check if the job has succeeded
       if: ${{ success() }}
       run: |
