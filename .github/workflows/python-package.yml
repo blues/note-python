@@ -49,12 +49,14 @@ jobs:
         --header 'Content-Type: application/json' \
         --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
         --data '{"req":"note.add","file":"build_results.qi","body":{"result":"running_tests"}}'
-    - name: Coveralls GitHub Action
-      uses: coverallsapp/github-action@1.1.3
     - name: Test with pytest
       run: |
         coverage run -m pytest
         coveralls
+    - name: Coverage With Coveralls
+      uses: coverallsapp/github-action@1.1.3
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
     - name: Check if the job has succeeded
       if: ${{ success() }}
       run: |
