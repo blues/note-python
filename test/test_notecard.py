@@ -34,6 +34,19 @@ def get_i2c_and_port():
     return (nCard, port)
 
 
+def test_get_user_agent():
+    nCard, _ = get_serial_and_port()
+    userAgent = nCard.GetUserAgent()
+
+    print(userAgent)
+
+    assert userAgent['agent'] == 'note-python'
+    assert userAgent['os_name'] is not None
+    assert userAgent['os_platform'] is not None
+    assert userAgent['os_version'] is not None
+    assert userAgent['os_family'] is not None
+
+
 def test_open_serial():
     nCard, _ = get_serial_and_port()
 
@@ -89,6 +102,14 @@ def test_hub_set():
                        host="http://hub.blues.foo")
 
     assert response == {}
+
+
+def test_send_user_agent_in_hub_set_helper():
+    pass
+
+
+def test_send_user_agent_in_hub_set_transaction():
+    pass
 
 
 def test_hub_set_invalid_card():

@@ -31,21 +31,35 @@
 # @brief Main module for note-python. Contains core library functionality.
 
 import sys
+import os
 import json
 import time
+
+user_agent = {
+    'agent': 'note-python',
+    'os_name': sys.implementation.name,
+    'os_platform': sys.platform,
+    'os_version': sys.version
+}
 
 use_periphery = False
 use_micropython = False
 use_serial_lock = False
 if sys.implementation.name == 'cpython':
-    if sys.platform == "linux" or sys.platform == "linux2":
+    user_agent['os_family'] = os.name
+    if sys.platform == 'linux' or sys.platform == 'linux2':
         use_periphery = True
         from periphery import I2C
 
         use_serial_lock = True
         from filelock import Timeout, FileLock
 elif sys.implementation.name == 'micropython':
+    user_agent['os_family'] = os.uname().machine
     use_micropython = True
+else:
+    user_agent['os_family'] = os.uname().machine
+
+print(user_agent)
 
 NOTECARD_I2C_ADDRESS = 0x17
 
@@ -158,6 +172,10 @@ class Notecard:
     def __init__(self):
         """Initialize the Notecard through a reset."""
         self.Reset()
+
+    def GetUserAgent(self):
+        """Return the User Agent String for the host for debug purposes."""
+        return user_agent
 
 
 class OpenSerial(Notecard):
