@@ -35,18 +35,10 @@ import os
 import json
 import time
 
-user_agent = {
-    'agent': 'note-python',
-    'os_name': sys.implementation.name,
-    'os_platform': sys.platform,
-    'os_version': sys.version
-}
-
 use_periphery = False
 use_micropython = False
 use_serial_lock = False
 if sys.implementation.name == 'cpython':
-    user_agent['os_family'] = os.name
     if sys.platform == 'linux' or sys.platform == 'linux2':
         use_periphery = True
         from periphery import I2C
@@ -54,12 +46,7 @@ if sys.implementation.name == 'cpython':
         use_serial_lock = True
         from filelock import Timeout, FileLock
 elif sys.implementation.name == 'micropython':
-    user_agent['os_family'] = os.uname().machine
     use_micropython = True
-else:
-    user_agent['os_family'] = os.uname().machine
-
-print(user_agent)
 
 NOTECARD_I2C_ADDRESS = 0x17
 
@@ -169,13 +156,41 @@ class Notecard:
     to reset the Notecard via Serial or I2C.
     """
 
+    _user_agent = {
+        'agent': 'note-python',
+        'os_name': sys.implementation.name,
+        'os_platform': sys.platform,
+        'os_version': sys.version
+    }
+    _user_agent_sent = False
+
     def __init__(self):
-        """Initialize the Notecard through a reset."""
+        """Initialize the Notecard through a reset and configure user agent."""
         self.Reset()
+
+        if sys.implementation.name == 'cpython':
+            self._user_agent['os_family'] = os.name
+        else:
+            self._user_agent['os_family'] = os.uname().machine
+
+    def _preprocessReq(self, req):
+        """Inspect the request for hub.set and add the User Agent."""
+        if 'hub.set' in req.values():
+            # Merge the User Agent to send along with the hub.set request.
+            new_req = req.copy()
+            new_req.update(self.GetUserAgent())
+            req = new_req
+
+            self._user_agent_sent = True
+        return req
 
     def GetUserAgent(self):
         """Return the User Agent String for the host for debug purposes."""
-        return user_agent
+        return self._user_agent
+
+    def UserAgentSent(self):
+        """Return true if the User Agent has been sent to the Notecard."""
+        return self._user_agent_sent
 
 
 class OpenSerial(Notecard):
@@ -183,6 +198,7 @@ class OpenSerial(Notecard):
 
     def Command(self, req):
         """Perform a Notecard command and exit with no response."""
+        req = self._preprocessReq(req)
         if 'cmd' not in req:
             raise Exception("Please use 'cmd' instead of 'req'")
 
@@ -199,6 +215,7 @@ class OpenSerial(Notecard):
 
     def Transaction(self, req):
         """Perform a Notecard transaction and return the result."""
+        req = self._preprocessReq(req)
         if use_serial_lock:
             try:
                 self.lock.acquire(timeout=5)
@@ -225,6 +242,9 @@ class OpenSerial(Notecard):
 
     def __init__(self, uart_id, debug=False):
         """Initialize the Notecard before a reset."""
+        self._user_agent['req_interface'] = 'serial'
+        self._user_agent['req_port'] = str(uart_id)
+
         self.uart = uart_id
         self._debug = debug
 
@@ -263,6 +283,7 @@ class OpenI2C(Notecard):
 
     def Command(self, req):
         """Perform a Notecard command and exit with no response."""
+        req = self._preprocessReq(req)
         if 'cmd' not in req:
             raise Exception("Please use 'cmd' instead of 'req'")
 
@@ -278,6 +299,8 @@ class OpenI2C(Notecard):
 
     def Transaction(self, req):
         """Perform a Notecard transaction and return the result."""
+        req = self._preprocessReq(req)
+
         req_json = prepareRequest(req, self._debug)
         rsp_json = ""
 
@@ -380,6 +403,9 @@ class OpenI2C(Notecard):
 
     def __init__(self, i2c, address, max_transfer, debug=False):
         """Initialize the Notecard before a reset."""
+        self._user_agent['req_interface'] = 'i2c'
+        self._user_agent['req_port'] = address
+
         self.i2c = i2c
         self._debug = debug
         if address == 0:
