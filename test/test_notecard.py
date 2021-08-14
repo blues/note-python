@@ -34,6 +34,38 @@ def get_i2c_and_port():
     return (nCard, port)
 
 
+def test_get_user_agent():
+    nCard, _ = get_serial_and_port()
+    userAgent = nCard.GetUserAgent()
+
+    assert userAgent['agent'] == 'note-python'
+    assert userAgent['os_name'] is not None
+    assert userAgent['os_platform'] is not None
+    assert userAgent['os_version'] is not None
+    assert userAgent['os_family'] is not None
+
+
+def test_user_agent_is_i2c_when_i2c_used():
+    periphery = Mock()  # noqa: F811
+    port = periphery.I2C("dev/i2c-foo")
+    port.try_lock.return_value = True
+
+    nCard = notecard.OpenI2C(port, 0x17, 255)
+
+    userAgent = nCard.GetUserAgent()
+
+    assert userAgent['req_interface'] == 'i2c'
+    assert userAgent['req_port'] is not None
+
+
+def test_user_agent_is_serial_when_serial_used():
+    nCard, _ = get_serial_and_port()
+    userAgent = nCard.GetUserAgent()
+
+    assert userAgent['req_interface'] == 'serial'
+    assert userAgent['req_port'] is not None
+
+
 def test_open_serial():
     nCard, _ = get_serial_and_port()
 
@@ -50,7 +82,6 @@ def test_transaction():
     nCard, port = get_serial_and_port()
 
     port.readline.return_value = "{\"connected\":true}\r\n"
-    print(port.readline())
     response = nCard.Transaction({"req": "hub.status"})
 
     assert "connected" in response
@@ -89,6 +120,40 @@ def test_hub_set():
                        host="http://hub.blues.foo")
 
     assert response == {}
+
+
+def test_user_agent_sent_is_false_before_hub_set():
+    nCard, _ = get_serial_and_port()
+
+    assert nCard.UserAgentSent() is False
+
+
+def test_send_user_agent_in_hub_set_helper():
+    nCard, port = get_serial_and_port()
+
+    port.readline.return_value = "{}\r\n"
+    hub.set(nCard, product="com.blues.tester",
+            sn="foo",
+            mode="continuous",
+            outbound=2,
+            inbound=60,
+            duration=5,
+            sync=True,
+            align=True,
+            voutbound="2.3",
+            vinbound="3.3",
+            host="http://hub.blues.foo")
+
+    assert nCard.UserAgentSent() is True
+
+
+def test_send_user_agent_in_hub_set_transaction():
+    nCard, port = get_serial_and_port()
+
+    port.readline.return_value = "{\"connected\":true}\r\n"
+    nCard.Transaction({"req": "hub.set"})
+
+    assert nCard.UserAgentSent() is True
 
 
 def test_hub_set_invalid_card():
