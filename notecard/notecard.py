@@ -39,7 +39,7 @@ use_periphery = False
 use_micropython = False
 use_serial_lock = False
 use_circuitpython = sys.implementation.name == 'circuitpython'
-use_micropython = sys.implementation.name == 'micropython' 
+use_micropython = sys.implementation.name == 'micropython'
 use_rtc = not use_micropython and not use_circuitpython
 
 if sys.implementation.name == 'cpython':
@@ -61,25 +61,33 @@ NOTECARD_I2C_ADDRESS = 0x17
 CARD_REQUEST_SEGMENT_MAX_LEN = 250
 CARD_REQUEST_SEGMENT_DELAY_MS = 250
 
-
-
 if not use_rtc:
     if use_circuitpython:
         import supervisor
         from supervisor import ticks_ms
+
         def ticks_diff(ticks1, ticks2):
-            "Compute the signed difference between two ticks values, assuming that they are within 2**28 ticks"
-            diff = (ticks1 - ticks2) & _TICKS_MAX
-            diff = ((diff + _TICKS_HALFPERIOD) & _TICKS_MAX) - _TICKS_HALFPERIOD
+            """Compute the signed difference between two ticks values."""
+            diff = (ticks1 - ticks2) & _TICKS_MAX  # noqa: F821
+            diff = ((diff + _TICKS_HALFPERIOD)  # noqa: F821
+                    & _TICKS_MAX) - _TICKS_HALFPERIOD  # noqa: F821
             return diff
     if use_micropython:
-        from utime import ticks_diff, ticks_ms
+        from utime import ticks_diff, ticks_ms  # noqa: F811
+
 
 def has_timed_out(start, timeout_secs):
-    return ticks_diff(ticks_ms(), start) > timeout_secs*1000 if not use_rtc else time.time() > start+timeout_secs
+    """Determine whether a timeout interval has passed during communication."""
+    if not use_rtc:
+        return ticks_diff(ticks_ms(), start) > timeout_secs * 1000
+    else:
+        return time.time() > start + timeout_secs
+
 
 def start_timeout():
+    """Start the timeout interval for I2C communication."""
     return ticks_ms() if not use_rtc else time.time()
+
 
 def prepareRequest(req, debug=False):
     """Format the request string as a JSON object and add a newline."""
@@ -171,6 +179,7 @@ def serialCommand(port, req, debug):
         if seg_left == 0:
             break
         time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+
 
 class Notecard:
     """Base Notecard class.
