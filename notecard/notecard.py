@@ -38,6 +38,10 @@ import time
 use_periphery = False
 use_micropython = False
 use_serial_lock = False
+use_circuitpython = sys.implementation.name == 'circuitpython'
+use_micropython = sys.implementation.name == 'micropython'
+use_rtc = not use_micropython and not use_circuitpython
+
 if sys.implementation.name == 'cpython':
     if sys.platform == 'linux' or sys.platform == 'linux2':
         use_periphery = True
@@ -45,8 +49,9 @@ if sys.implementation.name == 'cpython':
 
         use_serial_lock = True
         from filelock import Timeout, FileLock
-elif sys.implementation.name == 'micropython':
-    use_micropython = True
+
+use_i2c_lock = not use_periphery and not use_micropython
+
 
 NOTECARD_I2C_ADDRESS = 0x17
 
@@ -55,6 +60,33 @@ NOTECARD_I2C_ADDRESS = 0x17
 # therefore we push it in segments with a pause between each segment.
 CARD_REQUEST_SEGMENT_MAX_LEN = 250
 CARD_REQUEST_SEGMENT_DELAY_MS = 250
+
+if not use_rtc:
+    if use_circuitpython:
+        import supervisor
+        from supervisor import ticks_ms
+
+        def ticks_diff(ticks1, ticks2):
+            """Compute the signed difference between two ticks values."""
+            diff = (ticks1 - ticks2) & _TICKS_MAX  # noqa: F821
+            diff = ((diff + _TICKS_HALFPERIOD)  # noqa: F821
+                    & _TICKS_MAX) - _TICKS_HALFPERIOD  # noqa: F821
+            return diff
+    if use_micropython:
+        from utime import ticks_diff, ticks_ms  # noqa: F811
+
+
+def has_timed_out(start, timeout_secs):
+    """Determine whether a timeout interval has passed during communication."""
+    if not use_rtc:
+        return ticks_diff(ticks_ms(), start) > timeout_secs * 1000
+    else:
+        return time.time() > start + timeout_secs
+
+
+def start_timeout():
+    """Start the timeout interval for I2C communication."""
+    return ticks_ms() if not use_rtc else time.time()
 
 
 def prepareRequest(req, debug=False):
@@ -312,7 +344,7 @@ class OpenI2C(Notecard):
 
             chunk_len = 0
             received_newline = False
-            start = time.time()
+            start = start_timeout()
             transaction_timeout_secs = 10
             while True:
                 time.sleep(.001)
@@ -344,7 +376,7 @@ class OpenI2C(Notecard):
                     continue
                 if received_newline:
                     break
-                if (time.time() >= start + transaction_timeout_secs):
+                if (has_timed_out(start, transaction_timeout_secs)):
                     raise Exception("notecard request or response was lost")
                 time.sleep(0.05)
 
@@ -391,13 +423,13 @@ class OpenI2C(Notecard):
 
     def lock(self):
         """Lock the I2C port so the host can interact with the Notecard."""
-        if not use_periphery and not use_micropython:
+        if use_i2c_lock:
             return self.i2c.try_lock()
         return True
 
     def unlock(self):
         """Unlock the I2C port."""
-        if not use_periphery and not use_micropython:
+        if use_i2c_lock:
             return self.i2c.unlock()
         return True
 
