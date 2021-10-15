@@ -141,7 +141,7 @@ def update(card, file=None, note_id=None, body=None, payload=None):
     Returns:
         string: The result of the Notecard request.
     """
-    req = {"req": "note.get"}
+    req = {"req": "note.update"}
     if file:
         req["file"] = file
     if note_id:
@@ -168,7 +168,7 @@ def template(card, file=None, body=None, length=None):
     Returns:
         string: The result of the Notecard request.
     """
-    req = {"req": "note.get"}
+    req = {"req": "note.template"}
     if file:
         req["file"] = file
     if body:
