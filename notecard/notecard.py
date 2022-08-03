@@ -66,9 +66,9 @@ if not use_rtc:
         import supervisor
         from supervisor import ticks_ms
 
-        _TICKS_PERIOD = const(1 << 29)
-        _TICKS_MAX = const(_TICKS_PERIOD-1)
-        _TICKS_HALFPERIOD = const(_TICKS_PERIOD//2)
+        _TICKS_PERIOD = 1 << 29
+        _TICKS_MAX = _TICKS_PERIOD-1
+        _TICKS_HALFPERIOD = _TICKS_PERIOD//2
 
         def ticks_diff(ticks1, ticks2):
             """Compute the signed difference between two ticks values."""
