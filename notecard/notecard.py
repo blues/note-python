@@ -396,6 +396,7 @@ class OpenI2C(Notecard):
         """Reset the Notecard."""
         chunk_len = 0
 
+        self.i2c.deinit()
         while not self.lock():
             pass
 
