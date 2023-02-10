@@ -1,6 +1,5 @@
 import os
 import sys
-import unittest
 import pytest
 from unittest.mock import Mock, MagicMock, patch
 import periphery
@@ -33,7 +32,7 @@ def get_i2c_and_port():
     return (nCard, port)
 
 
-class NotecardTestSuite:
+class NotecardTest:
 
     def test_get_user_agent(self):
         nCard, _ = self.get_port()
@@ -342,7 +341,7 @@ class NotecardTestSuite:
         raise NotImplementedError("subclasses must implement `get_port()`")
 
 
-class NotecardMockSerialTestCase(NotecardTestSuite, unittest.TestCase):
+class TestNotecardMockSerial(NotecardTest):
     def get_port(self, response=None):
         nCard, port = get_serial_and_port()
         if response is not None:
@@ -371,7 +370,7 @@ class NotecardMockSerialTestCase(NotecardTestSuite, unittest.TestCase):
         assert nCard._debug
 
 
-class NotecardMockI2CTestCase(NotecardTestSuite, unittest.TestCase):
+class TestNotecardMockI2C(NotecardTest):
     def get_port(self, response=None):
         nCard, port = get_i2c_and_port()
         if response is not None:
