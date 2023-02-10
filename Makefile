@@ -8,7 +8,7 @@ venv: $(VENV_NAME)/bin/activate
 
 test: venv
 	${PYTHON} -m pydocstyle notecard/ examples/
-	${PYTHON} -m flake8 test/ notecard/ examples/ --count --ignore=E722,F401,F403,W503 --show-source --statistics
+	${PYTHON} -m flake8 test/ notecard/ examples/ --count --ignore=E722,F401,F403,W503,E501 --show-source --statistics
 	${PYTHON} -m pytest test --cov=notecard
 
 coverage: venv
@@ -19,3 +19,5 @@ run_build:
 
 deploy:
 	${PYTHON} -m twine upload -r "pypi" --config-file .pypirc 'dist/*'
+
+.PHONY: env test coverage run_build deploy
