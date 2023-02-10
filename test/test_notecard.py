@@ -1,10 +1,9 @@
 import os
 import sys
 import unittest
-
 import pytest
-
 from unittest.mock import Mock, MagicMock, patch
+import periphery
 
 sys.path.insert(0, os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..')))
@@ -387,7 +386,13 @@ class NotecardMockI2CTestCase(NotecardTestSuite, unittest.TestCase):
                 tosend = tosend[chunklen:]
                 chunklen = len(tosend)
 
+            def transfer(addr, messages: periphery.I2C.Message):
+                if len(messages) == 2 and messages[1].read:
+                    read = messages[1].data
+                    writeto_then_readfrom(addr, messages[0].data, read)
+
             port.writeto_then_readfrom = writeto_then_readfrom
+            port.transfer = transfer
         return (nCard, port)
 
     def test_open_i2c(self):
