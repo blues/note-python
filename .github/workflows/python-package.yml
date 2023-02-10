@@ -38,10 +38,10 @@ jobs:
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        flake8 test/ notecard/ examples/ --count --ignore=E722,F401,F403,W503,E501 --show-source --statistics
+        make flake8
     - name: Lint Docs with Pydocstyle
       run: |
-        pydocstyle notecard/ examples/
+        make docstyle
     - name: Send running tests notification
       run: |
         curl --request POST \
