@@ -1,13 +1,11 @@
 import os
 import sys
-import serial
-import periphery
 import pytest
-
 from unittest.mock import Mock, MagicMock, patch
+import periphery
 
 sys.path.insert(0, os.path.abspath(
-                os.path.join(os.path.dirname(__file__), '..')))
+    os.path.join(os.path.dirname(__file__), '..')))
 
 import notecard  # noqa: E402
 from notecard import card, hub, note, env, file  # noqa: E402
@@ -34,449 +32,385 @@ def get_i2c_and_port():
     return (nCard, port)
 
 
-def test_get_user_agent():
-    nCard, _ = get_serial_and_port()
-    userAgent = nCard.GetUserAgent()
+class NotecardTest:
 
-    assert userAgent['agent'] == 'note-python'
-    assert userAgent['os_name'] is not None
-    assert userAgent['os_platform'] is not None
-    assert userAgent['os_version'] is not None
-    assert userAgent['os_family'] is not None
+    def test_get_user_agent(self):
+        nCard, _ = self.get_port()
+        userAgent = nCard.GetUserAgent()
 
+        assert userAgent['agent'] == 'note-python'
+        assert userAgent['os_name'] is not None
+        assert userAgent['os_platform'] is not None
+        assert userAgent['os_version'] is not None
+        assert userAgent['os_family'] is not None
 
-def test_user_agent_is_i2c_when_i2c_used():
-    periphery = Mock()  # noqa: F811
-    port = periphery.I2C("dev/i2c-foo")
-    port.try_lock.return_value = True
+    def test_transaction(self):
+        nCard, port = self.get_port("{\"connected\":true}\r\n")
 
-    nCard = notecard.OpenI2C(port, 0x17, 255)
+        response = nCard.Transaction({"req": "hub.status"})
 
-    userAgent = nCard.GetUserAgent()
+        assert "connected" in response
+        assert response["connected"] is True
 
-    assert userAgent['req_interface'] == 'i2c'
-    assert userAgent['req_port'] is not None
+    def test_command(self):
+        nCard, port = self.get_port()
 
+        response = nCard.Command({"cmd": "card.sleep"})
 
-def test_user_agent_is_serial_when_serial_used():
-    nCard, _ = get_serial_and_port()
-    userAgent = nCard.GetUserAgent()
+        assert response is None
 
-    assert userAgent['req_interface'] == 'serial'
-    assert userAgent['req_port'] is not None
+    def test_command_fail_if_req(self):
+        nCard, port = self.get_port()
 
+        with pytest.raises(Exception, match="Please use 'cmd' instead of 'req'"):
+            nCard.Command({"req": "card.sleep"})
 
-def test_open_serial():
-    nCard, _ = get_serial_and_port()
+    def test_hub_set(self):
+        nCard, port = self.get_port("{}\r\n")
 
-    assert nCard.uart is not None
+        response = hub.set(nCard, product="com.blues.tester",
+                           sn="foo",
+                           mode="continuous",
+                           outbound=2,
+                           inbound=60,
+                           duration=5,
+                           sync=True,
+                           align=True,
+                           voutbound="2.3",
+                           vinbound="3.3",
+                           host="http://hub.blues.foo")
 
+        assert response == {}
 
-def test_open_i2c():
-    nCard, _ = get_i2c_and_port()
+    def test_user_agent_sent_is_false_before_hub_set(self):
+        nCard, _ = self.get_port()
 
-    assert nCard.i2c is not None
+        assert nCard.UserAgentSent() is False
 
+    def test_send_user_agent_in_hub_set_helper(self):
+        nCard, port = self.get_port("{}\r\n")
 
-def test_transaction():
-    nCard, port = get_serial_and_port()
+        hub.set(nCard, product="com.blues.tester",
+                sn="foo",
+                mode="continuous",
+                outbound=2,
+                inbound=60,
+                duration=5,
+                sync=True,
+                align=True,
+                voutbound="2.3",
+                vinbound="3.3",
+                host="http://hub.blues.foo")
 
-    port.readline.return_value = "{\"connected\":true}\r\n"
-    response = nCard.Transaction({"req": "hub.status"})
+        assert nCard.UserAgentSent() is True
 
-    assert "connected" in response
-    assert response["connected"] is True
+    def test_send_user_agent_in_hub_set_transaction(self):
+        nCard, port = self.get_port("{\"connected\":true}\r\n")
 
+        nCard.Transaction({"req": "hub.set"})
 
-def test_command():
-    nCard, port = get_serial_and_port()
+        assert nCard.UserAgentSent() is True
 
-    response = nCard.Command({"cmd": "card.sleep"})
+    def test_hub_set_invalid_card(self):
+        with pytest.raises(Exception, match="Notecard object required"):
+            hub.set(None, product="com.blues.tester")
 
-    assert response is None
+    def test_hub_sync(self):
+        nCard, port = self.get_port("{}\r\n")
 
+        response = hub.sync(nCard)
 
-def test_command_fail_if_req():
-    nCard, port = get_serial_and_port()
+        assert response == {}
 
-    with pytest.raises(Exception, match="Please use 'cmd' instead of 'req'"):
-        nCard.Command({"req": "card.sleep"})
+    def test_hub_sync_status(self):
+        nCard, port = self.get_port("{\"status\":\"connected\"}\r\n")
 
+        response = hub.syncStatus(nCard, True)
 
-def test_hub_set():
-    nCard, port = get_serial_and_port()
+        assert "status" in response
+        assert response["status"] == "connected"
 
-    port.readline.return_value = "{}\r\n"
-    response = hub.set(nCard, product="com.blues.tester",
-                       sn="foo",
-                       mode="continuous",
-                       outbound=2,
-                       inbound=60,
-                       duration=5,
-                       sync=True,
-                       align=True,
-                       voutbound="2.3",
-                       vinbound="3.3",
-                       host="http://hub.blues.foo")
+    def test_hub_status(self):
+        nCard, port = self.get_port("{\"connected\":true}\r\n")
 
-    assert response == {}
+        response = hub.status(nCard)
 
+        assert "connected" in response
+        assert response["connected"] is True
 
-def test_user_agent_sent_is_false_before_hub_set():
-    nCard, _ = get_serial_and_port()
+    def test_hub_log(self):
+        nCard, port = self.get_port("{}\r\n")
 
-    assert nCard.UserAgentSent() is False
+        response = hub.log(nCard, "there's been an issue!", False)
 
+        assert response == {}
 
-def test_send_user_agent_in_hub_set_helper():
-    nCard, port = get_serial_and_port()
+    def test_hub_get(self):
+        nCard, port = self.get_port("{\"mode\":\"continuous\"}\r\n")
 
-    port.readline.return_value = "{}\r\n"
-    hub.set(nCard, product="com.blues.tester",
-            sn="foo",
-            mode="continuous",
-            outbound=2,
-            inbound=60,
-            duration=5,
-            sync=True,
-            align=True,
-            voutbound="2.3",
-            vinbound="3.3",
-            host="http://hub.blues.foo")
+        response = hub.get(nCard)
 
-    assert nCard.UserAgentSent() is True
+        assert "mode" in response
+        assert response["mode"] == "continuous"
 
+    def test_card_time(self):
+        nCard, port = self.get_port("{\"time\":1592490375}\r\n")
 
-def test_send_user_agent_in_hub_set_transaction():
-    nCard, port = get_serial_and_port()
+        response = card.time(nCard)
 
-    port.readline.return_value = "{\"connected\":true}\r\n"
-    nCard.Transaction({"req": "hub.set"})
+        assert "time" in response
+        assert response["time"] == 1592490375
 
-    assert nCard.UserAgentSent() is True
+    def test_card_status(self):
+        nCard, port = self.get_port("{\"usb\":true,\"status\":\"{normal}\"}\r\n")
 
+        response = card.status(nCard)
 
-def test_hub_set_invalid_card():
-    with pytest.raises(Exception, match="Notecard object required"):
-        hub.set(None, product="com.blues.tester")
+        assert "status" in response
+        assert response["status"] == "{normal}"
 
+    def test_card_temp(self):
+        nCard, port = self.get_port("{\"value\":33.625,\"calibration\":-3.0}\r\n")
 
-def test_hub_sync():
-    nCard, port = get_serial_and_port()
+        response = card.temp(nCard, minutes=20)
 
-    port.readline.return_value = "{}\r\n"
-    response = hub.sync(nCard)
+        assert "value" in response
+        assert response["value"] == 33.625
 
-    assert response == {}
+    def test_card_attn(self):
+        nCard, port = self.get_port("{\"set\":true}\r\n")
 
+        response = card.attn(nCard, mode="arm, files",
+                             files=["sensors.qo"],
+                             seconds=10, payload={"foo": "bar"},
+                             start=True)
 
-def test_hub_sync_status():
-    nCard, port = get_serial_and_port()
+        assert "set" in response
+        assert response["set"] is True
 
-    port.readline.return_value = "{\"status\":\"connected\"}\r\n"
+    def test_card_attn_with_invalid_card(self):
+        with pytest.raises(Exception, match="Notecard object required"):
+            card.attn(None, mode="arm")
 
-    response = hub.syncStatus(nCard, True)
+    def test_card_voltage(self):
+        nCard, port = self.get_port("{\"hours\":707}\r\n")
 
-    assert "status" in response
-    assert response["status"] == "connected"
+        response = card.voltage(nCard, hours=24, offset=5, vmax=4, vmin=3)
 
+        assert "hours" in response
+        assert response["hours"] == 707
 
-def test_hub_status():
-    nCard, port = get_serial_and_port()
+    def test_card_wireless(self):
+        nCard, port = self.get_port("{\"status\":\"{modem-off}\",\"count\":1}\r\n")
 
-    port.readline.return_value = "{\"connected\":true}\r\n"
+        response = card.wireless(nCard, mode="auto", apn="-")
 
-    response = hub.status(nCard)
+        assert "status" in response
+        assert response["status"] == "{modem-off}"
 
-    assert "connected" in response
-    assert response["connected"] is True
+    def test_card_version(self):
+        nCard, port = self.get_port("{\"version\":\"notecard-1.2.3.9950\"}\r\n")
 
+        response = card.version(nCard)
 
-def test_hub_log():
-    nCard, port = get_serial_and_port()
+        assert "version" in response
+        assert response["version"] == "notecard-1.2.3.9950"
 
-    port.readline.return_value = "{}\r\n"
+    def test_note_add(self):
+        nCard, port = self.get_port("{\"total\":1}\r\n")
 
-    response = hub.log(nCard, "there's been an issue!", False)
+        response = note.add(nCard, file="sensors.qo",
+                            body={"temp": 72.22},
+                            payload="b64==",
+                            sync=True)
 
-    assert response == {}
+        assert "total" in response
+        assert response["total"] == 1
 
+    def test_note_get(self):
+        nCard, port = self.get_port("{\"note\":\"s\",\"body\":{\"s\":\"foo\"}}\r\n")
 
-def test_hub_get():
-    nCard, port = get_serial_and_port()
+        response = note.get(nCard, file="settings.db",
+                            note_id="s",
+                            delete=True,
+                            deleted=False)
 
-    port.readline.return_value = "{\"mode\":\"continuous\"}\r\n"
+        assert "note" in response
+        assert response["note"] == "s"
 
-    response = hub.get(nCard)
+    def test_note_delete(self):
+        nCard, port = self.get_port("{}\r\n")
 
-    assert "mode" in response
-    assert response["mode"] == "continuous"
+        response = note.delete(nCard, file="settings.db", note_id="s")
 
+        assert response == {}
 
-def test_card_time():
-    nCard, port = get_serial_and_port()
+    def test_note_update(self):
+        nCard, port = self.get_port("{}\r\n")
 
-    port.readline.return_value = "{\"time\":1592490375}\r\n"
+        response = note.update(nCard, file="settings.db", note_id="s",
+                               body={"foo": "bar"}, payload="123dfb==")
 
-    response = card.time(nCard)
+        assert response == {}
 
-    assert "time" in response
-    assert response["time"] == 1592490375
+    def test_note_changes(self):
+        nCard, port = self.get_port("{\"changes\":5,\"total\":15}\r\n")
 
+        response = note.changes(nCard, file="sensors.qo",
+                                tracker="123",
+                                maximum=10,
+                                start=True,
+                                stop=False,
+                                deleted=False,
+                                delete=True)
 
-def test_card_status():
-    nCard, port = get_serial_and_port()
+        assert "changes" in response
+        assert response["changes"] == 5
 
-    port.readline.return_value = "{\"usb\":true,\"status\":\"{normal}\"}\r\n"
+    def test_note_template(self):
+        nCard, port = self.get_port("{\"bytes\":40}\r\n")
 
-    response = card.status(nCard)
+        response = note.template(nCard, file="sensors.qo",
+                                 body={"temp": 1.1, "hu": 1},
+                                 length=5)
 
-    assert "status" in response
-    assert response["status"] == "{normal}"
+        assert "bytes" in response
+        assert response["bytes"] == 40
 
+    def test_env_default(self):
+        nCard, port = self.get_port("{}\r\n")
 
-def test_card_temp():
-    nCard, port = get_serial_and_port()
+        response = env.default(nCard, name="pump", text="on")
 
-    port.readline.return_value = "{\"value\":33.625,\"calibration\":-3.0}\r\n"
+        assert response == {}
 
-    response = card.temp(nCard, minutes=20)
+    def test_env_set(self):
+        nCard, port = self.get_port("{}\r\n")
 
-    assert "value" in response
-    assert response["value"] == 33.625
+        response = env.set(nCard, name="pump", text="on")
 
+        assert response == {}
 
-def test_card_attn():
-    nCard, port = get_serial_and_port()
+    def test_env_get(self):
+        nCard, port = self.get_port("{}\r\n")
 
-    port.readline.return_value = "{\"set\":true}\r\n"
+        response = env.get(nCard, name="pump")
 
-    response = card.attn(nCard, mode="arm, files",
-                         files=["sensors.qo"],
-                         seconds=10, payload={"foo": "bar"},
-                         start=True)
+        assert response == {}
 
-    assert "set" in response
-    assert response["set"] is True
+    def test_env_modified(self):
+        nCard, port = self.get_port("{\"time\": 1605814493}\r\n")
 
+        response = env.modified(nCard)
 
-def test_card_attn_with_invalid_card():
-    with pytest.raises(Exception, match="Notecard object required"):
-        card.attn(None, mode="arm")
+        assert "time" in response
+        assert response["time"] == 1605814493
 
+    def test_file_delete(self):
+        nCard, port = self.get_port("{}\r\n")
 
-def test_card_voltage():
-    nCard, port = get_serial_and_port()
+        response = file.delete(nCard, files=["sensors.qo"])
 
-    port.readline.return_value = "{\"hours\":707}\r\n"
+        assert response == {}
 
-    response = card.voltage(nCard, hours=24, offset=5, vmax=4, vmin=3)
+    def test_file_changes(self):
+        nCard, port = self.get_port("{\"total\":5}\r\n")
 
-    assert "hours" in response
-    assert response["hours"] == 707
+        response = file.changes(nCard, tracker="123", files=["sensors.qo"])
 
+        assert "total" in response
+        assert response["total"] == 5
 
-def test_card_wireless():
-    nCard, port = get_serial_and_port()
+    def test_file_stats(self):
+        nCard, port = self.get_port("{\"total\":24}\r\n")
 
-    port.readline.return_value = "{\"status\":\"{modem-off}\",\"count\":1}\r\n"
+        response = file.stats(nCard)
 
-    response = card.wireless(nCard, mode="auto", apn="-")
+        assert "total" in response
+        assert response["total"] == 24
 
-    assert "status" in response
-    assert response["status"] == "{modem-off}"
+    def test_file_pendingChanges(self):
+        nCard, port = self.get_port("{\"changes\":1}\r\n")
 
+        response = file.pendingChanges(nCard)
 
-def test_card_version():
-    nCard, port = get_serial_and_port()
+        assert "changes" in response
+        assert response["changes"] == 1
 
-    port.readline.return_value = "{\"version\":\"notecard-1.2.3.9950\"}\r\n"
+    def get_port(self, response=None):
+        raise NotImplementedError("subclasses must implement `get_port()`")
 
-    response = card.version(nCard)
 
-    assert "version" in response
-    assert response["version"] == "notecard-1.2.3.9950"
+class TestNotecardMockSerial(NotecardTest):
+    def get_port(self, response=None):
+        nCard, port = get_serial_and_port()
+        if response is not None:
+            port.readline.return_value = response
+        return (nCard, port)
 
+    def test_user_agent_is_serial_when_serial_used(self):
+        nCard, _ = self.get_port()
+        userAgent = nCard.GetUserAgent()
 
-def test_note_add():
-    nCard, port = get_serial_and_port()
+        assert userAgent['req_interface'] == 'serial'
+        assert userAgent['req_port'] is not None
 
-    port.readline.return_value = "{\"total\":1}\r\n"
+    def test_open_serial(self):
+        nCard, _ = get_serial_and_port()
 
-    response = note.add(nCard, file="sensors.qo",
-                        body={"temp": 72.22},
-                        payload="b64==",
-                        sync=True)
+        assert nCard.uart is not None
 
-    assert "total" in response
-    assert response["total"] == 1
+    def test_debug_mode_on_serial(self):
+        serial = Mock()  # noqa: F811
+        port = serial.Serial("/dev/tty.foo", 9600)
+        port.read.side_effect = [b'\r', b'\n', None]
 
+        nCard = notecard.OpenSerial(port, debug=True)
 
-def test_note_get():
-    nCard, port = get_serial_and_port()
+        assert nCard._debug
 
-    port.readline.return_value = \
-        "{\"note\":\"s\",\"body\":{\"s\":\"foo\"}}\r\n"
 
-    response = note.get(nCard, file="settings.db",
-                        note_id="s",
-                        delete=True,
-                        deleted=False)
+class TestNotecardMockI2C(NotecardTest):
+    def get_port(self, response=None):
+        nCard, port = get_i2c_and_port()
+        if response is not None:
+            chunklen = 0
+            tosend = bytes(response, 'utf-8')
 
-    assert "note" in response
-    assert response["note"] == "s"
+            def writeto_then_readfrom(addr, write, read):
+                nonlocal chunklen, tosend
+                read[0] = len(tosend)
+                read[1] = chunklen
+                read[2:2 + chunklen] = tosend[0:chunklen]
+                tosend = tosend[chunklen:]
+                chunklen = len(tosend)
 
+            def transfer(addr, messages: periphery.I2C.Message):
+                if len(messages) == 2 and messages[1].read:
+                    read = messages[1].data
+                    writeto_then_readfrom(addr, messages[0].data, read)
 
-def test_note_delete():
-    nCard, port = get_serial_and_port()
+            port.writeto_then_readfrom = writeto_then_readfrom
+            port.transfer = transfer
+        return (nCard, port)
 
-    port.readline.return_value = "{}\r\n"
+    def test_open_i2c(self):
+        nCard, _ = get_i2c_and_port()
 
-    response = note.delete(nCard, file="settings.db", note_id="s")
+        assert nCard.i2c is not None
 
-    assert response == {}
+    def test_user_agent_is_i2c_when_i2c_used(self):
+        nCard, _ = self.get_port()
+        userAgent = nCard.GetUserAgent()
 
+        assert userAgent['req_interface'] == 'i2c'
+        assert userAgent['req_port'] is not None
 
-def test_note_update():
-    nCard, port = get_serial_and_port()
+    def test_debug_mode_on_i2c(self):
+        periphery = Mock()  # noqa: F811
+        port = periphery.I2C("dev/i2c-foo")
+        port.try_lock.return_value = True
 
-    port.readline.return_value = "{}\r\n"
+        nCard = notecard.OpenI2C(port, 0x17, 255, debug=True)
 
-    response = note.update(nCard, file="settings.db", note_id="s",
-                           body={"foo": "bar"}, payload="123dfb==")
-
-    assert response == {}
-
-
-def test_note_changes():
-    nCard, port = get_serial_and_port()
-
-    port.readline.return_value = "{\"changes\":5,\"total\":15}\r\n"
-
-    response = note.changes(nCard, file="sensors.qo",
-                            tracker="123",
-                            maximum=10,
-                            start=True,
-                            stop=False,
-                            deleted=False,
-                            delete=True)
-
-    assert "changes" in response
-    assert response["changes"] == 5
-
-
-def test_note_template():
-    nCard, port = get_serial_and_port()
-
-    port.readline.return_value = "{\"bytes\":40}\r\n"
-
-    response = note.template(nCard, file="sensors.qo",
-                             body={"temp": 1.1, "hu": 1},
-                             length=5)
-
-    assert "bytes" in response
-    assert response["bytes"] == 40
-
-
-def test_debug_mode_on_serial():
-    serial = Mock()  # noqa: F811
-    port = serial.Serial("/dev/tty.foo", 9600)
-    port.read.side_effect = [b'\r', b'\n', None]
-
-    nCard = notecard.OpenSerial(port, debug=True)
-
-    assert nCard._debug
-
-
-def test_debug_mode_on_i2c():
-    periphery = Mock()  # noqa: F811
-    port = periphery.I2C("dev/i2c-foo")
-    port.try_lock.return_value = True
-
-    nCard = notecard.OpenI2C(port, 0x17, 255, debug=True)
-
-    assert nCard._debug
-
-
-def test_env_default():
-    nCard, port = get_serial_and_port()
-
-    port.readline.return_value = "{}\r\n"
-
-    response = env.default(nCard, name="pump", text="on")
-
-    assert response == {}
-
-
-def test_env_set():
-    nCard, port = get_serial_and_port()
-
-    port.readline.return_value = "{}\r\n"
-
-    response = env.set(nCard, name="pump", text="on")
-
-    assert response == {}
-
-
-def test_env_get():
-    nCard, port = get_serial_and_port()
-
-    port.readline.return_value = "{}\r\n"
-
-    response = env.get(nCard, name="pump")
-
-    assert response == {}
-
-
-def test_env_modified():
-    nCard, port = get_serial_and_port()
-
-    port.readline.return_value = "{\"time\": 1605814493}\r\n"
-
-    response = env.modified(nCard)
-
-    assert "time" in response
-    assert response["time"] == 1605814493
-
-
-def test_file_delete():
-    nCard, port = get_serial_and_port()
-
-    port.readline.return_value = "{}\r\n"
-
-    response = file.delete(nCard, files=["sensors.qo"])
-
-    assert response == {}
-
-
-def test_file_changes():
-    nCard, port = get_serial_and_port()
-
-    port.readline.return_value = "{\"total\":5}\r\n"
-
-    response = file.changes(nCard, tracker="123", files=["sensors.qo"])
-
-    assert "total" in response
-    assert response["total"] == 5
-
-
-def test_file_stats():
-    nCard, port = get_serial_and_port()
-
-    port.readline.return_value = "{\"total\":24}\r\n"
-
-    response = file.stats(nCard)
-
-    assert "total" in response
-    assert response["total"] == 24
-
-
-def test_file_pendingChanges():
-    nCard, port = get_serial_and_port()
-
-    port.readline.return_value = "{\"changes\":1}\r\n"
-
-    response = file.pendingChanges(nCard)
-
-    assert "changes" in response
-    assert response["changes"] == 1
+        assert nCard._debug
