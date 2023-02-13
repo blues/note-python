@@ -1,4 +1,4 @@
-future==0.18.2
+future==0.18.3
 iso8601==0.1.12
 pyserial==3.4
 python-periphery==2.3.0
