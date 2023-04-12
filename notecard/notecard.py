@@ -198,6 +198,7 @@ class Notecard:
         'os_platform': sys.platform,
         'os_version': sys.version
     }
+    _user_agent_app = None
     _user_agent_sent = False
 
     def __init__(self):
@@ -214,7 +215,8 @@ class Notecard:
         if 'hub.set' in req.values():
             # Merge the User Agent to send along with the hub.set request.
             new_req = req.copy()
-            new_req.update(self.GetUserAgent())
+            ua = {'body': self.GetUserAgent()}
+            new_req.update(ua)
             req = new_req
 
             self._user_agent_sent = True
@@ -222,7 +224,13 @@ class Notecard:
 
     def GetUserAgent(self):
         """Return the User Agent String for the host for debug purposes."""
-        return self._user_agent
+        ua_copy = self._user_agent.copy()
+        ua_copy.update(self._user_agent_app or {})
+        return ua_copy
+
+    def SetAppUserAgent(self, app_user_agent):
+        """Set the User Agent info for the app."""
+        self._user_agent_app = app_user_agent
 
     def UserAgentSent(self):
         """Return true if the User Agent has been sent to the Notecard."""

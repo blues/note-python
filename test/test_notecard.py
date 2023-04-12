@@ -414,3 +414,27 @@ class TestNotecardMockI2C(NotecardTest):
         nCard = notecard.OpenI2C(port, 0x17, 255, debug=True)
 
         assert nCard._debug
+
+
+class MockNotecard(notecard.Notecard):
+    def Reset(self):
+        pass
+
+
+class TestUserAgent:
+
+    def setUserAgentInfo(self, info=None):
+        nCard = MockNotecard()
+        orgReq = {"req": "hub.set"}
+        nCard.SetAppUserAgent(info)
+        req = nCard._preprocessReq(orgReq)
+        return req
+
+    def test_amends_hub_set_request(self):
+        req = self.setUserAgentInfo()
+        assert req['body'] is not None
+
+    def test_adds_app_info(self):
+        info = {"app": "myapp"}
+        req = self.setUserAgentInfo(info)
+        assert req['body']['app'] == 'myapp'
