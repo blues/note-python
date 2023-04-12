@@ -214,10 +214,8 @@ class Notecard:
         """Inspect the request for hub.set and add the User Agent."""
         if 'hub.set' in req.values():
             # Merge the User Agent to send along with the hub.set request.
-            new_req = req.copy()
-            ua = {'body': self.GetUserAgent()}
-            new_req.update(ua)
-            req = new_req
+            req = req.copy()
+            req.update({'body': self.GetUserAgent()})
 
             self._user_agent_sent = True
         return req
