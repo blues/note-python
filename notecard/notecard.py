@@ -355,7 +355,7 @@ class OpenI2C(Notecard):
             chunk_len = 0
             received_newline = False
             start = start_timeout()
-            transaction_timeout_secs = 10
+            transaction_timeout_secs = 30
             while True:
                 time.sleep(.001)
                 reg = bytearray(2)
