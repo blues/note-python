@@ -84,9 +84,9 @@ card = notecard.OpenI2C(port, 0, 0)
 Whether using Serial or I2C, sending Notecard requests and reading responses
 follows the same pattern:
 
-1. Create a JSON object that adheres to the Notecard API
-2. Call `card.Transaction`, `card.Request` or `card.RequestResponse` and pass
-   in the request JSON object.
+1. Create a JSON object that adheres to the Notecard API.
+2. Call `Transaction` on a `Notecard` object and pass in the request JSON
+object.
 3. Make sure the response contains the data you need
 
 ```python
@@ -101,12 +101,11 @@ print(rsp) # {"total":1}
 ### Using the Library Fluent API
 
 The `notecard` class allows complete access to the Notecard API via manual JSON
-object construction and the `Transaction`, `Request`, and `RequestResponse`
-methods. Alternatively, you can import one or more Fluent API helpers to work
- with common aspects of the Notecard API without having to author JSON objects,
- by hand. **Note** that not all aspects of the Notecard API are available using
- these helpers. For a complete list of supported helpers, visit the
- [API](API.md) doc.
+object construction and the `Transaction` method. Alternatively, you can import
+one or more Fluent API helpers to work with common aspects of the Notecard API
+without having to author JSON objects, by hand. **Note** that not all aspects of
+the Notecard API are available using these helpers. For a complete list of
+supported helpers, visit the [API](API.md) doc.
 
 Here's an example that uses the `hub` helper to set the Notecard Product UID
 in CircuitPython:

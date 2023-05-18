@@ -618,8 +618,6 @@ class notecard::notecard::OpenSerial
 --------------------------------|---------------------------------------------
 `public  `[`uart`](#classnotecard_1_1notecard_1_1_open_serial_1a535a6dffc769a9f55214ea22095f598f) | 
 `public  `[`lock`](#classnotecard_1_1notecard_1_1_open_serial_1afbc7e0e12502762f8d7a205085ec9deb) | 
-`public def `[`Request`](#classnotecard_1_1notecard_1_1_open_serial_1aed3df72d86f07f5960500b811213db68)`(self,req)` | Call the Transaction method and discard the result.
-`public def `[`RequestResponse`](#classnotecard_1_1notecard_1_1_open_serial_1aec9d0d2754f4d8744c4db8d9488c859f)`(self,req)` | Call the Transaction method and return the result.
 `public def `[`Command`](#classnotecard_1_1notecard_1_1_open_serial_1aa6f70223bc2bfdaf9da2667f4181d4ad)`(self,req)` | Perform a [Notecard](#classnotecard_1_1notecard_1_1_notecard) command and exit with no response.
 `public def `[`Transaction`](#classnotecard_1_1notecard_1_1_open_serial_1aeb9a39cf7f794a38e8aadd1d9db6f7c7)`(self,req)` | Perform a [Notecard](#classnotecard_1_1notecard_1_1_notecard) transaction and return the result.
 `public def `[`Reset`](#classnotecard_1_1notecard_1_1_open_serial_1a849ee6e929c9dd79438f0fa6df78a3c0)`(self)` | Reset the [Notecard](#classnotecard_1_1notecard_1_1_notecard).
@@ -630,14 +628,6 @@ class notecard::notecard::OpenSerial
 #### `public  `[`uart`](#classnotecard_1_1notecard_1_1_open_serial_1a535a6dffc769a9f55214ea22095f598f) 
 
 #### `public  `[`lock`](#classnotecard_1_1notecard_1_1_open_serial_1afbc7e0e12502762f8d7a205085ec9deb) 
-
-#### `public def `[`Request`](#classnotecard_1_1notecard_1_1_open_serial_1aed3df72d86f07f5960500b811213db68)`(self,req)` 
-
-Call the Transaction method and discard the result.
-
-#### `public def `[`RequestResponse`](#classnotecard_1_1notecard_1_1_open_serial_1aec9d0d2754f4d8744c4db8d9488c859f)`(self,req)` 
-
-Call the Transaction method and return the result.
 
 #### `public def `[`Command`](#classnotecard_1_1notecard_1_1_open_serial_1aa6f70223bc2bfdaf9da2667f4181d4ad)`(self,req)` 
 
