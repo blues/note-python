@@ -7,22 +7,22 @@
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
 | `card.attn`            | card.attn          |
-| `card.aux`             | NOT IMPLEMENTED                |
-| `card.contact`         | NOT IMPLEMENTED                 |
-| `card.location.mode`   | NOT IMPLEMENTED                 |
-| `card.location.track`  | NOT IMPLEMENTED                 |
-| `card.motion.mode`     | NOT IMPLEMENTED                 |
-| `card.motion.sync`     | NOT IMPLEMENTED                 |
-| `card.motion.track`    | NOT IMPLEMENTED                 |
-| `card.restart`         | NOT IMPLEMENTED                 |
-| `card.restore`         | NOT IMPLEMENTED                 |
+| `card.aux`             | NOT IMPLEMENTED    |
+| `card.contact`         | NOT IMPLEMENTED    |
+| `card.location.mode`   | NOT IMPLEMENTED    |
+| `card.location.track`  | NOT IMPLEMENTED    |
+| `card.motion.mode`     | NOT IMPLEMENTED    |
+| `card.motion.sync`     | NOT IMPLEMENTED    |
+| `card.motion.track`    | NOT IMPLEMENTED    |
+| `card.restart`         | NOT IMPLEMENTED    |
+| `card.restore`         | NOT IMPLEMENTED    |
 | `card.status`          | card.status        |
 | `card.temp`            | card.temp          |
 | `card.time`            | card.time          |
-| `card.usage.get`       | NOT IMPLEMENTED                 |
-| `card.usage.test`      | NOT IMPLEMENTED                 |
-| `card.version`         | card.version                 |
-| `card.voltage`         | card.voltage                 |
+| `card.usage.get`       | NOT IMPLEMENTED    |
+| `card.usage.test`      | NOT IMPLEMENTED    |
+| `card.version`         | card.version       |
+| `card.voltage`         | card.voltage       |
 | `card.wireless`        | card.wireless      |
 
 ## Note Commands
@@ -36,6 +36,7 @@
 | `note.delete`          | note.delete        |
 | `note.get`             | note.get           |
 | `note.update`          | note.update        |
+| `note.template`        | note.template      |
 
 ## Hub Commands
 
@@ -63,9 +64,9 @@
 
 | Notecard API           | Python Library API |
 | -----------------------| -------------------|
-| `default`        | env.default            |
-| `get`                  | env.get            |
-| `modified`        | env.modified          |
+| `env.default`          | env.default        |
+| `env.get`              | env.get            |
+| `env.modified`         | env.modified       |
 | `set`                  | env.set            |
 
 ## File Commands
