@@ -34,6 +34,8 @@ import sys
 import os
 import json
 import time
+from .timeout import start_timeout, has_timed_out
+from .transaction_manager import TransactionManager
 
 use_periphery = False
 use_micropython = False
@@ -52,7 +54,6 @@ if sys.implementation.name == 'cpython':
 
 use_i2c_lock = not use_periphery and not use_micropython
 
-
 NOTECARD_I2C_ADDRESS = 0x17
 
 # The notecard is a real-time device that has a fixed size interrupt buffer.
@@ -60,37 +61,6 @@ NOTECARD_I2C_ADDRESS = 0x17
 # therefore we push it in segments with a pause between each segment.
 CARD_REQUEST_SEGMENT_MAX_LEN = 250
 CARD_REQUEST_SEGMENT_DELAY_MS = 250
-
-if not use_rtc:
-    if use_circuitpython:
-        import supervisor
-        from supervisor import ticks_ms
-
-        _TICKS_PERIOD = 1 << 29
-        _TICKS_MAX = _TICKS_PERIOD - 1
-        _TICKS_HALFPERIOD = _TICKS_PERIOD // 2
-
-        def ticks_diff(ticks1, ticks2):
-            """Compute the signed difference between two ticks values."""
-            diff = (ticks1 - ticks2) & _TICKS_MAX  # noqa: F821
-            diff = ((diff + _TICKS_HALFPERIOD)  # noqa: F821
-                    & _TICKS_MAX) - _TICKS_HALFPERIOD  # noqa: F821
-            return diff
-    if use_micropython:
-        from utime import ticks_diff, ticks_ms  # noqa: F811
-
-
-def has_timed_out(start, timeout_secs):
-    """Determine whether a timeout interval has passed during communication."""
-    if not use_rtc:
-        return ticks_diff(ticks_ms(), start) > timeout_secs * 1000
-    else:
-        return time.time() > start + timeout_secs
-
-
-def start_timeout():
-    """Start the timeout interval for I2C communication."""
-    return ticks_ms() if not use_rtc else time.time()
 
 
 def prepareRequest(req, debug=False):
@@ -137,9 +107,13 @@ def serialReset(port):
             raise Exception("Notecard not responding")
 
 
-def serialTransaction(port, req, debug):
+def serialTransaction(port, req, debug, txn_manager=None):
     """Perform a single write to and read from a Notecard."""
     req_json = prepareRequest(req, debug)
+
+    transaction_timeout_secs = 30
+    if txn_manager:
+        txn_manager.start(transaction_timeout_secs)
 
     seg_off = 0
     seg_left = len(req_json)
@@ -156,8 +130,10 @@ def serialTransaction(port, req, debug):
             break
         time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
 
-    rsp_json = port.readline()
+    if txn_manager:
+        txn_manager.stop()
 
+    rsp_json = port.readline()
     if debug:
         print(rsp_json.rstrip())
 
@@ -206,6 +182,7 @@ class Notecard:
             self._user_agent['os_family'] = os.name
         else:
             self._user_agent['os_family'] = os.uname().machine
+        self._transaction_manager = None
 
     def _preprocessReq(self, req):
         """Inspect the request for hub.set and add the User Agent."""
@@ -230,6 +207,10 @@ class Notecard:
     def UserAgentSent(self):
         """Return true if the User Agent has been sent to the Notecard."""
         return self._user_agent_sent
+
+    def SetTransactionPins(self, rtx_pin, ctx_pin):
+        """Set the pins used for RTX and CTX."""
+        self._transaction_manager = TransactionManager(rtx_pin, ctx_pin)
 
 
 class OpenSerial(Notecard):
@@ -258,13 +239,13 @@ class OpenSerial(Notecard):
         if use_serial_lock:
             try:
                 self.lock.acquire(timeout=5)
-                return serialTransaction(self.uart, req, self._debug)
+                return serialTransaction(self.uart, req, self._debug, self._transaction_manager)
             except Timeout:
                 raise Exception("Notecard in use")
             finally:
                 self.lock.release()
         else:
-            return serialTransaction(self.uart, req, self._debug)
+            return serialTransaction(self.uart, req, self._debug, self._transaction_manager)
 
     def Reset(self):
         """Reset the Notecard."""
@@ -349,12 +330,15 @@ class OpenI2C(Notecard):
             pass
 
         try:
+            transaction_timeout_secs = 30
+            if self._transaction_manager:
+                self._transaction_manager.start(transaction_timeout_secs)
+
             self._sendPayload(req_json)
 
             chunk_len = 0
             received_newline = False
             start = start_timeout()
-            transaction_timeout_secs = 30
             while True:
                 time.sleep(.001)
                 reg = bytearray(2)
@@ -391,6 +375,8 @@ class OpenI2C(Notecard):
 
         finally:
             self.unlock()
+            if self._transaction_manager:
+                self._transaction_manager.stop()
 
         if self._debug:
             print(rsp_json.rstrip())
