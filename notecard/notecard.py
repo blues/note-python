@@ -192,19 +192,16 @@ class Notecard:
     to reset the Notecard via Serial or I2C.
     """
 
-    _user_agent = {
-        'agent': 'note-python',
-        'os_name': sys.implementation.name,
-        'os_platform': sys.platform,
-        'os_version': sys.version
-    }
-    _user_agent_app = None
-    _user_agent_sent = False
-
     def __init__(self):
-        """Initialize the Notecard through a reset and configure user agent."""
-        self.Reset()
-
+        """Configure user agent."""
+        self._user_agent_app = None
+        self._user_agent_sent = False
+        self._user_agent = {
+            'agent': 'note-python',
+            'os_name': sys.implementation.name,
+            'os_platform': sys.platform,
+            'os_version': sys.version
+        }
         if sys.implementation.name == 'cpython':
             self._user_agent['os_family'] = os.name
         else:
@@ -284,6 +281,7 @@ class OpenSerial(Notecard):
 
     def __init__(self, uart_id, debug=False):
         """Initialize the Notecard before a reset."""
+        super().__init__()
         self._user_agent['req_interface'] = 'serial'
         self._user_agent['req_port'] = str(uart_id)
 
@@ -292,7 +290,8 @@ class OpenSerial(Notecard):
 
         if use_serial_lock:
             self.lock = FileLock('serial.lock', timeout=1)
-        super().__init__()
+
+        self.Reset()
 
 
 class OpenI2C(Notecard):
@@ -445,6 +444,7 @@ class OpenI2C(Notecard):
 
     def __init__(self, i2c, address, max_transfer, debug=False):
         """Initialize the Notecard before a reset."""
+        super().__init__()
         self._user_agent['req_interface'] = 'i2c'
         self._user_agent['req_port'] = address
 
@@ -458,4 +458,5 @@ class OpenI2C(Notecard):
             self.max = 255
         else:
             self.max = max_transfer
-        super().__init__()
+
+        self.Reset()
