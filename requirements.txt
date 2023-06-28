@@ -4,7 +4,7 @@ pyserial==3.4
 python-periphery==2.3.0
 PyYAML==5.4
 flake8==3.8.3
-pytest==5.4.3
+pytest==7.0.1
 pytest-cov==2.8.1
 filelock==3.0.12
 pydocstyle==5.0.2
