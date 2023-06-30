@@ -1,0 +1,39 @@
+{
+    "urls": [
+        [
+            "note-python/__init__.py",
+            "github:blues/note-python/notecard/__init__.py"
+        ],
+        [
+            "note-python/card.py",
+            "github:blues/note-python/notecard/card.py"
+        ],
+        [
+            "note-python/env.py",
+            "github:blues/note-python/notecard/env.py"
+        ],
+        [
+            "note-python/file.py",
+            "github:blues/note-python/notecard/file.py"
+        ],
+        [
+            "note-python/hub.py",
+            "github:blues/note-python/notecard/hub.py"
+        ],
+        [
+            "note-python/note.py",
+            "github:blues/note-python/notecard/note.py"
+        ],
+        [
+            "note-python/notecard.py",
+            "github:blues/note-python/notecard/notecard.py"
+        ],
+        [
+            "note-python/validators.py",
+            "github:blues/note-python/notecard/validators.py"
+        ]
+    ],
+    "deps": [
+    ],
+    "version": "1.4.4"
+}
