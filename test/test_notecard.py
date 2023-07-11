@@ -4,8 +4,8 @@ import pytest
 from unittest.mock import Mock, MagicMock, patch
 import periphery
 
-sys.path.insert(0, os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0,
+                os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import notecard  # noqa: E402
 from notecard import card, hub, note, env, file  # noqa: E402
@@ -52,6 +52,18 @@ class NotecardTest:
         assert "connected" in response
         assert response["connected"] is True
 
+    @patch('notecard.notecard.TransactionManager')
+    def test_setting_transaction_pins(self, transaction_manager_mock):
+        nCard, _ = self.get_port("{\"connected\":true}\r\n")
+
+        nCard.SetTransactionPins(1, 2)
+        nCard.Transaction({"req": "hub.status"})
+
+        # If transaction pins have been set, start and stop should be called
+        # once for each Transaction call.
+        nCard._transaction_manager.start.assert_called_once()
+        nCard._transaction_manager.stop.assert_called_once()
+
     def test_command(self):
         nCard, port = self.get_port()
 
@@ -62,13 +74,15 @@ class NotecardTest:
     def test_command_fail_if_req(self):
         nCard, port = self.get_port()
 
-        with pytest.raises(Exception, match="Please use 'cmd' instead of 'req'"):
+        with pytest.raises(Exception,
+                           match="Please use 'cmd' instead of 'req'"):
             nCard.Command({"req": "card.sleep"})
 
     def test_hub_set(self):
         nCard, port = self.get_port("{}\r\n")
 
-        response = hub.set(nCard, product="com.blues.tester",
+        response = hub.set(nCard,
+                           product="com.blues.tester",
                            sn="foo",
                            mode="continuous",
                            outbound=2,
@@ -90,7 +104,8 @@ class NotecardTest:
     def test_send_user_agent_in_hub_set_helper(self):
         nCard, port = self.get_port("{}\r\n")
 
-        hub.set(nCard, product="com.blues.tester",
+        hub.set(nCard,
+                product="com.blues.tester",
                 sn="foo",
                 mode="continuous",
                 outbound=2,
@@ -162,7 +177,8 @@ class NotecardTest:
         assert response["time"] == 1592490375
 
     def test_card_status(self):
-        nCard, port = self.get_port("{\"usb\":true,\"status\":\"{normal}\"}\r\n")
+        nCard, port = self.get_port(
+            "{\"usb\":true,\"status\":\"{normal}\"}\r\n")
 
         response = card.status(nCard)
 
@@ -170,7 +186,8 @@ class NotecardTest:
         assert response["status"] == "{normal}"
 
     def test_card_temp(self):
-        nCard, port = self.get_port("{\"value\":33.625,\"calibration\":-3.0}\r\n")
+        nCard, port = self.get_port(
+            "{\"value\":33.625,\"calibration\":-3.0}\r\n")
 
         response = card.temp(nCard, minutes=20)
 
@@ -180,9 +197,11 @@ class NotecardTest:
     def test_card_attn(self):
         nCard, port = self.get_port("{\"set\":true}\r\n")
 
-        response = card.attn(nCard, mode="arm, files",
+        response = card.attn(nCard,
+                             mode="arm, files",
                              files=["sensors.qo"],
-                             seconds=10, payload={"foo": "bar"},
+                             seconds=10,
+                             payload={"foo": "bar"},
                              start=True)
 
         assert "set" in response
@@ -201,7 +220,8 @@ class NotecardTest:
         assert response["hours"] == 707
 
     def test_card_wireless(self):
-        nCard, port = self.get_port("{\"status\":\"{modem-off}\",\"count\":1}\r\n")
+        nCard, port = self.get_port(
+            "{\"status\":\"{modem-off}\",\"count\":1}\r\n")
 
         response = card.wireless(nCard, mode="auto", apn="-")
 
@@ -209,7 +229,8 @@ class NotecardTest:
         assert response["status"] == "{modem-off}"
 
     def test_card_version(self):
-        nCard, port = self.get_port("{\"version\":\"notecard-1.2.3.9950\"}\r\n")
+        nCard, port = self.get_port(
+            "{\"version\":\"notecard-1.2.3.9950\"}\r\n")
 
         response = card.version(nCard)
 
@@ -219,7 +240,8 @@ class NotecardTest:
     def test_note_add(self):
         nCard, port = self.get_port("{\"total\":1}\r\n")
 
-        response = note.add(nCard, file="sensors.qo",
+        response = note.add(nCard,
+                            file="sensors.qo",
                             body={"temp": 72.22},
                             payload="b64==",
                             sync=True)
@@ -228,9 +250,11 @@ class NotecardTest:
         assert response["total"] == 1
 
     def test_note_get(self):
-        nCard, port = self.get_port("{\"note\":\"s\",\"body\":{\"s\":\"foo\"}}\r\n")
+        nCard, port = self.get_port(
+            "{\"note\":\"s\",\"body\":{\"s\":\"foo\"}}\r\n")
 
-        response = note.get(nCard, file="settings.db",
+        response = note.get(nCard,
+                            file="settings.db",
                             note_id="s",
                             delete=True,
                             deleted=False)
@@ -248,15 +272,19 @@ class NotecardTest:
     def test_note_update(self):
         nCard, port = self.get_port("{}\r\n")
 
-        response = note.update(nCard, file="settings.db", note_id="s",
-                               body={"foo": "bar"}, payload="123dfb==")
+        response = note.update(nCard,
+                               file="settings.db",
+                               note_id="s",
+                               body={"foo": "bar"},
+                               payload="123dfb==")
 
         assert response == {}
 
     def test_note_changes(self):
         nCard, port = self.get_port("{\"changes\":5,\"total\":15}\r\n")
 
-        response = note.changes(nCard, file="sensors.qo",
+        response = note.changes(nCard,
+                                file="sensors.qo",
                                 tracker="123",
                                 maximum=10,
                                 start=True,
@@ -270,8 +298,12 @@ class NotecardTest:
     def test_note_template(self):
         nCard, port = self.get_port("{\"bytes\":40}\r\n")
 
-        response = note.template(nCard, file="sensors.qo",
-                                 body={"temp": 1.1, "hu": 1},
+        response = note.template(nCard,
+                                 file="sensors.qo",
+                                 body={
+                                     "temp": 1.1,
+                                     "hu": 1
+                                 },
                                  length=5)
 
         assert "bytes" in response
@@ -342,6 +374,7 @@ class NotecardTest:
 
 
 class TestNotecardMockSerial(NotecardTest):
+
     def get_port(self, response=None):
         nCard, port = get_serial_and_port()
         if response is not None:
@@ -371,6 +404,7 @@ class TestNotecardMockSerial(NotecardTest):
 
 
 class TestNotecardMockI2C(NotecardTest):
+
     def get_port(self, response=None):
         nCard, port = get_i2c_and_port()
         if response is not None:
@@ -417,6 +451,7 @@ class TestNotecardMockI2C(NotecardTest):
 
 
 class MockNotecard(notecard.Notecard):
+
     def Reset(self):
         pass
 
