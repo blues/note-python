@@ -10,11 +10,7 @@
 # This module is optional and not required for use with the Notecard.
 
 import notecard
-import sys
-if sys.implementation.name == 'micropython':
-    from validators import validate_card_object
-else:
-    from .validators import validate_card_object
+from .validators import validate_card_object
 
 
 @validate_card_object
