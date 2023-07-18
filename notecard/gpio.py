@@ -1,13 +1,19 @@
 """GPIO abstractions for note-python."""
 
-from .platform import platform
+import sys
 
-if platform == 'circuitpython':
+if sys.implementation.name == 'circuitpython':
     import digitalio
-elif platform == 'micropython':
+elif sys.implementation.name == 'micropython':
     import machine
-elif platform == 'raspbian':
-    import RPi.GPIO as rpi_gpio
+else:
+    try:
+        with open('/etc/os-release', 'r') as f:
+            if 'ID=raspbian' in f.read():
+                raspbian = True
+                import RPi.GPIO as rpi_gpio
+    except IOError:
+        pass
 
 
 class GPIO:
@@ -50,12 +56,15 @@ class GPIO:
         The platform is detected internally so that the user doesn't need to
         write platform-specific code themselves.
         """
-        if platform == 'circuitpython':
+        if sys.implementation.name == 'circuitpython':
             return CircuitPythonGPIO(pin, direction, pull, value)
-        elif platform == 'micropython':
+        elif sys.implementation.name == 'micropython':
             return MicroPythonGPIO(pin, direction, pull, value)
-        elif platform == 'raspbian':
+        elif raspbian:
             return RpiGPIO(pin, direction, pull, value)
+        else:
+            raise NotImplementedError(
+                'GPIO not implemented for this platform.')
 
     def __init__(self, pin, direction, pull=None, value=None):
         """Initialize the GPIO.

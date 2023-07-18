@@ -38,11 +38,7 @@ from .timeout import start_timeout, has_timed_out
 from .transaction_manager import TransactionManager
 
 use_periphery = False
-use_micropython = False
 use_serial_lock = False
-use_circuitpython = sys.implementation.name == 'circuitpython'
-use_micropython = sys.implementation.name == 'micropython'
-use_rtc = not use_micropython and not use_circuitpython
 
 if sys.implementation.name == 'cpython':
     if sys.platform == 'linux' or sys.platform == 'linux2':
@@ -52,7 +48,7 @@ if sys.implementation.name == 'cpython':
         use_serial_lock = True
         from filelock import Timeout, FileLock
 
-use_i2c_lock = not use_periphery and not use_micropython
+use_i2c_lock = not use_periphery and sys.implementation.name != 'micropython'
 
 NOTECARD_I2C_ADDRESS = 0x17
 
@@ -122,8 +118,7 @@ def serialTransaction(port, req, debug, txn_manager=None):
         if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
             seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
 
-        port.write(req_json[seg_off:seg_off + seg_len]
-                   .encode('utf-8'))
+        port.write(req_json[seg_off:seg_off + seg_len].encode('utf-8'))
         seg_off += seg_len
         seg_left -= seg_len
         if seg_left == 0:
@@ -152,8 +147,7 @@ def serialCommand(port, req, debug):
         if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
             seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
 
-        port.write(req_json[seg_off:seg_off + seg_len]
-                   .encode('utf-8'))
+        port.write(req_json[seg_off:seg_off + seg_len].encode('utf-8'))
         seg_off += seg_len
         seg_left -= seg_len
         if seg_left == 0:
@@ -239,13 +233,15 @@ class OpenSerial(Notecard):
         if use_serial_lock:
             try:
                 self.lock.acquire(timeout=5)
-                return serialTransaction(self.uart, req, self._debug, self._transaction_manager)
+                return serialTransaction(self.uart, req, self._debug,
+                                         self._transaction_manager)
             except Timeout:
                 raise Exception("Notecard in use")
             finally:
                 self.lock.release()
         else:
-            return serialTransaction(self.uart, req, self._debug, self._transaction_manager)
+            return serialTransaction(self.uart, req, self._debug,
+                                     self._transaction_manager)
 
     def Reset(self):
         """Reset the Notecard."""
@@ -287,10 +283,8 @@ class OpenI2C(Notecard):
             chunk_len = min(json_left, self.max)
             reg = bytearray(1)
             reg[0] = chunk_len
-            write_data = bytes(json[
-                               chunk_offset:
-                               chunk_offset + chunk_len
-                               ], 'utf-8')
+            write_data = bytes(json[chunk_offset:chunk_offset + chunk_len],
+                               'utf-8')
             if use_periphery:
                 msgs = [I2C.Message(reg + write_data)]
                 self.i2c.transfer(self.addr, msgs)
@@ -350,7 +344,7 @@ class OpenI2C(Notecard):
                     msgs = [I2C.Message(reg), I2C.Message(buf, read=True)]
                     self.i2c.transfer(self.addr, msgs)
                     buf = msgs[1].data
-                elif use_micropython:
+                elif sys.implementation.name == 'micropython':
                     self.i2c.writeto(self.addr, reg, False)
                     self.i2c.readfrom_into(self.addr, buf)
                 else:
@@ -402,7 +396,7 @@ class OpenI2C(Notecard):
                     msgs = [I2C.Message(reg), I2C.Message(buf, read=True)]
                     self.i2c.transfer(self.addr, msgs)
                     buf = msgs[1].data
-                elif use_micropython:
+                elif sys.implementation.name == 'micropython':
                     self.i2c.writeto(self.addr, reg, False)
                     self.i2c.readfrom_into(self.addr, buf)
                 else:

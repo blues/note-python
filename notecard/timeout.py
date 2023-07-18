@@ -3,12 +3,10 @@
 import sys
 import time
 
-from .platform import platform
-
-use_rtc = platform != 'micropython' and platform != 'circuitpython'
+use_rtc = sys.implementation.name != 'micropython' and sys.implementation.name != 'circuitpython'
 
 if not use_rtc:
-    if platform == 'circuitpython':
+    if sys.implementation.name == 'circuitpython':
         import supervisor
         from supervisor import ticks_ms
 
@@ -23,7 +21,7 @@ if not use_rtc:
                     & _TICKS_MAX) - _TICKS_HALFPERIOD  # noqa: F821
             return diff
 
-    if platform == 'micropython':
+    if sys.implementation.name == 'micropython':
         from utime import ticks_diff, ticks_ms  # noqa: F811
 
 
