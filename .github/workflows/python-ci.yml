@@ -4,6 +4,7 @@
 # Linting (flake8 and docstyle)
 # Testing and coverage with pytest
 # Optionally publish coverage to coveralls (requires secrets.GITHUB_TOKEN)
+# Reports test coverage to DataDog if secrets.DD_API_KEY is defined.
 
 on:
     workflow_call:
@@ -26,7 +27,7 @@ jobs:
       runs-on: ubuntu-20.04
       strategy:
         matrix:
-          python-version: [3.9]
+          python-version: [3.6, 3.7, 3.8, 3.9]
 
       steps:
       - name: Send building notification
@@ -45,7 +46,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 pytest coveralls
+          pip install -U flake8 pytest coveralls ddtrace
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Lint with flake8
         run: |
@@ -63,8 +64,13 @@ jobs:
           --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
           --data '{"req":"note.add","file":"build_results.qi","body":{"result":"running_tests"}}'
       - name: Test with pytest
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_CIVISIBILITY_AGENTLESS_ENABLED: ${{ !!secrets.DD_API_KEY }}
+          DD_SERVICE: note-python
+          DD_ENV: ci
         run: |
-          coverage run -m pytest
+          coverage run -m pytest --ddtrace
       - name: Publish to Coveralls
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
