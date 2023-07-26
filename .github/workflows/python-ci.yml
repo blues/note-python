@@ -1,0 +1,90 @@
+# Reusable workflow to run the python CI, which covers
+# Optional notificiation to notehub (requires secrets NOTEHUB_SESSION_TOKEN, NOTEHUB_DEVICE_ID and NOTEHUB_PRODUCT_UID)
+# Python installation and dependencies
+# Linting (flake8 and docstyle)
+# Testing and coverage with pytest
+# Optionally publish coverage to coveralls (requires secrets.GITHUB_TOKEN)
+
+on:
+    workflow_call:
+        secrets:
+            NOTEHUB_SESSION_TOKEN:
+            NOTEHUB_PRODUCT_UID:
+            NOTECARD_DEVICE_ID:
+        inputs:
+            coveralls:
+                type: boolean
+                required: false
+                default: false
+            notehub_notify:
+                type: boolean
+                required: false
+                default: false
+
+jobs:
+    build:
+      runs-on: ubuntu-20.04
+      strategy:
+        matrix:
+          python-version: [3.9]
+
+      steps:
+      - name: Send building notification
+        if: ${{ inputs.notehub_notify }}
+        run: |
+          curl --request POST \
+          --url 'https://api.notefile.net/?product=${{ secrets.NOTEHUB_PRODUCT_UID }}&device=${{ secrets.NOTECARD_DEVICE_ID }}' \
+          --header 'Content-Type: application/json' \
+          --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
+          --data '{"req":"note.add","file":"build_results.qi","body":{"result":"building"}}'
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest coveralls
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          make flake8
+      - name: Lint Docs with Pydocstyle
+        run: |
+          make docstyle
+      - name: Send running tests notification
+        if: ${{ inputs.notehub_notify }}
+        run: |
+          curl --request POST \
+          --url 'https://api.notefile.net/?product=${{ secrets.NOTEHUB_PRODUCT_UID }}&device=${{ secrets.NOTECARD_DEVICE_ID }}' \
+          --header 'Content-Type: application/json' \
+          --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
+          --data '{"req":"note.add","file":"build_results.qi","body":{"result":"running_tests"}}'
+      - name: Test with pytest
+        run: |
+          coverage run -m pytest
+      - name: Publish to Coveralls
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ inputs.coveralls }}
+        run: |
+          coveralls --service=github
+
+      - name: Check if the job has succeeded
+        if: ${{ success() && inputs.notehub_notify }}
+        run: |
+          curl --request POST \
+          --url 'https://api.notefile.net/?product=${{ secrets.NOTEHUB_PRODUCT_UID }}&device=${{ secrets.NOTECARD_DEVICE_ID }}' \
+          --header 'Content-Type: application/json' \
+          --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
+          --data '{"req":"note.add","file":"build_results.qi","body":{"result":"success"}}'
+      - name: Check if the job has failed
+        if: ${{ failure() && inputs.notehub_notify }}
+        run: |
+          curl --request POST \
+          --url 'https://api.notefile.net/?product=${{ secrets.NOTEHUB_PRODUCT_UID }}&device=${{ secrets.NOTECARD_DEVICE_ID }}' \
+          --header 'Content-Type: application/json' \
+          --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
+          --data '{"req":"note.add","file":"build_results.qi","body":{"result":"tests_failed"}}'
