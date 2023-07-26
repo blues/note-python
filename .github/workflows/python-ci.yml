@@ -78,7 +78,7 @@ jobs:
           DD_SERVICE: note-python
           DD_ENV: ci
         run: |
-          coverage run -m pytest --ddtrace
+          coverage run -m pytest --ddtrace --ddtrace-patch-all
       - name: Publish to Coveralls
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
