@@ -3,6 +3,7 @@ import sys
 import pytest
 from unittest.mock import Mock, MagicMock, patch
 import periphery
+import json
 
 sys.path.insert(0,
                 os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -462,7 +463,7 @@ class TestUserAgent:
         nCard = MockNotecard()
         orgReq = {"req": "hub.set"}
         nCard.SetAppUserAgent(info)
-        req = nCard._preprocess_req(orgReq)
+        req = json.loads(nCard._prepare_request(orgReq))
         return req
 
     def test_amends_hub_set_request(self):
