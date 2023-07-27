@@ -75,99 +75,20 @@ def _prepare_request(req, debug=False):
     return req_json
 
 
-def serialReadByte(port):
-    """Read a single byte from a Notecard."""
-    if sys.implementation.name == 'micropython':
-        if not port.any():
-            return None
-    elif sys.implementation.name == 'cpython':
-        if port.in_waiting == 0:
-            return None
-    return port.read(1)
+def serial_lock(fn):
+    """Attempt to get a lock on the serial channel used for Notecard comms."""
 
-
-def serialReset(port):
-    """Send a reset command to a Notecard."""
-    for i in range(10):
-        try:
-            port.write(b'\n')
-        except:
-            continue
-        time.sleep(0.5)
-        somethingFound = False
-        nonControlCharFound = False
-        while True:
-            data = serialReadByte(port)
-            if (data is None) or (data == b''):
-                break
-            somethingFound = True
-            if data[0] >= 0x20:
-                nonControlCharFound = True
-        if somethingFound and not nonControlCharFound:
-            break
+    def decorator(self, *args, **kwargs):
+        if use_serial_lock:
+            try:
+                with self.lock.acquire(timeout=5):
+                    return fn(self, *args, **kwargs)
+            except Timeout:
+                raise Exception('Notecard in use')
         else:
-            raise Exception("Notecard not responding")
+            return fn(self, *args, **kwargs)
 
-
-def serialTransaction(port, req, debug, txn_manager=None):
-    """Perform a single write to and read from a Notecard."""
-    req_json = _prepare_request(req, debug)
-
-    transaction_timeout_secs = 30
-    if txn_manager:
-        txn_manager.start(transaction_timeout_secs)
-
-    try:
-        seg_off = 0
-        seg_left = len(req_json)
-        while True:
-            seg_len = seg_left
-            if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
-                seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
-
-            port.write(req_json[seg_off:seg_off + seg_len].encode('utf-8'))
-            seg_off += seg_len
-            seg_left -= seg_len
-            if seg_left == 0:
-                break
-            time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
-    finally:
-        if txn_manager:
-            txn_manager.stop()
-
-    rsp_json = port.readline()
-    if debug:
-        print(rsp_json.rstrip())
-
-    rsp = json.loads(rsp_json)
-    return rsp
-
-
-def serialCommand(port, req, debug, txn_manager=None):
-    """Perform a single write to and read from a Notecard."""
-    req_json = _prepare_request(req, debug)
-
-    transaction_timeout_secs = 30
-    if txn_manager:
-        txn_manager.start(transaction_timeout_secs)
-
-    try:
-        seg_off = 0
-        seg_left = len(req_json)
-        while True:
-            seg_len = seg_left
-            if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
-                seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
-
-            port.write(req_json[seg_off:seg_off + seg_len].encode('utf-8'))
-            seg_off += seg_len
-            seg_left -= seg_len
-            if seg_left == 0:
-                break
-            time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
-    finally:
-        if txn_manager:
-            txn_manager.stop()
+    return decorator
 
 
 class Notecard:
@@ -225,51 +146,81 @@ class Notecard:
 class OpenSerial(Notecard):
     """Notecard class for Serial communication."""
 
-    def Command(self, req):
-        """Perform a Notecard command and exit with no response."""
+    def _transmit(self, req):
         req = self._preprocess_req(req)
+        req_json = _prepare_request(req, self._debug)
+
+        transaction_timeout_secs = 30
+        if self._transaction_manager:
+            self._transaction_manager.start(transaction_timeout_secs)
+
+        seg_off = 0
+        seg_left = len(req_json)
+        while seg_left > 0:
+            seg_len = seg_left
+            if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
+                seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
+
+            self.uart.write(req_json[seg_off:seg_off + seg_len].encode('utf-8'))
+            seg_off += seg_len
+            seg_left -= seg_len
+            time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+
+        if self._transaction_manager:
+            self._transaction_manager.stop()
+
+    def _read_byte(self):
+        """Read a single byte from the Notecard."""
+        if sys.implementation.name == 'micropython':
+            if not self.uart.any():
+                return None
+        elif sys.implementation.name == 'cpython':
+            if self.uart.in_waiting == 0:
+                return None
+        return self.uart.read(1)
+
+    @serial_lock
+    def Command(self, req):
+        """Send a command to the Notecard. The Notecard response is ignored."""
         if 'cmd' not in req:
             raise Exception("Please use 'cmd' instead of 'req'")
 
-        if use_serial_lock:
-            try:
-                self.lock.acquire(timeout=5)
-                serialCommand(self.uart, req, self._debug, self._transaction_manager)
-            except Timeout:
-                raise Exception("Notecard in use")
-            finally:
-                self.lock.release()
-        else:
-            serialCommand(self.uart, req, self._debug, self._transaction_manager)
+        self._transmit(req)
 
+    @serial_lock
     def Transaction(self, req):
         """Perform a Notecard transaction and return the result."""
-        req = self._preprocess_req(req)
-        if use_serial_lock:
-            try:
-                self.lock.acquire(timeout=5)
-                return serialTransaction(self.uart, req, self._debug,
-                                         self._transaction_manager)
-            except Timeout:
-                raise Exception("Notecard in use")
-            finally:
-                self.lock.release()
-        else:
-            return serialTransaction(self.uart, req, self._debug,
-                                     self._transaction_manager)
+        self._transmit(req)
 
+        rsp_json = self.uart.readline()
+        if self._debug:
+            print(rsp_json.rstrip())
+
+        rsp = json.loads(rsp_json)
+        return rsp
+
+    @serial_lock
     def Reset(self):
         """Reset the Notecard."""
-        if use_serial_lock:
+        for i in range(10):
             try:
-                self.lock.acquire(timeout=5)
-                serialReset(self.uart)
-            except Timeout:
-                raise Exception("Notecard in use")
-            finally:
-                self.lock.release()
-        else:
-            serialReset(self.uart)
+                self.uart.write(b'\n')
+            except:
+                continue
+            time.sleep(0.5)
+            somethingFound = False
+            nonControlCharFound = False
+            while True:
+                data = self._read_byte()
+                if (data is None) or (data == b''):
+                    break
+                somethingFound = True
+                if data[0] >= 0x20:
+                    nonControlCharFound = True
+            if somethingFound and not nonControlCharFound:
+                break
+            else:
+                raise Exception('Notecard not responding')
 
     def __init__(self, uart_id, debug=False):
         """Initialize the Notecard before a reset."""
@@ -380,11 +331,11 @@ class OpenI2C(Notecard):
         return read_data
 
     def Command(self, req):
-        """Perform a Notecard command and return with no response."""
+        """Perform a Notecard command and exit with no response."""
+        req = self._preprocess_req(req)
         if 'cmd' not in req:
             raise Exception("Please use 'cmd' instead of 'req'")
 
-        req = self._preprocess_req(req)
         req_json = _prepare_request(req, self._debug)
 
         while not self.lock():
@@ -404,6 +355,7 @@ class OpenI2C(Notecard):
     def Transaction(self, req):
         """Perform a Notecard transaction and return the result."""
         req = self._preprocess_req(req)
+
         req_json = _prepare_request(req, self._debug)
         rsp_json = ""
 
