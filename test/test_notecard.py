@@ -462,7 +462,7 @@ class TestUserAgent:
         nCard = MockNotecard()
         orgReq = {"req": "hub.set"}
         nCard.SetAppUserAgent(info)
-        req = nCard._preprocessReq(orgReq)
+        req = nCard._preprocess_req(orgReq)
         return req
 
     def test_amends_hub_set_request(self):

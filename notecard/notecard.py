@@ -56,10 +56,16 @@ NOTECARD_I2C_ADDRESS = 0x17
 # We can push data at it far, far faster than it can process it,
 # therefore we push it in segments with a pause between each segment.
 CARD_REQUEST_SEGMENT_MAX_LEN = 250
+# "a 250ms delay is required to separate "segments", ~256 byte
+# I2C transactions." See
+# https://dev.blues.io/guides-and-tutorials/notecard-guides/serial-over-i2c-protocol/#data-write
 CARD_REQUEST_SEGMENT_DELAY_MS = 250
+# "A 20ms delay is commonly used to separate smaller I2C transactions known as
+# 'chunks'". See the same document linked above.
+I2C_CHUNK_DELAY_MS = 20
 
 
-def prepareRequest(req, debug=False):
+def _prepare_request(req, debug=False):
     """Format the request string as a JSON object and add a newline."""
     req_json = json.dumps(req)
     if debug:
@@ -105,28 +111,29 @@ def serialReset(port):
 
 def serialTransaction(port, req, debug, txn_manager=None):
     """Perform a single write to and read from a Notecard."""
-    req_json = prepareRequest(req, debug)
+    req_json = _prepare_request(req, debug)
 
     transaction_timeout_secs = 30
     if txn_manager:
         txn_manager.start(transaction_timeout_secs)
 
-    seg_off = 0
-    seg_left = len(req_json)
-    while True:
-        seg_len = seg_left
-        if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
-            seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
+    try:
+        seg_off = 0
+        seg_left = len(req_json)
+        while True:
+            seg_len = seg_left
+            if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
+                seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
 
-        port.write(req_json[seg_off:seg_off + seg_len].encode('utf-8'))
-        seg_off += seg_len
-        seg_left -= seg_len
-        if seg_left == 0:
-            break
-        time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
-
-    if txn_manager:
-        txn_manager.stop()
+            port.write(req_json[seg_off:seg_off + seg_len].encode('utf-8'))
+            seg_off += seg_len
+            seg_left -= seg_len
+            if seg_left == 0:
+                break
+            time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+    finally:
+        if txn_manager:
+            txn_manager.stop()
 
     rsp_json = port.readline()
     if debug:
@@ -136,23 +143,31 @@ def serialTransaction(port, req, debug, txn_manager=None):
     return rsp
 
 
-def serialCommand(port, req, debug):
+def serialCommand(port, req, debug, txn_manager=None):
     """Perform a single write to and read from a Notecard."""
-    req_json = prepareRequest(req, debug)
+    req_json = _prepare_request(req, debug)
 
-    seg_off = 0
-    seg_left = len(req_json)
-    while True:
-        seg_len = seg_left
-        if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
-            seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
+    transaction_timeout_secs = 30
+    if txn_manager:
+        txn_manager.start(transaction_timeout_secs)
 
-        port.write(req_json[seg_off:seg_off + seg_len].encode('utf-8'))
-        seg_off += seg_len
-        seg_left -= seg_len
-        if seg_left == 0:
-            break
-        time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+    try:
+        seg_off = 0
+        seg_left = len(req_json)
+        while True:
+            seg_len = seg_left
+            if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
+                seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
+
+            port.write(req_json[seg_off:seg_off + seg_len].encode('utf-8'))
+            seg_off += seg_len
+            seg_left -= seg_len
+            if seg_left == 0:
+                break
+            time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+    finally:
+        if txn_manager:
+            txn_manager.stop()
 
 
 class Notecard:
@@ -178,7 +193,7 @@ class Notecard:
             self._user_agent['os_family'] = os.uname().machine
         self._transaction_manager = None
 
-    def _preprocessReq(self, req):
+    def _preprocess_req(self, req):
         """Inspect the request for hub.set and add the User Agent."""
         if 'hub.set' in req.values():
             # Merge the User Agent to send along with the hub.set request.
@@ -212,24 +227,24 @@ class OpenSerial(Notecard):
 
     def Command(self, req):
         """Perform a Notecard command and exit with no response."""
-        req = self._preprocessReq(req)
+        req = self._preprocess_req(req)
         if 'cmd' not in req:
             raise Exception("Please use 'cmd' instead of 'req'")
 
         if use_serial_lock:
             try:
                 self.lock.acquire(timeout=5)
-                serialCommand(self.uart, req, self._debug)
+                serialCommand(self.uart, req, self._debug, self._transaction_manager)
             except Timeout:
                 raise Exception("Notecard in use")
             finally:
                 self.lock.release()
         else:
-            serialCommand(self.uart, req, self._debug)
+            serialCommand(self.uart, req, self._debug, self._transaction_manager)
 
     def Transaction(self, req):
         """Perform a Notecard transaction and return the result."""
-        req = self._preprocessReq(req)
+        req = self._preprocess_req(req)
         if use_serial_lock:
             try:
                 self.lock.acquire(timeout=5)
@@ -274,50 +289,122 @@ class OpenSerial(Notecard):
 class OpenI2C(Notecard):
     """Notecard class for I2C communication."""
 
-    def _sendPayload(self, json):
+    def _send_payload(self, json):
         chunk_offset = 0
         json_left = len(json)
         sent_in_seg = 0
+        write_length = bytearray(1)
+
         while json_left > 0:
-            time.sleep(.001)
             chunk_len = min(json_left, self.max)
-            reg = bytearray(1)
-            reg[0] = chunk_len
+            write_length[0] = chunk_len
             write_data = bytes(json[chunk_offset:chunk_offset + chunk_len],
                                'utf-8')
+            # Send a message with the length of the incoming bytes followed
+            # by the bytes themselves.
             if use_periphery:
-                msgs = [I2C.Message(reg + write_data)]
+                msgs = [I2C.Message(write_length + write_data)]
                 self.i2c.transfer(self.addr, msgs)
             else:
-                self.i2c.writeto(self.addr, reg + write_data)
+                self.i2c.writeto(self.addr, write_length + write_data)
+
             chunk_offset += chunk_len
             json_left -= chunk_len
             sent_in_seg += chunk_len
+
             if sent_in_seg > CARD_REQUEST_SEGMENT_MAX_LEN:
                 sent_in_seg -= CARD_REQUEST_SEGMENT_MAX_LEN
-            time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+                time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+
+            time.sleep(I2C_CHUNK_DELAY_MS / 1000)
+
+    def _receive(self, timeout_secs, chunk_delay_secs, wait_for_newline):
+        chunk_len = 0
+        received_newline = False
+        start = start_timeout()
+        read_data = bytearray()
+
+        while True:
+            initiate_read = bytearray(2)
+            # 0 indicates we are reading from the Notecard.
+            initiate_read[0] = 0
+            # This indicates how many bytes we are prepared to read.
+            initiate_read[1] = chunk_len
+            # read_buf is a buffer to store the data we're reading.
+            # chunk_len accounts for the payload and the +2 is for the
+            # header. The header sent by the Notecard has one byte to
+            # indicate the number of bytes still available to read and a
+            # second byte to indicate the number of bytes coming in the
+            # current chunk.
+            read_buf = bytearray(chunk_len + 2)
+
+            if use_periphery:
+                msgs = [I2C.Message(initiate_read), I2C.Message(read_buf, read=True)]
+                self.i2c.transfer(self.addr, msgs)
+                read_buf = msgs[1].data
+            elif sys.implementation.name == 'micropython':
+                self.i2c.writeto(self.addr, initiate_read, False)
+                self.i2c.readfrom_into(self.addr, read_buf)
+            else:
+                self.i2c.writeto_then_readfrom(self.addr, initiate_read, read_buf)
+
+            # The number of bytes still available to read.
+            num_bytes_available = read_buf[0]
+            # The number of bytes in this chunk.
+            num_bytes_this_chunk = read_buf[1]
+            if num_bytes_this_chunk > 0:
+                read_data += read_buf[2:2 + num_bytes_this_chunk]
+                received_newline = read_buf[-1] == ord('\n')
+
+            chunk_len = min(num_bytes_available, self.max)
+            # Keep going if there's still byte available to read, even if
+            # we've received a newline.
+            if chunk_len > 0:
+                continue
+
+            # Otherwise, if there's no bytes available to read and we either
+            # 1) don't care about waiting for a newline or 2) do care and
+            # received the newline, we're done.
+            if not wait_for_newline or received_newline:
+                break
+
+            # Delay between reading chunks. Note that as long as bytes are
+            # available to read (i.e. chunk_len > 0), we don't delay here, nor
+            # do we check the timeout below. This is intentional and mimics the
+            # behavior of other SDKs (e.g. note-c).
+            time.sleep(chunk_delay_secs)
+
+            if (timeout_secs != 0 and has_timed_out(start, timeout_secs)):
+                raise Exception("Timed out while reading data from the Notecard.")
+
+        return read_data
 
     def Command(self, req):
-        """Perform a Notecard command and exit with no response."""
-        req = self._preprocessReq(req)
+        """Perform a Notecard command and return with no response."""
         if 'cmd' not in req:
             raise Exception("Please use 'cmd' instead of 'req'")
 
-        req_json = prepareRequest(req, self._debug)
+        req = self._preprocess_req(req)
+        req_json = _prepare_request(req, self._debug)
 
         while not self.lock():
             pass
 
         try:
-            self._sendPayload(req_json)
+            transaction_timeout_secs = 30
+            if self._transaction_manager:
+                self._transaction_manager.start(transaction_timeout_secs)
+
+            self._send_payload(req_json)
         finally:
             self.unlock()
+            if self._transaction_manager:
+                self._transaction_manager.stop()
 
     def Transaction(self, req):
         """Perform a Notecard transaction and return the result."""
-        req = self._preprocessReq(req)
-
-        req_json = prepareRequest(req, self._debug)
+        req = self._preprocess_req(req)
+        req_json = _prepare_request(req, self._debug)
         rsp_json = ""
 
         while not self.lock():
@@ -328,45 +415,10 @@ class OpenI2C(Notecard):
             if self._transaction_manager:
                 self._transaction_manager.start(transaction_timeout_secs)
 
-            self._sendPayload(req_json)
+            self._send_payload(req_json)
 
-            chunk_len = 0
-            received_newline = False
-            start = start_timeout()
-            while True:
-                time.sleep(.001)
-                reg = bytearray(2)
-                reg[0] = 0
-                reg[1] = chunk_len
-                readlen = chunk_len + 2
-                buf = bytearray(readlen)
-                if use_periphery:
-                    msgs = [I2C.Message(reg), I2C.Message(buf, read=True)]
-                    self.i2c.transfer(self.addr, msgs)
-                    buf = msgs[1].data
-                elif sys.implementation.name == 'micropython':
-                    self.i2c.writeto(self.addr, reg, False)
-                    self.i2c.readfrom_into(self.addr, buf)
-                else:
-                    self.i2c.writeto_then_readfrom(self.addr, reg, buf)
-                available = buf[0]
-                good = buf[1]
-                data = buf[2:2 + good]
-                if good > 0 and buf[-1] == 0x0a:
-                    received_newline = True
-                try:
-                    rsp_json += "".join(map(chr, data))
-                except:
-                    pass
-                chunk_len = min(available, self.max)
-                if chunk_len > 0:
-                    continue
-                if received_newline:
-                    break
-                if (has_timed_out(start, transaction_timeout_secs)):
-                    raise Exception("notecard request or response was lost")
-                time.sleep(0.05)
-
+            read_data = self._receive(transaction_timeout_secs, 0.05, True)
+            rsp_json = "".join(map(chr, read_data))
         finally:
             self.unlock()
             if self._transaction_manager:
@@ -374,41 +426,19 @@ class OpenI2C(Notecard):
 
         if self._debug:
             print(rsp_json.rstrip())
-        rsp = json.loads(rsp_json)
-        return rsp
+
+        return json.loads(rsp_json)
 
     def Reset(self):
         """Reset the Notecard."""
-        chunk_len = 0
-
         while not self.lock():
             pass
 
         try:
-            while True:
-                time.sleep(.001)
-                reg = bytearray(2)
-                reg[0] = 0
-                reg[1] = chunk_len
-                readlen = chunk_len + 2
-                buf = bytearray(readlen)
-                if use_periphery:
-                    msgs = [I2C.Message(reg), I2C.Message(buf, read=True)]
-                    self.i2c.transfer(self.addr, msgs)
-                    buf = msgs[1].data
-                elif sys.implementation.name == 'micropython':
-                    self.i2c.writeto(self.addr, reg, False)
-                    self.i2c.readfrom_into(self.addr, buf)
-                else:
-                    self.i2c.writeto_then_readfrom(self.addr, reg, buf)
-                available = buf[0]
-                if available == 0:
-                    break
-                chunk_len = min(available, self.max)
+            # Read from the Notecard until there's nothing left to read.
+            self._receive(0, .001, False)
         finally:
             self.unlock()
-
-        pass
 
     def lock(self):
         """Lock the I2C port so the host can interact with the Notecard."""
