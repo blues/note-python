@@ -136,11 +136,11 @@ The documentation for this library can be found
 The [examples](examples/) directory contains examples for using this
 library with:
 
-- [Serial](examples/notecard-basics/serial-example.py)
-- [I2C](examples/notecard-basics/i2c-example.py)
-- [RaspberryPi](examples/notecard-basics/rpi-example.py)
-- [CircuitPython](examples/notecard-basics/cpy-example.py)
-- [MicroPython](examples/notecard-basics/mpy-example.py)
+- [Serial](examples/notecard-basics/serial_example.py)
+- [I2C](examples/notecard-basics/i2c_example.py)
+- [RaspberryPi](examples/notecard-basics/rpi_example.py)
+- [CircuitPython](examples/notecard-basics/cpy_example.py)
+- [MicroPython](examples/notecard-basics/mpy_example.py)
 
 ## Contributing
 
