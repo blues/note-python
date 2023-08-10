@@ -1,0 +1,33 @@
+#!/bin/bash 
+
+set -e
+
+
+# Exit if device or mountpoint is empty.
+test -z "$UM_DEVICE" && test -z "$UM_MOUNTPOINT" && exit 0
+
+
+# get volume label name
+label=`blkid -s LABEL -o value $UM_DEVICE`
+
+function find_diskid() {
+  ls /dev/disk/by-id | while read name; do
+      device_link="`readlink -f \"/dev/disk/by-id/${name}\" || :`"
+      if test "${device_link}" = "$UM_DEVICE"; then
+        echo "$name"
+        break
+      fi
+  done
+}
+
+diskid=`find_diskid`
+# remove special characters
+name=`echo "${diskid}" | sed 's/ /_/g; s/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-]//g'`
+if test -n "$label"; then
+    name="${name}_${label}"
+fi
+
+# If the symlink does not yet exist, create it.
+test -z "${name}" || test -e "/var/run/usbmount/${name}" || ln -sf "$UM_MOUNTPOINT" "/var/run/usbmount/${name}"
+
+exit 0
