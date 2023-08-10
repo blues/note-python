@@ -122,6 +122,7 @@ jobs:
 
       - name: Run CircuitPython Tests
         run: |
+          . .venv-runner/bin/activate
           ${{ ! matrix.lock_cpy_filesystem }} && skipsetup=--skipsetup
           pytest $skipsetup "--productuid=$CPY_PRODUCT_UID" "--port=$CPY_SERIAL" --platform=circuitpython test/hitl
   
