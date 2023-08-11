@@ -78,6 +78,10 @@ jobs:
           esptool.py --chip esp32 --port ${MPY_SERIAL} --baud 460800 write_flash -z 0x1000 ${{ env.MICROPYTHON_BIN }}
           timeout 10 bash test/scripts/wait_for_file.sh "$MPY_SERIAL"
 
+          # wait for MicroPython to complete initial setup
+          echo "help()" >> "$MPY_SERIAL"
+          sleep 10
+
       - name: Run MicroPython Tests
         run: |
           . ${{ env.VENV }}/bin/activate
