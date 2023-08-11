@@ -3,11 +3,28 @@ name: HIL-micropython
 on:
   pull_request:
     branches: [ main ]
+    paths:
+      - .github/workflows/hil-micropython.yml
+      - test/hitl/**
+      - notecard/**
+      - examples/notecard-basics/mpy_example.py
+      - test/scripts/check_mpy*.*
+
   workflow_dispatch:
+    inputs:
+      flash_device:
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   huzzah32:
-    runs-on: [self-hosted, linux, esp32, notecard-serial, micropython]
+    runs-on:
+      - self-hosted,
+      - linux,
+      - ${{ matrix.MPY_BOARD }},
+      - notecard-serial,
+      - micropython
     defaults:
       run:
         shell: bash
@@ -17,7 +34,8 @@ jobs:
         MICROPYTHON_DATE: [20230426]
         MICROPYTHON_MCU: [esp32]
         MPY_BOARD: [huzzah32]   # the --mpyboard parameter to the tests
-        flash_device: [false]
+        flash_device: # has to be an array - use the input from workflow_dispatch if present, otherwlse true
+            - ${{ github.event.inputs.flash_device=='' && true || github.event.inputs.flash_device }}
     env:
       VENV: .venv-runner-mpy
       USB_MSD_ATTACH_TIME: 15

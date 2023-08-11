@@ -5,7 +5,21 @@ name: HIL-circuitpython
 on:
   pull_request:
     branches: [ main ]
+    paths:
+      # This is quite a big job so run only when files affecting it change.
+      - .github/workflows/hil-circuitpython.yml
+      - examples/notecard-basics/cpy_example.py
+      - test/hitl/**
+      - test/scripts/usbmount
+      - test/scripts/check_cpy*.*
+      - notecard/**
+
   workflow_dispatch:
+    inputs:
+      flash_device:
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   test:
@@ -16,7 +30,8 @@ jobs:
     strategy:
       matrix:
         CIRCUITPYTHON_VERSION: [8.2.2]
-        flash_device: [true]
+        flash_device: # has to be an array - use the input from workflow_dispatch if present, otherwlse true
+            - ${{ github.event.inputs.flash_device=='' && true || github.event.inputs.flash_device }}
         lock_cpy_filesystem: [true]
     env:
       USB_MSD_ATTACH_TIME: 15
@@ -51,7 +66,7 @@ jobs:
           download_name=$(jq -r '.name' $asset_file)
           download_url=$(jq -r '.browser_download_url' $asset_file)
           echo "Downloading release from $download_url"
-          wget -q -N $download_url          
+          wget -q -N $download_url
           unzip -o $download_name
           binfile=$(basename $download_name .zip).bin
           echo "TINYUF2_BIN=$binfile" >> $GITHUB_ENV
@@ -73,14 +88,14 @@ jobs:
              -f interface/stlink.cfg -c "transport select hla_swd" -f target/stm32l4x.cfg \
              -c "init; halt; stm32l4x mass_erase 0" \
              -c "program $TINYUF2_BIN 0x8000000 verify reset; shutdown"
-            
+
       - name: Program CircuitPython
         if: ${{ matrix.flash_device }}
         run: |
           # wait for the bootloader drive to appear
           timeout $USB_MSD_ATTACH_TIME bash test/scripts/wait_for_file.sh "$CPY_FS_UF2"
 
-          # The bootloader reboots quickly once the whole file has been received, 
+          # The bootloader reboots quickly once the whole file has been received,
           # causing an input/output error to be reported.
           # Ignore that, and fail if the CIRCUITPY filesystem doesn't appear
           echo "Uploading CircuitPython binary..."
@@ -88,13 +103,15 @@ jobs:
           echo Ignore the input/output error above. Waiting for device to boot.
           timeout $USB_MSD_ATTACH_TIME bash test/scripts/wait_for_file.sh "$CPY_FS_CIRCUITPY"
           echo "CircuitPython binary uploaded and running."
-    
+
       - name: Make CircuitPython filesystem writeable to pyboard
         if: ${{ matrix.lock_cpy_filesystem }}
         run: |
           timeout $USB_MSD_ATTACH_TIME bash test/scripts/wait_for_file.sh "$CPY_FS_CIRCUITPY"
 
-          cp test/hitl/boot.py "$CPY_FS_CIRCUITPY"
+          # only copy if it's changed or not present. After the device has reset, no further changes can be made
+          # until the filesystem is erased. This allows the workflow to be rerun flash_device=false
+          diff test/hitl/boot.py "$CPY_FS_CIRCUITPY/boot.py" || test/hitl/boot.py "$CPY_FS_CIRCUITPY"
 
           # reset the device (todo move this blob to a utility script)
           ~/.platformio/packages/tool-openocd/bin/openocd \
@@ -110,17 +127,16 @@ jobs:
            python3 -m venv .venv-runner
            . .venv-runner/bin/activate
            pip install -r test/hitl/requirements.txt
-  
+
       - name: Setup 'note-python' on device
         if: ${{ ! matrix.lock_cpy_filesystem }}
         run: |
           mkdir -p ${CPY_FS_CIRCUITPY}/lib/notecard
           cp notecard/*.py ${CPY_FS_CIRCUITPY}/lib/notecard/
-          cp examples/notecard-basics/cpy_example.py ${CPY_FS_CIRCUITPY}/example.py      
+          cp examples/notecard-basics/cpy_example.py ${CPY_FS_CIRCUITPY}/example.py
 
       - name: Run CircuitPython Tests
         run: |
           . .venv-runner/bin/activate
           ${{ ! matrix.lock_cpy_filesystem }} && skipsetup=--skipsetup
           pytest $skipsetup "--productuid=$CPY_PRODUCT_UID" "--port=$CPY_SERIAL" --platform=circuitpython test/hitl
-  
