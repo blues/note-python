@@ -7,62 +7,8 @@ on: workflow_dispatch
 
 jobs:
   build:
-
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: [3.8, 3.9]
-
-    steps:
-    - name: Send building notification
-      run: |
-        curl --request POST \
-        --url 'https://api.notefile.net/?product=${{ secrets.NOTEHUB_PRODUCT_UID }}&device=${{ secrets.NOTECARD_DEVICE_ID }}' \
-        --header 'Content-Type: application/json' \
-        --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
-        --data '{"req":"note.add","file":"build_results.qi","body":{"result":"building"}}'
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        make flake8
-        # flake8 test/ notecard/ examples/ --count --ignore=E722,F401,F403,W503,E501 --show-source --statistics
-    - name: Lint Docs with Pydocstyle
-      run: |
-        make docstyle
-        # pydocstyle notecard/ examples/
-    - name: Send running tests notification
-      run: |
-        curl --request POST \
-        --url 'https://api.notefile.net/?product=${{ secrets.NOTEHUB_PRODUCT_UID }}&device=${{ secrets.NOTECARD_DEVICE_ID }}' \
-        --header 'Content-Type: application/json' \
-        --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
-        --data '{"req":"note.add","file":"build_results.qi","body":{"result":"running_tests"}}'
-    - name: Test with pytest
-      run: |
-        make test
-    - name: Check if the job has succeeded
-      if: ${{ success() }}
-      run: |
-        curl --request POST \
-        --url 'https://api.notefile.net/?product=${{ secrets.NOTEHUB_PRODUCT_UID }}&device=${{ secrets.NOTECARD_DEVICE_ID }}' \
-        --header 'Content-Type: application/json' \
-        --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
-        --data '{"req":"note.add","file":"build_results.qi","body":{"result":"success"}}'
-    - name: Check if the job has failed
-      if: ${{ failure() }}
-      run: |
-        curl --request POST \
-        --url 'https://api.notefile.net/?product=${{ secrets.NOTEHUB_PRODUCT_UID }}&device=${{ secrets.NOTECARD_DEVICE_ID }}' \
-        --header 'Content-Type: application/json' \
-        --header 'X-Session-Token: ${{ secrets.NOTEHUB_SESSION_TOKEN }}' \
-        --data '{"req":"note.add","file":"build_results.qi","body":{"result":"tests_failed"}}'
+    uses: ./.github/workflows/python-ci.yml
+    secrets: inherit
+    with:
+      notehub_notify: false
+      coveralls: false
