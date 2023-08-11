@@ -13,7 +13,7 @@ def run_example(port, product_uid, use_uart):
         assert 'Example complete.' in output
     finally:
         pyb.exit_raw_repl()
-
+        pyb.close()
 
 def test_example_i2c(pytestconfig):
     run_example(pytestconfig.port, pytestconfig.product_uid, use_uart=False)
