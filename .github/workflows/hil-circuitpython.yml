@@ -3,8 +3,6 @@
 name: HIL-circuitpython
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -34,8 +32,8 @@ jobs:
           echo "CIRCUITPYTHON_UF2_URL=https://downloads.circuitpython.org/bin/swan_r5/en_US/${CIRCUITPYTHON_UF2}" >> $GITHUB_ENV
 
       - name: Check Runner Config
-        run: test/scripts/check_runner_config.sh
-        
+        run: test/scripts/check_cpy_runner_config.sh
+
       - name: Download Latest Bootloader
         env:
           REPO: adafruit/tinyuf2

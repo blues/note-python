@@ -1,0 +1,63 @@
+name: HIL-micropython
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  huzzah32:
+    runs-on: [self-hosted, linux, esp32, notecard-serial, micropython]
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        MICROPYTHON_VERSION: [1.20.0]
+        MICROPYTHON_DATE: [20230426]
+        MICROPYTHON_MCU: [esp32]
+        MPY_BOARD: [huzzah32]   # the --mpyboard parameter to the tests
+        flash_device: [false]
+    env:
+      VENV: .venv-runner-mpy
+      USB_MSD_ATTACH_TIME: 15
+      MICROPYTHON_BIN: "${{matrix.MICROPYTHON_MCU}}-${{matrix.MICROPYTHON_DATE}}-v${{matrix.MICROPYTHON_VERSION}}.bin"
+      MICROPYTHON_VERSION: ${{matrix.MICROPYTHON_VERSION}}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set Env Vars
+        run: |
+          # environment variables set in a step cannot be used until subsequent steps
+          echo "MICROPYTHON_BIN_URL=https://micropython.org/resources/firmware/${{env.MICROPYTHON_BIN}}" >> $GITHUB_ENV
+
+      - name: Check Runner Config
+        run: test/scripts/check_mpy_runner_config.sh
+
+      - name: Download MicroPython v${{ env.MICROPYTHON_VERSION }}
+        if: ${{ matrix.flash_device }}
+        run: |
+          echo "Downloading MicroPython for ESP32 from $MICROPYTHON_BIN_URL"
+          wget -q -N "$MICROPYTHON_BIN_URL"
+
+      - name: Setup Python
+        run: |
+           python3 -m venv ${{ env.VENV }}
+           . ${{ env.VENV }}/bin/activate
+           pip install -r test/hitl/requirements.txt -r test/hitl/requirements-esp32.txt
+
+      - name: Erase device and Program Micropython
+        if: ${{ matrix.flash_device }}
+        run: |
+          . ${{ env.VENV }}/bin/activate
+          esptool.py --chip esp32 -p ${MPY_SERIAL} erase_flash
+          timeout 10 bash test/scripts/wait_for_file.sh "$MPY_SERIAL"
+
+          esptool.py --chip esp32 --port ${MPY_SERIAL} --baud 460800 write_flash -z 0x1000 ${{ env.MICROPYTHON_BIN }}
+          timeout 10 bash test/scripts/wait_for_file.sh "$MPY_SERIAL"
+
+      - name: Run MicroPython Tests
+        run: |
+          . ${{ env.VENV }}/bin/activate
+          pytest "--productuid=$MPY_PRODUCT_UID" "--port=$MPY_SERIAL" --platform=micropython --mpyboard=${{ matrix.MPY_BOARD }} test/hitl
