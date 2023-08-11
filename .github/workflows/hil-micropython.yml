@@ -45,12 +45,15 @@ jobs:
         run: |
            python3 -m venv ${{ env.VENV }}
            . ${{ env.VENV }}/bin/activate
-           pip install -r test/hitl/requirements.txt -r test/hitl/requirements-esp32.txt
+           # esptool installed directly because it's only a dependency of this workflow
+           # while requirements.txt are dependencies of the tests in test/hitl
+           pip install -r test/hitl/requirements.txt esptool
 
       - name: Erase device and Program Micropython
         if: ${{ matrix.flash_device }}
         run: |
           . ${{ env.VENV }}/bin/activate
+          # esptool requires the flash to be erased first
           esptool.py --chip esp32 -p ${MPY_SERIAL} erase_flash
           timeout 10 bash test/scripts/wait_for_file.sh "$MPY_SERIAL"
 
