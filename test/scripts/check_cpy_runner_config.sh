@@ -1,7 +1,7 @@
-
+#!/bin/bash
 function diff_dir() {
     src=$1
-    dest=$2  
+    dest=$2
     diff -r $src $dest
 }
 

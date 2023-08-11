@@ -1,3 +1,5 @@
+#!/bin/bash
+
 function env_var_defined() {
     [ -v $1 ] || echo "Environment variable '$1' not set."
 }

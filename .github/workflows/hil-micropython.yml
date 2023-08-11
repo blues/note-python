@@ -20,10 +20,10 @@ on:
 jobs:
   huzzah32:
     runs-on:
-      - self-hosted,
-      - linux,
-      - ${{ matrix.MPY_BOARD }},
-      - notecard-serial,
+      - self-hosted
+      - linux
+      - ${{ matrix.MPY_BOARD }}
+      - notecard-serial
       - micropython
     defaults:
       run:

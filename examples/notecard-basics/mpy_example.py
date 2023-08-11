@@ -82,11 +82,6 @@ def run_example(product_uid, use_uart=True):
                   timeout=3000, timeout_char=100)
     else:
         port = I2C(board.I2C_ID, scl=Pin(board.SCL), sda=Pin(board.SDA))
-        # If you"re using an ESP32, connect GPIO 22 to SCL and GPIO 21 to SDA.
-        if "ESP32abc" in sys.implementation._machine:
-            port = I2C(1, scl=Pin(22), sda=Pin(21))
-        else:
-            port = I2C(0, scl=Pin(22), sda=Pin(23))
 
     print("Opening Notecard...")
     if use_uart:

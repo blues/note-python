@@ -170,6 +170,21 @@ Alternatively, you can inspect the contents of the [Makefile](Makefile) and run
 `Makefile` run against every pull request, so your best bet is to ensure these
 tests are successful before submitting your PR.
 
+## Installing the `pre-commit` Hook
+
+Please run
+
+`pre-commit install`
+
+Before committing to this repo. It will catch a lot of common errors that you can fix locally.
+
+You may also run the pre-commit checks before committing with
+
+`pre-commit run`
+
+Note that `pre-commit run` only considers staged changes, so be sure all
+changes are staged before running this.
+
 ## More Information
 
 For additional Notecard SDKs and Libraries, see:
