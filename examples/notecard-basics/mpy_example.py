@@ -6,6 +6,7 @@ library on a MicroPython device.
 import sys
 import time
 import notecard
+import board
 
 if sys.implementation.name != "micropython":
     raise Exception("Please run this example in a MicroPython environment.")
@@ -76,15 +77,16 @@ def run_example(product_uid, use_uart=True):
     """Connect to Notcard and run a transaction test."""
     print("Opening port...")
     if use_uart:
-        port = UART(2, 9600)
+        port = UART(board.UART, 9600)
         port.init(9600, bits=8, parity=None, stop=1,
                   timeout=3000, timeout_char=100)
     else:
+        port = I2C(board.I2C_ID, scl=Pin(board.SCL), sda=Pin(board.SDA))
         # If you"re using an ESP32, connect GPIO 22 to SCL and GPIO 21 to SDA.
-        if "ESP32" in sys.implementation._machine:
+        if "ESP32abc" in sys.implementation._machine:
             port = I2C(1, scl=Pin(22), sda=Pin(21))
         else:
-            port = I2C()
+            port = I2C(0, scl=Pin(22), sda=Pin(23))
 
     print("Opening Notecard...")
     if use_uart:

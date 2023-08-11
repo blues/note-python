@@ -41,7 +41,7 @@ def copy_file_to_host(pyb, file, dest):
         pyb.exit_raw_repl()
 
 
-def setup_host(port, platform):
+def setup_host(port, platform, board):
     pyb = pyboard.Pyboard(port, 115200)
     # Get the path to the root of the note-python repository.
     note_python_root_dir = Path(__file__).parent.parent.parent
@@ -60,6 +60,10 @@ def setup_host(port, platform):
         example_file = 'cpy_example.py'
     else:
         example_file = 'mpy_example.py'
+        boards_dir = note_python_root_dir / 'mpy_board'
+        board_file_path = boards_dir / f"{board}.py"
+        copy_file_to_host(pyb, board_file_path, '/board.py')
+
     examples_dir = note_python_root_dir / 'examples'
     example_file_path = examples_dir / 'notecard-basics' / example_file
     copy_file_to_host(pyb, example_file_path, '/example.py')
@@ -89,6 +93,11 @@ def pytest_addoption(parser):
         action="store_true",
         help="Skip host setup (copying over note-python, etc.) (default: False)"
     )
+    parser.addoption(
+        '--board',
+        required=True,
+        help='The board name that is being used.'
+    )
 
 
 def pytest_configure(config):
@@ -96,6 +105,7 @@ def pytest_configure(config):
     config.platform = config.getoption("platform")
     config.product_uid = config.getoption("productuid")
     config.skip_setup = config.getoption("skipsetup")
+    config.board = config.getoption("board")
 
     if not config.skip_setup:
-        setup_host(config.port, config.platform)
+        setup_host(config.port, config.platform, config.board)
