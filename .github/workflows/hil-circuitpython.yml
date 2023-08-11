@@ -111,7 +111,7 @@ jobs:
 
           # only copy if it's changed or not present. After the device has reset, no further changes can be made
           # until the filesystem is erased. This allows the workflow to be rerun flash_device=false
-          diff test/hitl/boot.py "$CPY_FS_CIRCUITPY/boot.py" || test/hitl/boot.py "$CPY_FS_CIRCUITPY"
+          diff test/hitl/boot.py "$CPY_FS_CIRCUITPY/boot.py" || cp test/hitl/boot.py "$CPY_FS_CIRCUITPY"
 
           # reset the device (todo move this blob to a utility script)
           ~/.platformio/packages/tool-openocd/bin/openocd \
