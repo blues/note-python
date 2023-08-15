@@ -1,0 +1,142 @@
+#
+
+name: HIL-circuitpython
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      # This is quite a big job so run only when files affecting it change.
+      - .github/workflows/hil-circuitpython.yml
+      - examples/notecard-basics/cpy_example.py
+      - test/hitl/**
+      - test/scripts/usbmount
+      - test/scripts/check_cpy*.*
+      - notecard/**
+
+  workflow_dispatch:
+    inputs:
+      flash_device:
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  test:
+    runs-on: [self-hosted, linux, circuitpython, swan-3.0, notecard-serial]
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        CIRCUITPYTHON_VERSION: [8.2.2]
+        flash_device: # has to be an array - use the input from workflow_dispatch if present, otherwlse true
+            - ${{ github.event.inputs.flash_device=='' && true || github.event.inputs.flash_device }}
+        lock_cpy_filesystem: [true]
+    env:
+      USB_MSD_ATTACH_TIME: 15
+      CIRCUITPYTHON_UF2: "adafruit-circuitpython-swan_r5-en_US-${{ matrix.CIRCUITPYTHON_VERSION }}.uf2"
+      CIRCUITPYTHON_VERSION: ${{ matrix.CIRCUITPYTHON_VERSION}}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set Env Vars
+        run: |
+          # environment variables set in a step cannot be used until subsequent steps
+          echo "CIRCUITPYTHON_UF2_URL=https://downloads.circuitpython.org/bin/swan_r5/en_US/${CIRCUITPYTHON_UF2}" >> $GITHUB_ENV
+
+      - name: Check Runner Config
+        run: test/scripts/check_cpy_runner_config.sh
+
+      - name: Download Latest Bootloader
+        env:
+          REPO: adafruit/tinyuf2
+          ASSET: tinyuf2-swan_r5
+        if: ${{ matrix.flash_device }}
+        run: |
+          echo "retrieving the latest release from ${REPO}"
+          wget -q -O latest.json "https://api.github.com/repos/${REPO}/releases/latest"
+
+          echo "extracting asset details for ${ASSET}"
+          asset_file="${ASSET}_asset.json"
+          jq -r --arg ASSET "$ASSET" '.assets[] | select(.name | startswith($ASSET))' latest.json > $asset_file
+
+          # extract the name and download url without double quotes
+          download_name=$(jq -r '.name' $asset_file)
+          download_url=$(jq -r '.browser_download_url' $asset_file)
+          echo "Downloading release from $download_url"
+          wget -q -N $download_url
+          unzip -o $download_name
+          binfile=$(basename $download_name .zip).bin
+          echo "TINYUF2_BIN=$binfile" >> $GITHUB_ENV
+
+      - name: Download CircuitPython v${{ env.CIRCUITPYTHON_VERSION }}
+        if: ${{ matrix.flash_device }}
+        run: |
+          echo "Downloading CircuitPython for Swan from $CIRCUITPYTHON_UF2_URL"
+          wget -q -N "$CIRCUITPYTHON_UF2_URL"
+
+      - name: Erase device and program bootloader
+        if: ${{ matrix.flash_device }}
+        run: |
+          # cannot use st-flash - every 2nd programing incorrectly puts the device in DFU mode
+          # st-flash --reset  write $binfile 0x8000000
+          # Have to use the version of openocd bundled with the STM32 platform in PlatformIO, which (presumably) has the stm32 extensions compiled in
+          ~/.platformio/packages/tool-openocd/bin/openocd \
+             -d2 -s ~/.platformio/packages/tool-openocd/openocd/scripts \
+             -f interface/stlink.cfg -c "transport select hla_swd" -f target/stm32l4x.cfg \
+             -c "init; halt; stm32l4x mass_erase 0" \
+             -c "program $TINYUF2_BIN 0x8000000 verify reset; shutdown"
+
+      - name: Program CircuitPython
+        if: ${{ matrix.flash_device }}
+        run: |
+          # wait for the bootloader drive to appear
+          timeout $USB_MSD_ATTACH_TIME bash test/scripts/wait_for_file.sh "$CPY_FS_UF2"
+
+          # The bootloader reboots quickly once the whole file has been received,
+          # causing an input/output error to be reported.
+          # Ignore that, and fail if the CIRCUITPY filesystem doesn't appear
+          echo "Uploading CircuitPython binary..."
+          cp "$CIRCUITPYTHON_UF2" "$CPY_FS_UF2" || true
+          echo Ignore the input/output error above. Waiting for device to boot.
+          timeout $USB_MSD_ATTACH_TIME bash test/scripts/wait_for_file.sh "$CPY_FS_CIRCUITPY"
+          echo "CircuitPython binary uploaded and running."
+
+      - name: Make CircuitPython filesystem writeable to pyboard
+        if: ${{ matrix.lock_cpy_filesystem }}
+        run: |
+          timeout $USB_MSD_ATTACH_TIME bash test/scripts/wait_for_file.sh "$CPY_FS_CIRCUITPY"
+
+          # only copy if it's changed or not present. After the device has reset, no further changes can be made
+          # until the filesystem is erased. This allows the workflow to be rerun flash_device=false
+          diff test/hitl/boot.py "$CPY_FS_CIRCUITPY/boot.py" || cp test/hitl/boot.py "$CPY_FS_CIRCUITPY"
+
+          # reset the device (todo move this blob to a utility script)
+          ~/.platformio/packages/tool-openocd/bin/openocd \
+          -d2 -s ~/.platformio/packages/tool-openocd/openocd/scripts \
+          -f interface/stlink.cfg -c "transport select hla_swd" -f target/stm32l4x.cfg \
+          -c "init; halt; reset; shutdown"
+
+          # wait for the device to come back
+          timeout $USB_MSD_ATTACH_TIME bash test/scripts/wait_for_file.sh "$CPY_FS_CIRCUITPY"
+
+      - name: Setup Python
+        run: |
+           python3 -m venv .venv-runner
+           . .venv-runner/bin/activate
+           pip install -r test/hitl/requirements.txt
+
+      - name: Setup 'note-python' on device
+        if: ${{ ! matrix.lock_cpy_filesystem }}
+        run: |
+          mkdir -p ${CPY_FS_CIRCUITPY}/lib/notecard
+          cp notecard/*.py ${CPY_FS_CIRCUITPY}/lib/notecard/
+          cp examples/notecard-basics/cpy_example.py ${CPY_FS_CIRCUITPY}/example.py
+
+      - name: Run CircuitPython Tests
+        run: |
+          . .venv-runner/bin/activate
+          ${{ ! matrix.lock_cpy_filesystem }} && skipsetup=--skipsetup
+          pytest $skipsetup "--productuid=$CPY_PRODUCT_UID" "--port=$CPY_SERIAL" --platform=circuitpython test/hitl

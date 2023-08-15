@@ -9,3 +9,4 @@ pytest-cov==2.8.1
 filelock==3.0.12
 pydocstyle==5.0.2
 packaging>=20.4
+pre-commit
