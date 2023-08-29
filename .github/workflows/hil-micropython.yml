@@ -17,6 +17,10 @@ on:
         type: boolean
         default: true
 
+  schedule:
+    - cron: '15 4 * * 1'
+
+
 jobs:
   test:
     runs-on:
@@ -32,7 +36,7 @@ jobs:
       matrix:
         MICROPYTHON_VERSION: [1.20.0]
         MICROPYTHON_DATE: [20230426]
-        MICROPYTHON_MCU: [esp32]
+        MICROPYTHON_MCU: [ESP32_GENERIC]
         MPY_BOARD: [huzzah32]   # the --mpyboard parameter to the tests
         flash_device: # has to be an array - use the input from workflow_dispatch if present, otherwlse true
             - ${{ github.event.inputs.flash_device=='' && true || github.event.inputs.flash_device }}
@@ -45,7 +49,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set Env Vars
+      - name: Set Environment Variables
         run: |
           # environment variables set in a step cannot be used until subsequent steps
           echo "MICROPYTHON_BIN_URL=https://micropython.org/resources/firmware/${{env.MICROPYTHON_BIN}}" >> $GITHUB_ENV
