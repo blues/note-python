@@ -91,6 +91,33 @@ def serial_lock(fn):
     return decorator
 
 
+def i2c_lock(fn):
+    """Attempt to get a lock on the I2C bus used for Notecard comms."""
+
+    def decorator(self, *args, **kwargs):
+        retries = 5
+        while use_i2c_lock and retries != 0:
+            if self.i2c.try_lock():
+                break
+
+            retries -= 1
+            # Try again after 100 ms.
+            time.sleep(.1)
+
+        if retries == 0:
+            raise Exception('Failed to acquire I2C lock.')
+
+        try:
+            ret = fn(self, *args, **kwargs)
+        finally:
+            if use_i2c_lock:
+                self.i2c.unlock()
+
+        return ret
+
+    return decorator
+
+
 class Notecard:
     """Base Notecard class.
 
@@ -150,24 +177,25 @@ class OpenSerial(Notecard):
         req = self._preprocess_req(req)
         req_json = _prepare_request(req, self._debug)
 
-        transaction_timeout_secs = 30
-        if self._transaction_manager:
-            self._transaction_manager.start(transaction_timeout_secs)
+        try:
+            transaction_timeout_secs = 30
+            if self._transaction_manager:
+                self._transaction_manager.start(transaction_timeout_secs)
 
-        seg_off = 0
-        seg_left = len(req_json)
-        while seg_left > 0:
-            seg_len = seg_left
-            if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
-                seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
+            seg_off = 0
+            seg_left = len(req_json)
+            while seg_left > 0:
+                seg_len = seg_left
+                if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
+                    seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
 
-            self.uart.write(req_json[seg_off:seg_off + seg_len].encode('utf-8'))
-            seg_off += seg_len
-            seg_left -= seg_len
-            time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
-
-        if self._transaction_manager:
-            self._transaction_manager.stop()
+                self.uart.write(req_json[seg_off:seg_off + seg_len].encode('utf-8'))
+                seg_off += seg_len
+                seg_left -= seg_len
+                time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+        finally:
+            if self._transaction_manager:
+                self._transaction_manager.stop()
 
     def _read_byte(self):
         """Read a single byte from the Notecard."""
@@ -325,84 +353,51 @@ class OpenI2C(Notecard):
             # behavior of other SDKs (e.g. note-c).
             time.sleep(chunk_delay_secs)
 
-            if (timeout_secs != 0 and has_timed_out(start, timeout_secs)):
+            if timeout_secs != 0 and has_timed_out(start, timeout_secs):
                 raise Exception("Timed out while reading data from the Notecard.")
 
         return read_data
 
+    def _transmit(self, req):
+        req = self._preprocess_req(req)
+        req_json = _prepare_request(req, self._debug)
+
+        try:
+            transaction_timeout_secs = 30
+            if self._transaction_manager:
+                self._transaction_manager.start(transaction_timeout_secs)
+
+            self._send_payload(req_json)
+        finally:
+            if self._transaction_manager:
+                self._transaction_manager.stop()
+
+    @i2c_lock
     def Command(self, req):
         """Perform a Notecard command and exit with no response."""
-        req = self._preprocess_req(req)
         if 'cmd' not in req:
             raise Exception("Please use 'cmd' instead of 'req'")
 
-        req_json = _prepare_request(req, self._debug)
+        self._transmit(req)
 
-        while not self.lock():
-            pass
-
-        try:
-            transaction_timeout_secs = 30
-            if self._transaction_manager:
-                self._transaction_manager.start(transaction_timeout_secs)
-
-            self._send_payload(req_json)
-        finally:
-            self.unlock()
-            if self._transaction_manager:
-                self._transaction_manager.stop()
-
+    @i2c_lock
     def Transaction(self, req):
         """Perform a Notecard transaction and return the result."""
-        req = self._preprocess_req(req)
+        self._transmit(req)
 
-        req_json = _prepare_request(req, self._debug)
-        rsp_json = ""
-
-        while not self.lock():
-            pass
-
-        try:
-            transaction_timeout_secs = 30
-            if self._transaction_manager:
-                self._transaction_manager.start(transaction_timeout_secs)
-
-            self._send_payload(req_json)
-
-            read_data = self._receive(transaction_timeout_secs, 0.05, True)
-            rsp_json = "".join(map(chr, read_data))
-        finally:
-            self.unlock()
-            if self._transaction_manager:
-                self._transaction_manager.stop()
+        read_data = self._receive(30, 0.05, True)
+        rsp_json = "".join(map(chr, read_data))
 
         if self._debug:
             print(rsp_json.rstrip())
 
         return json.loads(rsp_json)
 
+    @i2c_lock
     def Reset(self):
         """Reset the Notecard."""
-        while not self.lock():
-            pass
-
-        try:
-            # Read from the Notecard until there's nothing left to read.
-            self._receive(0, .001, False)
-        finally:
-            self.unlock()
-
-    def lock(self):
-        """Lock the I2C port so the host can interact with the Notecard."""
-        if use_i2c_lock:
-            return self.i2c.try_lock()
-        return True
-
-    def unlock(self):
-        """Unlock the I2C port."""
-        if use_i2c_lock:
-            return self.i2c.unlock()
-        return True
+        # Read from the Notecard until there's nothing left to read.
+        self._receive(0, .001, False)
 
     def __init__(self, i2c, address, max_transfer, debug=False):
         """Initialize the Notecard before a reset."""
