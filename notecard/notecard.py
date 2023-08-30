@@ -40,13 +40,19 @@ from .transaction_manager import TransactionManager
 use_periphery = False
 use_serial_lock = False
 
-if sys.implementation.name == 'cpython':
-    if sys.platform == 'linux' or sys.platform == 'linux2':
-        use_periphery = True
-        from periphery import I2C
+if sys.implementation.name == 'cpython' and (sys.platform == 'linux' or sys.platform == 'linux2'):
 
-        use_serial_lock = True
-        from filelock import Timeout, FileLock
+    use_periphery = True
+    from periphery import I2C
+
+    use_serial_lock = True
+    from filelock import FileLock
+    from filelock import Timeout as SerialLockTimeout
+else:
+    class SerialLockTimeout(Exception):
+        """A null SerialLockTimeout for when use_serial_lock is False."""
+
+        pass
 
 use_i2c_lock = not use_periphery and sys.implementation.name != 'micropython'
 
@@ -75,18 +81,35 @@ def _prepare_request(req, debug=False):
     return req_json
 
 
+class NullContextManager:
+    """A null context manager for use with NoOpSerialLock."""
+
+    def __enter__(self):
+        """Null enter function. Required for context managers."""
+        pass
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Null exit function. Required for context managers."""
+        pass
+
+
+class NoOpSerialLock():
+    """A no-op serial lock class for when use_serial_lock is False."""
+
+    def acquire(*args, **kwargs):
+        """Acquire the no-op lock."""
+        return NullContextManager()
+
+
 def serial_lock(fn):
     """Attempt to get a lock on the serial channel used for Notecard comms."""
 
     def decorator(self, *args, **kwargs):
-        if use_serial_lock:
-            try:
-                with self.lock.acquire(timeout=5):
-                    return fn(self, *args, **kwargs)
-            except Timeout:
-                raise Exception('Notecard in use')
-        else:
-            return fn(self, *args, **kwargs)
+        try:
+            with self.lock.acquire(timeout=5):
+                return fn(self, *args, **kwargs)
+        except SerialLockTimeout:
+            raise Exception('Notecard in use')
 
     return decorator
 
@@ -146,40 +169,57 @@ class Notecard:
 class OpenSerial(Notecard):
     """Notecard class for Serial communication."""
 
+    @serial_lock
     def _transmit(self, req):
         req = self._preprocess_req(req)
         req_json = _prepare_request(req, self._debug)
 
-        transaction_timeout_secs = 30
-        if self._transaction_manager:
-            self._transaction_manager.start(transaction_timeout_secs)
+        try:
+            transaction_timeout_secs = 30
+            if self._transaction_manager:
+                self._transaction_manager.start(transaction_timeout_secs)
 
-        seg_off = 0
-        seg_left = len(req_json)
-        while seg_left > 0:
-            seg_len = seg_left
-            if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
-                seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
+            seg_off = 0
+            seg_left = len(req_json)
+            while seg_left > 0:
+                seg_len = seg_left
+                if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
+                    seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
 
-            self.uart.write(req_json[seg_off:seg_off + seg_len].encode('utf-8'))
-            seg_off += seg_len
-            seg_left -= seg_len
-            time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
-
-        if self._transaction_manager:
-            self._transaction_manager.stop()
-
-    def _read_byte(self):
-        """Read a single byte from the Notecard."""
-        if sys.implementation.name == 'micropython':
-            if not self.uart.any():
-                return None
-        elif sys.implementation.name == 'cpython':
-            if self.uart.in_waiting == 0:
-                return None
-        return self.uart.read(1)
+                self.uart.write(req_json[seg_off:seg_off + seg_len].encode('utf-8'))
+                seg_off += seg_len
+                seg_left -= seg_len
+                time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+        finally:
+            if self._transaction_manager:
+                self._transaction_manager.stop()
 
     @serial_lock
+    def _transmit_and_receive(self, req):
+        self._transmit(req)
+
+        rsp_json = self.uart.readline()
+        if self._debug:
+            print(rsp_json.rstrip())
+
+        return json.loads(rsp_json)
+
+    def _read_byte_micropython(self):
+        """Read a single byte from the Notecard (MicroPython)."""
+        if not self.uart.any():
+            return None
+        return self.uart.read(1)
+
+    def _read_byte_cpython(self):
+        """Read a single byte from the Notecard (CPython)."""
+        if self.uart.in_waiting == 0:
+            return None
+        return self.uart.read(1)
+
+    def _read_byte_circuitpython(self):
+        """Read a single byte from the Notecard (CircuitPython)."""
+        return self.uart.read(1)
+
     def Command(self, req):
         """Send a command to the Notecard. The Notecard response is ignored."""
         if 'cmd' not in req:
@@ -187,17 +227,9 @@ class OpenSerial(Notecard):
 
         self._transmit(req)
 
-    @serial_lock
     def Transaction(self, req):
         """Perform a Notecard transaction and return the result."""
-        self._transmit(req)
-
-        rsp_json = self.uart.readline()
-        if self._debug:
-            print(rsp_json.rstrip())
-
-        rsp = json.loads(rsp_json)
-        return rsp
+        return self._transmit_and_receive(req)
 
     @serial_lock
     def Reset(self):
@@ -232,7 +264,18 @@ class OpenSerial(Notecard):
         self._debug = debug
 
         if use_serial_lock:
-            self.lock = FileLock('serial.lock', timeout=1)
+            self.lock = FileLock('serial.lock')
+        else:
+            self.lock = NoOpSerialLock()
+
+        if sys.implementation.name == 'micropython':
+            self._read_byte = self._read_byte_micropython
+        elif sys.implementation.name == 'cpython':
+            self._read_byte = self._read_byte_cpython
+        elif sys.implementation.name == 'circuitpython':
+            self._read_byte = self._read_byte_circuitpython
+        else:
+            raise NotImplementedError(f'Unsupported platform: {sys.implementation.name}')
 
         self.Reset()
 
