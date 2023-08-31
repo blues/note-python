@@ -71,16 +71,6 @@ CARD_REQUEST_SEGMENT_DELAY_MS = 250
 I2C_CHUNK_DELAY_MS = 20
 
 
-def _prepare_request(req, debug=False):
-    """Format the request string as a JSON object and add a newline."""
-    req_json = json.dumps(req)
-    if debug:
-        print(req_json)
-
-    req_json += "\n"
-    return req_json
-
-
 class NullContextManager:
     """A null context manager for use with NoOpSerialLock."""
 
@@ -137,15 +127,25 @@ class Notecard:
             self._user_agent['os_family'] = os.uname().machine
         self._transaction_manager = None
 
-    def _preprocess_req(self, req):
-        """Inspect the request for hub.set and add the User Agent."""
+    def _prepare_request(self, req):
+        """Prepare a request for transmission to the Notecard."""
+        # Inspect the request for hub.set and add the User Agent.
         if 'hub.set' in req.values():
             # Merge the User Agent to send along with the hub.set request.
             req = req.copy()
             req.update({'body': self.GetUserAgent()})
 
             self._user_agent_sent = True
-        return req
+
+        # Serialize the JSON request to a string.
+        req_string = json.dumps(req)
+        if self._debug:
+            print(req_string)
+
+        req_string += "\n"
+
+        # Encode the request string as UTF-8 bytes.
+        return req_string.encode('utf-8')
 
     def GetUserAgent(self):
         """Return the User Agent String for the host for debug purposes."""
@@ -170,9 +170,9 @@ class OpenSerial(Notecard):
     """Notecard class for Serial communication."""
 
     @serial_lock
-    def _transmit(self, req):
-        req = self._preprocess_req(req)
-        req_json = _prepare_request(req, self._debug)
+    def _transact(self, req, rsp_expected):
+        """Perform a low-level transaction with the Notecard."""
+        rsp = None
 
         try:
             transaction_timeout_secs = 30
@@ -180,29 +180,24 @@ class OpenSerial(Notecard):
                 self._transaction_manager.start(transaction_timeout_secs)
 
             seg_off = 0
-            seg_left = len(req_json)
+            seg_left = len(req)
             while seg_left > 0:
                 seg_len = seg_left
                 if seg_len > CARD_REQUEST_SEGMENT_MAX_LEN:
                     seg_len = CARD_REQUEST_SEGMENT_MAX_LEN
 
-                self.uart.write(req_json[seg_off:seg_off + seg_len].encode('utf-8'))
+                self.uart.write(req[seg_off:seg_off + seg_len])
                 seg_off += seg_len
                 seg_left -= seg_len
                 time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+
+            if rsp_expected:
+                rsp = self.uart.readline()
         finally:
             if self._transaction_manager:
                 self._transaction_manager.stop()
 
-    @serial_lock
-    def _transmit_and_receive(self, req):
-        self._transmit(req)
-
-        rsp_json = self.uart.readline()
-        if self._debug:
-            print(rsp_json.rstrip())
-
-        return json.loads(rsp_json)
+        return rsp
 
     def _read_byte_micropython(self):
         """Read a single byte from the Notecard (MicroPython)."""
@@ -225,11 +220,18 @@ class OpenSerial(Notecard):
         if 'cmd' not in req:
             raise Exception("Please use 'cmd' instead of 'req'")
 
-        self._transmit(req)
+        req_bytes = self._prepare_request(req)
+        self._transact(req_bytes, False)
 
     def Transaction(self, req):
         """Perform a Notecard transaction and return the result."""
-        return self._transmit_and_receive(req)
+        req_bytes = self._prepare_request(req)
+        rsp_bytes = self._transact(req_bytes, True)
+        rsp_json = json.loads(rsp_bytes)
+        if self._debug:
+            print(rsp_json)
+
+        return rsp_json
 
     @serial_lock
     def Reset(self):
@@ -283,17 +285,17 @@ class OpenSerial(Notecard):
 class OpenI2C(Notecard):
     """Notecard class for I2C communication."""
 
-    def _send_payload(self, json):
+    def _send_payload(self, data):
         chunk_offset = 0
-        json_left = len(json)
+        data_left = len(data)
         sent_in_seg = 0
         write_length = bytearray(1)
 
-        while json_left > 0:
-            chunk_len = min(json_left, self.max)
+        while data_left > 0:
+            chunk_len = min(data_left, self.max)
             write_length[0] = chunk_len
-            write_data = bytes(json[chunk_offset:chunk_offset + chunk_len],
-                               'utf-8')
+            write_data = data[chunk_offset:chunk_offset + chunk_len]
+
             # Send a message with the length of the incoming bytes followed
             # by the bytes themselves.
             if use_periphery:
@@ -303,7 +305,7 @@ class OpenI2C(Notecard):
                 self.i2c.writeto(self.addr, write_length + write_data)
 
             chunk_offset += chunk_len
-            json_left -= chunk_len
+            data_left -= chunk_len
             sent_in_seg += chunk_len
 
             if sent_in_seg > CARD_REQUEST_SEGMENT_MAX_LEN:
@@ -378,8 +380,7 @@ class OpenI2C(Notecard):
         if 'cmd' not in req:
             raise Exception("Please use 'cmd' instead of 'req'")
 
-        req = self._preprocess_req(req)
-        req_json = _prepare_request(req, self._debug)
+        req_bytes = self._prepare_request(req)
 
         while not self.lock():
             pass
@@ -389,7 +390,7 @@ class OpenI2C(Notecard):
             if self._transaction_manager:
                 self._transaction_manager.start(transaction_timeout_secs)
 
-            self._send_payload(req_json)
+            self._send_payload(req_bytes)
         finally:
             self.unlock()
             if self._transaction_manager:
@@ -397,8 +398,7 @@ class OpenI2C(Notecard):
 
     def Transaction(self, req):
         """Perform a Notecard transaction and return the result."""
-        req = self._preprocess_req(req)
-        req_json = _prepare_request(req, self._debug)
+        req_bytes = self._prepare_request(req)
         rsp_json = ""
 
         while not self.lock():
@@ -409,7 +409,7 @@ class OpenI2C(Notecard):
             if self._transaction_manager:
                 self._transaction_manager.start(transaction_timeout_secs)
 
-            self._send_payload(req_json)
+            self._send_payload(req_bytes)
 
             read_data = self._receive(transaction_timeout_secs, 0.05, True)
             rsp_json = "".join(map(chr, read_data))
