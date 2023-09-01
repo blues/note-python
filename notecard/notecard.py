@@ -255,25 +255,49 @@ class OpenSerial(Notecard):
     @serial_lock
     def Reset(self):
         """Reset the Notecard."""
+        notecard_ready = False
         for i in range(10):
             try:
+                # Send a newline to the Notecard to terminate any partial
+                # request that might be sitting in its input buffer.
                 self.uart.write(b'\n')
             except:
+                # Wait 500 ms and before trying to send the newline again.
+                time.sleep(.5)
                 continue
-            time.sleep(0.5)
-            somethingFound = False
-            nonControlCharFound = False
-            while True:
+
+            something_found = False
+            non_control_char_found = False
+            # Drain serial for 500 ms.
+            start = start_timeout()
+            while not has_timed_out(start, 0.5):
                 data = self._read_byte()
-                if (data is None) or (data == b''):
-                    break
-                somethingFound = True
-                if data[0] >= 0x20:
-                    nonControlCharFound = True
-            if somethingFound and not nonControlCharFound:
+                # If data was read from the Notecard, inspect what we received.
+                # If it isn't a \n or \r, the host and the Notecard aren't
+                # synced up yet, and we'll need to retransmit the \n and try
+                # again.
+                while data is not None and data != b'':
+                    something_found = True
+                    if data[0] != ord('\n') and data[0] != ord('\r'):
+                        non_control_char_found = True
+
+                    data = self._read_byte()
+
+                # If there was no data read from the Notecard, wait 1 ms and try
+                # again. Keep doing this for 500 ms.
+                time.sleep(.001)
+
+            # If we received anything other than newlines from the Notecard, we
+            # aren't in sync, yet.
+            if something_found and not non_control_char_found:
+                notecard_ready = True
                 break
-            else:
-                raise Exception('Notecard not responding')
+
+            # Wait 500 ms before trying again.
+            time.sleep(.5)
+
+        if not notecard_ready:
+            raise Exception('Failed to reset Notecard.')
 
     def __init__(self, uart_id, debug=False):
         """Initialize the Notecard before a reset."""
@@ -408,8 +432,25 @@ class OpenI2C(Notecard):
     @i2c_lock
     def Reset(self):
         """Reset the Notecard."""
-        # Read from the Notecard until there's nothing left to read.
-        self._receive(0, .001, False)
+        # Send a newline to the Notecard to terminate any partial request that
+        # might be sitting in its input buffer.
+        self._transmit(b'\n')
+
+        time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
+
+        # Read from the Notecard until there's nothing left, retrying a max of 3
+        # times.
+        retries = 3
+        while retries > 0:
+            try:
+                self._receive(0, .001, False)
+            except:
+                retries -= 1
+            else:
+                break
+
+        if retries == 0:
+            raise Exception('Failed to reset Notecard.')
 
     def _linux_write(self, length, data):
         msgs = [I2C.Message(length + data)]

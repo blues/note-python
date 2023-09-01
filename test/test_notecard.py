@@ -18,7 +18,9 @@ def get_serial_and_port():
     port.read.side_effect = [b'\r', b'\n', None]
     port.readline.return_value = "\r\n"
 
-    nCard = notecard.OpenSerial(port)
+    # Patch the Reset method so that we don't actually call it during __init__.
+    with patch('notecard.notecard.OpenSerial.Reset'):
+        nCard = notecard.OpenSerial(port)
 
     return (nCard, port)
 
@@ -28,7 +30,9 @@ def get_i2c_and_port():
     port = periphery.I2C("dev/i2c-foo")
     port.try_lock.return_value = True
 
-    nCard = notecard.OpenI2C(port, 0x17, 255)
+    # Patch the Reset method so that we don't actually call it during __init__.
+    with patch('notecard.notecard.OpenI2C.Reset'):
+        nCard = notecard.OpenI2C(port, 0x17, 255)
 
     return (nCard, port)
 
@@ -395,11 +399,11 @@ class TestNotecardMockSerial(NotecardTest):
         assert nCard.uart is not None
 
     def test_debug_mode_on_serial(self):
-        serial = Mock()  # noqa: F811
-        port = serial.Serial("/dev/tty.foo", 9600)
-        port.read.side_effect = [b'\r', b'\n', None]
-
-        nCard = notecard.OpenSerial(port, debug=True)
+        # Patch the Reset method so that we don't actually call it during
+        # __init__.
+        with patch('notecard.notecard.OpenSerial.Reset'):
+            port = MagicMock()
+            nCard = notecard.OpenSerial(port, debug=True)
 
         assert nCard._debug
 
