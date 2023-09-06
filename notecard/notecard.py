@@ -54,8 +54,6 @@ else:
 
         pass
 
-use_i2c_lock = not use_periphery and sys.implementation.name != 'micropython'
-
 NOTECARD_I2C_ADDRESS = 0x17
 
 # The notecard is a real-time device that has a fixed size interrupt buffer.
@@ -109,8 +107,8 @@ def i2c_lock(fn):
 
     def decorator(self, *args, **kwargs):
         retries = 5
-        while use_i2c_lock and retries != 0:
-            if self.i2c.try_lock():
+        while retries != 0:
+            if self.lock():
                 break
 
             retries -= 1
@@ -123,8 +121,7 @@ def i2c_lock(fn):
         try:
             ret = fn(self, *args, **kwargs)
         finally:
-            if use_i2c_lock:
-                self.i2c.unlock()
+            self.unlock()
 
         return ret
 
@@ -306,24 +303,24 @@ class OpenSerial(Notecard):
 class OpenI2C(Notecard):
     """Notecard class for I2C communication."""
 
+    def _write(self, data):
+        write_length = bytearray(1)
+        write_length[0] = len(data)
+
+        # Send a message with the length of the incoming bytes followed
+        # by the bytes themselves.
+        self._platform_write(write_length, data)
+
     def _transmit(self, data):
         chunk_offset = 0
         data_left = len(data)
         sent_in_seg = 0
-        write_length = bytearray(1)
 
         while data_left > 0:
             chunk_len = min(data_left, self.max)
-            write_length[0] = chunk_len
             write_data = data[chunk_offset:chunk_offset + chunk_len]
 
-            # Send a message with the length of the incoming bytes followed
-            # by the bytes themselves.
-            if use_periphery:
-                msgs = [I2C.Message(write_length + write_data)]
-                self.i2c.transfer(self.addr, msgs)
-            else:
-                self.i2c.writeto(self.addr, write_length + write_data)
+            self._write(write_data)
 
             chunk_offset += chunk_len
             data_left -= chunk_len
@@ -335,6 +332,21 @@ class OpenI2C(Notecard):
 
             time.sleep(I2C_CHUNK_DELAY_MS / 1000)
 
+    def _read(self, length):
+        initiate_read = bytearray(2)
+        # 0 indicates we are reading from the Notecard.
+        initiate_read[0] = 0
+        # This indicates how many bytes we are prepared to read.
+        initiate_read[1] = length
+        # read_buf is a buffer to store the data we're reading.
+        # length accounts for the payload and the +2 is for the header. The
+        # header sent by the Notecard has one byte to indicate the number of
+        # bytes still available to read and a second byte to indicate the number
+        # of bytes coming in the current chunk.
+        read_buf = bytearray(length + 2)
+
+        return self._platform_read(initiate_read, read_buf)
+
     def _receive(self, timeout_secs, chunk_delay_secs, wait_for_newline):
         chunk_len = 0
         received_newline = False
@@ -342,28 +354,7 @@ class OpenI2C(Notecard):
         read_data = bytearray()
 
         while True:
-            initiate_read = bytearray(2)
-            # 0 indicates we are reading from the Notecard.
-            initiate_read[0] = 0
-            # This indicates how many bytes we are prepared to read.
-            initiate_read[1] = chunk_len
-            # read_buf is a buffer to store the data we're reading.
-            # chunk_len accounts for the payload and the +2 is for the
-            # header. The header sent by the Notecard has one byte to
-            # indicate the number of bytes still available to read and a
-            # second byte to indicate the number of bytes coming in the
-            # current chunk.
-            read_buf = bytearray(chunk_len + 2)
-
-            if use_periphery:
-                msgs = [I2C.Message(initiate_read), I2C.Message(read_buf, read=True)]
-                self.i2c.transfer(self.addr, msgs)
-                read_buf = msgs[1].data
-            elif sys.implementation.name == 'micropython':
-                self.i2c.writeto(self.addr, initiate_read, False)
-                self.i2c.readfrom_into(self.addr, read_buf)
-            else:
-                self.i2c.writeto_then_readfrom(self.addr, initiate_read, read_buf)
+            read_buf = self._read(chunk_len)
 
             # The number of bytes still available to read.
             num_bytes_available = read_buf[0]
@@ -420,6 +411,31 @@ class OpenI2C(Notecard):
         # Read from the Notecard until there's nothing left to read.
         self._receive(0, .001, False)
 
+    def _linux_write(self, length, data):
+        msgs = [I2C.Message(length + data)]
+        self.i2c.transfer(self.addr, msgs)
+
+    def _non_linux_write(self, length, data):
+        self.i2c.writeto(self.addr, length + data)
+
+    def _linux_read(self, initiate_read_msg, read_buf):
+        msgs = [I2C.Message(initiate_read_msg), I2C.Message(read_buf, read=True)]
+        self.i2c.transfer(self.addr, msgs)
+        read_buf = msgs[1].data
+
+        return read_buf
+
+    def _micropython_read(self, initiate_read_msg, read_buf):
+        self.i2c.writeto(self.addr, initiate_read_msg, False)
+        self.i2c.readfrom_into(self.addr, read_buf)
+
+        return read_buf
+
+    def _circuitpython_read(self, initiate_read_msg, read_buf):
+        self.i2c.writeto_then_readfrom(self.addr, initiate_read_msg, read_buf)
+
+        return read_buf
+
     def __init__(self, i2c, address, max_transfer, debug=False):
         """Initialize the Notecard before a reset."""
         super().__init__(debug)
@@ -427,6 +443,23 @@ class OpenI2C(Notecard):
         self._user_agent['req_port'] = address
 
         self.i2c = i2c
+
+        def i2c_no_op_try_lock(*args, **kwargs):
+            """No-op lock function."""
+            return True
+
+        def i2c_no_op_unlock(*args, **kwargs):
+            """No-op unlock function."""
+            pass
+
+        use_i2c_lock = not use_periphery and sys.implementation.name != 'micropython'
+        if use_i2c_lock:
+            self.lock = self.i2c.try_lock
+            self.unlock = self.i2c.unlock
+        else:
+            self.lock = i2c_no_op_try_lock
+            self.unlock = i2c_no_op_unlock
+
         if address == 0:
             self.addr = NOTECARD_I2C_ADDRESS
         else:
@@ -435,5 +468,17 @@ class OpenI2C(Notecard):
             self.max = 255
         else:
             self.max = max_transfer
+
+        if use_periphery:
+            self._platform_write = self._linux_write
+            self._platform_read = self._linux_read
+        elif sys.implementation.name == 'micropython':
+            self._platform_write = self._non_linux_write
+            self._platform_read = self._micropython_read
+        elif sys.implementation.name == 'circuitpython':
+            self._platform_write = self._non_linux_write
+            self._platform_read = self._circuitpython_read
+        else:
+            raise NotImplementedError(f'Unsupported platform: {sys.implementation.name}')
 
         self.Reset()
