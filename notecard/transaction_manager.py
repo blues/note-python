@@ -58,3 +58,19 @@ class TransactionManager:
         """Make RTX an input to conserve power and remove the pull up on CTX."""
         self.rtx_pin.direction(GPIO.IN)
         self.ctx_pin.pull(GPIO.PULL_NONE)
+
+
+class NoOpTransactionManager:
+    """Class for transaction start/stop when no transaction pins are set.
+
+    If the transaction pins aren't set, the start and stop operations should be
+    no-ops.
+    """
+
+    def start(self, timeout_secs):
+        """No-op start function."""
+        pass
+
+    def stop(self):
+        """No-op stop function."""
+        pass
