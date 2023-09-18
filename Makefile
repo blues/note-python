@@ -29,7 +29,7 @@ flake8:
 	# F403 'from module import *' used; unable to detect undefined names  https://www.flake8rules.com/rules/F403.html
 	# W503 Line break occurred before a binary operator https://www.flake8rules.com/rules/W503.html
 	# E501 Line too long (>79 characters) https://www.flake8rules.com/rules/E501.html
-	${PYTHON} -m flake8 test/ notecard/ examples/ mpy_board/ --count --ignore=E722,F401,F403,W503,E501,E502 --show-source --statistics
+	${PYTHON} -m flake8 --exclude=notecard/md5.py test/ notecard/ examples/ mpy_board/ --count --ignore=E722,F401,F403,W503,E501,E502 --show-source --statistics
 
 coverage:
 	${RUN_VENV_ACTIVATE}

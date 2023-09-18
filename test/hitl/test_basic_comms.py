@@ -1,24 +1,20 @@
 import pyboard
 import pytest
+from example_runner import ExampleRunner
 
 
-def run_example(port, product_uid, use_uart):
-    pyb = pyboard.Pyboard(port, 115200)
-    pyb.enter_raw_repl()
-    try:
-        cmd = f'from example import run_example; run_example("{product_uid}", {use_uart})'
-        output = pyb.exec(cmd)
-        output = output.decode()
-        print(output)
-        assert 'Example complete.' in output
-    finally:
-        pyb.exit_raw_repl()
-        pyb.close()
+def run_basic_comms_test(config, use_uart):
+    if config.platform == 'micropython':
+        example_file = 'mpy_example.py'
+    elif config.platform == 'circuitpython':
+        example_file = 'cpy_example.py'
+    else:
+        raise Exception(f'Unsupported platform: {config.platform}')
+
+    runner = ExampleRunner(config.port, example_file, config.product_uid)
+    runner.run(use_uart)
 
 
-def test_example_i2c(pytestconfig):
-    run_example(pytestconfig.port, pytestconfig.product_uid, use_uart=False)
-
-
-def test_example_serial(pytestconfig):
-    run_example(pytestconfig.port, pytestconfig.product_uid, use_uart=True)
+@pytest.mark.parametrize('use_uart', [False, True])
+def test_basic_comms(pytestconfig, use_uart):
+    run_basic_comms_test(pytestconfig, use_uart)
