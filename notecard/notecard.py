@@ -129,7 +129,7 @@ class Notecard:
         self._card_supports_crc = False
         self._reset_required = True
 
-    def _crc_add(self, req, seq_number):
+    def _crc_add(self, req_string, seq_number):
         """Add a CRC field to the request.
 
         The CRC field also contains a sequence number and has this format:
@@ -139,10 +139,18 @@ class Notecard:
         SSSS is the sequence number encoded as a string of 4 hex digits.
         CCCCCCCC is the CRC32 encoded as a string of 8 hex digits.
         """
-        req_bytes = json.dumps(req, separators=(',', ':')).encode('utf-8')
+        req_bytes = req_string.encode('utf-8')
         crc_hex = '{:08x}'.format(crc32(req_bytes))
         seq_number_hex = '{:04x}'.format(seq_number)
-        req['crc'] = f'{seq_number_hex}:{crc_hex}'
+        crc_field = f'"crc":"{seq_number_hex}:{crc_hex}"'
+        req_string_w_crc = req_string[:-1]
+        if req_string[-2] == '{':
+            req_string_w_crc += f'{crc_field}'
+        else:
+            req_string_w_crc += f',{crc_field}'
+        req_string_w_crc += '}'
+
+        return req_string_w_crc
 
     def _crc_error(self, rsp_bytes):
         """Check the CRC in a Notecard response."""
@@ -199,12 +207,13 @@ class Notecard:
         rsp_expected = 'req' in req
 
         # If this is a request and not a command, add a CRC.
+        req_string = json.dumps(req, separators=(',', ':'))
         if rsp_expected:
-            self._crc_add(req, self._last_request_seq_number)
+            req_string = self._crc_add(req_string,
+                                       self._last_request_seq_number)
 
         # Serialize the JSON request to a string, removing any unnecessary
         # whitespace.
-        req_string = json.dumps(req, separators=(',', ':'))
         if self._debug:
             print(req_string)
 
@@ -320,7 +329,7 @@ class Notecard:
                         if '{io}' in rsp_json['err']:
                             if self._debug:
                                 print(('Response has error field indicating I/O'
-                                       ' error.'))
+                                       f' error: {rsp_json}'))
 
                             error = True
                             retries_left -= 1
@@ -329,8 +338,8 @@ class Notecard:
                         elif '{bad-bin}' in rsp_json['err']:
                             if self._debug:
                                 print(('Response has error field indicating '
-                                       'binary I/O error. Not eligible for '
-                                       'retry.'))
+                                       f'binary I/O error: {rsp_json}'))
+                                print('Not eligible for retry.')
 
                             error = True
                             break
@@ -433,6 +442,7 @@ class OpenSerial(Notecard):
                     time.sleep(.001)
 
             timeout_secs = CARD_INTRA_TRANSACTION_TIMEOUT_SEC
+            start = start_timeout()
             byte = self._read_byte()
             data.extend(byte)
             received_newline = byte == b'\n'

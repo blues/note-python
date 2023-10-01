@@ -49,23 +49,25 @@ class TestNotecard:
     # _crc_add tests
     def test_crc_add_adds_a_crc_field(self):
         card = notecard.Notecard()
-        req = {'req': 'hub.status'}
+        req = '{"req":"hub.status"}'
 
-        card._crc_add(req, 0)
+        req_string = card._crc_add(req, 0)
 
-        assert 'crc' in req
+        req_json = json.loads(req_string)
+        assert 'crc' in req_json
 
     def test_crc_add_formats_the_crc_field_correctly(self):
         card = notecard.Notecard()
-        req = {'req': 'hub.status'}
+        req = '{"req":"hub.status"}'
         seq_number = 37
 
-        card._crc_add(req, seq_number)
+        req_string = card._crc_add(req, seq_number)
 
+        req_json = json.loads(req_string)
         # The format should be SSSS:CCCCCCCC, where S and C are hex digits
         # comprising the sequence number and CRC32, respectively.
         pattern = r'^[0-9A-Fa-f]{4}:[0-9A-Fa-f]{8}$'
-        assert re.match(pattern, req['crc'])
+        assert re.match(pattern, req_json['crc'])
 
     # _crc_error tests.
     @pytest.mark.parametrize('crc_supported', [False, True])
