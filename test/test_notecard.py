@@ -368,7 +368,7 @@ class TestNotecard:
         card = notecard.Notecard()
         card.Transaction = MagicMock()
 
-        rsp = card.Command({'cmd': 'card.sleep'})
+        rsp = card.Command({'cmd': 'hub.set'})
 
         # A command generates no response, by definition.
         assert rsp is None

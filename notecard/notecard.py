@@ -572,7 +572,12 @@ class OpenSerial(Notecard):
         if sys.implementation.name == 'micropython':
             self._available = self._available_micropython
         else:
-            self._available = self._available_default
+            if hasattr(self.uart, 'in_waiting'):
+                self._available = self._available_default
+            else:
+                raise NotImplementedError(('Serial communications with the '
+                                           'Notecard are not supported for this'
+                                           ' platform.'))
 
         self.Reset()
 
@@ -604,7 +609,12 @@ class OpenI2C(Notecard):
         # The rest is the data.
         data = read_buf[2:]
 
-        return (available, data_len, data)
+        if len(data) != data_len:
+            raise Exception(('Serial-over-I2C error: reported data length '
+                             f'({data_len}) differs from actual data length'
+                             f' ({len(data)}).'))
+
+        return available, data
 
     def _write(self, data):
         """Perform a serial-over-I2C write."""
@@ -620,8 +630,8 @@ class OpenI2C(Notecard):
         received_data = bytearray()
 
         while True:
-            available, data_len, data = self._read(read_len)
-            if data_len > 0:
+            available, data = self._read(read_len)
+            if len(data) > 0:
                 received_data += data
 
                 timeout_secs = CARD_INTRA_TRANSACTION_TIMEOUT_SEC
@@ -670,6 +680,8 @@ class OpenI2C(Notecard):
             data_left -= chunk_len
             sent_in_seg += chunk_len
 
+            # We delay for CARD_REQUEST_SEGMENT_DELAY_MS ms every time a full
+            # "segment" of data has been transmitted.
             if sent_in_seg > CARD_REQUEST_SEGMENT_MAX_LEN:
                 sent_in_seg -= CARD_REQUEST_SEGMENT_MAX_LEN
 
@@ -693,7 +705,7 @@ class OpenI2C(Notecard):
         start = start_timeout()
         available = 0
         while available == 0:
-            available, _, _ = self._read(0)
+            available, _ = self._read(0)
 
             if timeout_secs != 0 and has_timed_out(start, timeout_secs):
                 raise Exception(('Timed out while querying Notecard for '
@@ -730,14 +742,14 @@ class OpenI2C(Notecard):
                 read_len = 0
                 while not has_timed_out(start, CARD_RESET_DRAIN_MS / 1000):
                     try:
-                        available, data_len, data = self._read(read_len)
+                        available, data = self._read(read_len)
                     except Exception as e:
                         if self._debug:
                             print(e)
                         time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
                         continue
 
-                    if data_len > 0:
+                    if len(data) > 0:
                         something_found = True
                         # The Notecard responds to a bare `\n` with `\r\n`. If
                         # we get any other characters back, it means the host

@@ -1,6 +1,7 @@
 import os
 import sys
 import pytest
+import re
 from unittest.mock import MagicMock, patch
 from .unit_test_utils import TrueOnNthIteration, BooleanToggle
 
@@ -59,12 +60,29 @@ def arrange_transact_test(arrange_test):
     yield _arrange_transact_test
 
 
+@pytest.fixture
+def arrange_read_test(arrange_test):
+    def _arrange_read_test(available, data_len, data):
+        def _platform_read_side_effect(initiate_read_msg, read_buf):
+            read_buf[0] = available
+            read_buf[1] = data_len
+            read_buf[2:] = data
+
+        card = arrange_test()
+        card._platform_read = MagicMock(
+            side_effect=_platform_read_side_effect)
+
+        return card
+
+    yield _arrange_read_test
+
+
 class TestI2C:
     # Reset tests.
     def test_reset_succeeds_on_good_notecard_response(
             self, arrange_reset_test):
         card = arrange_reset_test()
-        card._read.return_value = (0, 2, b'\r\n')
+        card._read.return_value = (0, b'\r\n')
 
         with patch('notecard.notecard.has_timed_out',
                    side_effect=TrueOnNthIteration(2)):
@@ -75,7 +93,7 @@ class TestI2C:
     def test_reset_sends_a_newline_to_clear_stale_response(
             self, arrange_reset_test):
         card = arrange_reset_test()
-        card._read.return_value = (0, 2, b'\r\n')
+        card._read.return_value = (0, b'\r\n')
 
         with patch('notecard.notecard.has_timed_out',
                    side_effect=TrueOnNthIteration(2)):
@@ -85,7 +103,7 @@ class TestI2C:
 
     def test_reset_locks_and_unlocks(self, arrange_reset_test):
         card = arrange_reset_test()
-        card._read.return_value = (0, 2, b'\r\n')
+        card._read.return_value = (0, b'\r\n')
 
         with patch('notecard.notecard.has_timed_out',
                    side_effect=TrueOnNthIteration(2)):
@@ -220,10 +238,10 @@ class TestI2C:
         card._read.side_effect = [
             # There are 4 bytes available to read, and there are no more bytes
             # to read in this packet.
-            (4, 0, None),
+            (4, bytearray()),
             # 0 bytes available to read after this packet. 4 coming in this
             # packet, and they are {}\r\n.
-            (0, 4, payload)
+            (0, payload)
         ]
 
         rx_data = card.receive()
@@ -239,13 +257,13 @@ class TestI2C:
         card._read.side_effect = [
             # There are 4 bytes available to read, and there are no more bytes
             # to read in this packet.
-            (4, 0, None),
+            (4, bytearray()),
             # 2 bytes available to read after this packet. 4 coming in this
             # packet, and they are {}\r\n.
-            (2, 4, payload),
+            (2, payload),
             # 0 bytes after this packet. 2 coming in this packet, and they are
             # io.
-            (0, 2, excess_data)
+            (0, excess_data)
         ]
 
         rx_data = card.receive()
@@ -259,11 +277,11 @@ class TestI2C:
         card._read.side_effect = [
             # There are 3 bytes available to read, and there are no more bytes
             # to read in this packet.
-            (4, 0, None),
+            (3, bytearray()),
             # 0 bytes available to read after this packet. 3 coming in this
             # packet, and they are {}\r. The lack of a newline at the end will
             # cause this test to hit the timeout.
-            (0, 3, payload)
+            (0, payload)
         ]
 
         with patch('notecard.notecard.has_timed_out', return_value=True):
@@ -330,7 +348,7 @@ class TestI2C:
     def test_transact_returns_not_none_if_rsp_expected(
             self, arrange_transact_test):
         card, req_bytes = arrange_transact_test()
-        card._read = MagicMock(return_value=(1, None, None))
+        card._read = MagicMock(return_value=(1, bytearray()))
 
         rsp = card._transact(req_bytes, rsp_expected=True)
 
@@ -339,7 +357,7 @@ class TestI2C:
     def test_transact_calls_receive_if_rsp_expected(
             self, arrange_transact_test):
         card, req_bytes = arrange_transact_test()
-        card._read = MagicMock(return_value=(1, None, None))
+        card._read = MagicMock(return_value=(1, bytearray()))
 
         card._transact(req_bytes, rsp_expected=True)
 
@@ -347,7 +365,7 @@ class TestI2C:
 
     def test_transact_raises_exception_on_timeout(self, arrange_transact_test):
         card, req_bytes = arrange_transact_test()
-        card._read = MagicMock(return_value=(0, None, None))
+        card._read = MagicMock(return_value=(0, bytearray()))
 
         # Force a timeout.
         with patch('notecard.notecard.has_timed_out',
@@ -357,55 +375,64 @@ class TestI2C:
                                       'available data.')):
                 card._transact(req_bytes, rsp_expected=True)
 
-    # _read tests
-    def test_read_sends_the_initial_read_packet_correctly(self, arrange_test):
-        card = arrange_test()
-        card._platform_read = MagicMock()
-        length = 12
+    # _read tests.
+    def test_read_sends_the_initial_read_packet_correctly(
+            self, arrange_read_test):
+        data_len = 4
+        data = b'\xDE\xAD\xBE\xEF'
+        card = arrange_read_test(0, data_len, data)
         # To start a read from the Notecard using serial-over-I2C, the host
         # should send a 0 byte followed by a byte with the requested read
         # length.
         expected_packet = bytearray(2)
         expected_packet[0] = 0
-        expected_packet[1] = length
+        expected_packet[1] = data_len
 
-        card._read(length)
+        card._read(data_len)
 
         card._platform_read.assert_called_once()
         assert card._platform_read.call_args[0][0] == expected_packet
 
-    def test_read_sizes_read_buf_correctly(self, arrange_test):
-        card = arrange_test()
-        card._platform_read = MagicMock()
-        header_length = 2
-        data_length = 12
-        expected_read_buffer_length = header_length + data_length
+    def test_read_sizes_read_buf_correctly(self, arrange_read_test):
+        data_len = 4
+        data = b'\xDE\xAD\xBE\xEF'
+        card = arrange_read_test(0, data_len, data)
+        header_len = 2
+        expected_read_buffer_len = header_len + data_len
 
-        card._read(data_length)
+        card._read(data_len)
 
         card._platform_read.assert_called_once()
-        assert card._platform_read.call_args[0][1] == bytearray(expected_read_buffer_length)
+        assert len(card._platform_read.call_args[0][1]) == \
+               expected_read_buffer_len
 
-    def test_read_parses_data_correctly(self, arrange_test):
+    def test_read_parses_data_correctly(self, arrange_read_test):
         available = 8
         data_len = 4
         data = b'\xDE\xAD\xBE\xEF'
+        card = arrange_read_test(available, data_len, data)
 
-        def platform_read_side_effect(initiate_read_msg, read_buf):
-            read_buf[0] = available
-            read_buf[1] = data_len
-            read_buf[2:] = data
-
-        card = arrange_test()
-        card._platform_read = MagicMock(side_effect=platform_read_side_effect)
-
-        actual_available, actual_data_len, actual_data = card._read(len(data))
+        actual_available, actual_data = card._read(len(data))
 
         card._platform_read.assert_called_once()
         assert actual_available == available
-        assert actual_data_len == data_len
         assert actual_data == data
 
+    def test_read_raises_exception_if_data_length_does_not_match_data(
+            self, arrange_read_test):
+        available = 8
+        # The reported length is 5, but the actual length is 4.
+        data_len = 5
+        data = b'\xDE\xAD\xBE\xEF'
+        card = arrange_read_test(available, data_len, data)
+
+        exception_msg = re.escape(('Serial-over-I2C error: reported data length'
+                                   f' ({data_len}) differs from actual data '
+                                   f'length ({len(data)}).'))
+        with pytest.raises(Exception, match=exception_msg):
+            card._read(len(data))
+
+    # _write tests.
     def test_write_calls_platform_write_correctly(self, arrange_test):
         card = arrange_test()
         card._platform_write = MagicMock()

@@ -155,6 +155,16 @@ class TestSerial:
 
         assert isinstance(card.lock_handle, lock_type)
 
+    def test_init_fails_if_not_micropython_and_uart_has_no_in_waiting_attr(
+            self):
+        exception_msg = ('Serial communications with the Notecard are not '
+                         'supported for this platform.')
+
+        with patch('notecard.notecard.sys.implementation.name', new='cpython'):
+            with patch('notecard.notecard.OpenSerial.Reset'):
+                with pytest.raises(Exception, match=exception_msg):
+                    notecard.OpenSerial(42)
+
     @pytest.mark.parametrize(
         'platform,available_method',
         [
