@@ -184,8 +184,8 @@ class Notecard:
 
         if seq_number != expected_seq_number:
             if self._debug:
-                print(('Sequence number mismatch. Expected '
-                       f'{expected_seq_number}, received {seq_number}.'))
+                print('Sequence number mismatch. Expected ' + \
+                      f'{expected_seq_number}, received {seq_number}.')
             return True
         elif crc != computed_crc:
             if self._debug:
@@ -245,8 +245,8 @@ class Notecard:
         elif 'cmd' in req:
             req_key = 'cmd'
         else:
-            raise Exception(('Malformed request. Missing \'req\' or \'cmd\' '
-                             f'field: {req}.'))
+            raise Exception('Malformed request. Missing \'req\' or \'cmd\' ' + \
+                            f'field: {req}.')
 
         if req[req_key] == 'note.add':
             if 'milliseconds' in req:
@@ -328,8 +328,8 @@ class Notecard:
                     if 'err' in rsp_json:
                         if '{io}' in rsp_json['err']:
                             if self._debug:
-                                print(('Response has error field indicating I/O'
-                                       f' error: {rsp_json}'))
+                                print('Response has error field indicating ' + \
+                                      f'I/O error: {rsp_json}')
 
                             error = True
                             retries_left -= 1
@@ -337,8 +337,8 @@ class Notecard:
                             continue
                         elif '{bad-bin}' in rsp_json['err']:
                             if self._debug:
-                                print(('Response has error field indicating '
-                                       f'binary I/O error: {rsp_json}'))
+                                print('Response has error field indicating ' + \
+                                      f'binary I/O error: {rsp_json}')
                                 print('Not eligible for retry.')
 
                             error = True
@@ -415,8 +415,8 @@ class OpenSerial(Notecard):
         start = start_timeout()
         while not self._available():
             if timeout_secs != 0 and has_timed_out(start, timeout_secs):
-                raise Exception(('Timed out while querying Notecard for '
-                                 'available data.'))
+                raise Exception('Timed out while querying Notecard for ' + \
+                                'available data.')
 
             # Delay for 10 ms before checking for available data again.
             time.sleep(.01)
@@ -433,8 +433,8 @@ class OpenSerial(Notecard):
         while not received_newline:
             while not self._available():
                 if timeout_secs != 0 and has_timed_out(start, timeout_secs):
-                    raise Exception(('Timed out waiting to receive data from '
-                                     'Notecard.'))
+                    raise Exception('Timed out waiting to receive data from' + \
+                                    ' Notecard.')
 
                 # Sleep while awaiting the first byte (lazy). After the first
                 # byte, start to spin for the remaining bytes (greedy).
@@ -521,13 +521,13 @@ class OpenSerial(Notecard):
 
                 if not something_found:
                     if self._debug:
-                        print(('Notecard not responding to newline during '
-                               'reset.'))
+                        print('Notecard not responding to newline during ' + \
+                              'reset.')
 
                 elif non_control_char_found:
                     if self._debug:
-                        print(('Received non-control characters from the '
-                               'Notecard during reset.'))
+                        print('Received non-control characters from the ' + \
+                              'Notecard during reset.')
                 else:
                     # If all we got back is newlines, we're in sync with the
                     # Notecard.
@@ -575,9 +575,9 @@ class OpenSerial(Notecard):
             if hasattr(self.uart, 'in_waiting'):
                 self._available = self._available_default
             else:
-                raise NotImplementedError(('Serial communications with the '
-                                           'Notecard are not supported for this'
-                                           ' platform.'))
+                raise NotImplementedError('Serial communications with the ' + \
+                                          'Notecard are not supported for ' + \
+                                          'this platform.')
 
         self.Reset()
 
@@ -610,9 +610,9 @@ class OpenI2C(Notecard):
         data = read_buf[2:]
 
         if len(data) != data_len:
-            raise Exception(('Serial-over-I2C error: reported data length '
-                             f'({data_len}) differs from actual data length'
-                             f' ({len(data)}).'))
+            raise Exception('Serial-over-I2C error: reported data length ' + \
+                            f'({data_len}) differs from actual data length' + \
+                            f' ({len(data)}).')
 
         return available, data
 
@@ -653,8 +653,8 @@ class OpenI2C(Notecard):
                 break
 
             if timeout_secs != 0 and has_timed_out(start, timeout_secs):
-                raise Exception(('Timed out while reading data from the '
-                                 'Notecard.'))
+                raise Exception('Timed out while reading data from the ' + \
+                                'Notecard.')
 
             if delay:
                 time.sleep(0.05)
@@ -708,8 +708,8 @@ class OpenI2C(Notecard):
             available, _ = self._read(0)
 
             if timeout_secs != 0 and has_timed_out(start, timeout_secs):
-                raise Exception(('Timed out while querying Notecard for '
-                                 'available data.'))
+                raise Exception('Timed out while querying Notecard for ' + \
+                                'available data.')
 
         return self.receive()
 
@@ -768,13 +768,13 @@ class OpenI2C(Notecard):
 
                 if not something_found:
                     if self._debug:
-                        print(('Notecard not responding to newline during '
-                               'reset.'))
+                        print('Notecard not responding to newline during ' + \
+                              'reset.')
                     time.sleep(.005)
                 elif non_control_char_found:
                     if self._debug:
-                        print(('Received non-control characters from the '
-                               'Notecard during reset.'))
+                        print('Received non-control characters from the ' + \
+                              'Notecard during reset.')
                 else:
                     # If all we got back is newlines, we're in sync with the
                     # Notecard.
