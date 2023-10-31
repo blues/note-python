@@ -14,20 +14,6 @@ import board  # noqa: E402
 import busio  # noqa: E402
 
 
-def NotecardExceptionInfo(exception):
-    """Construct a formatted Exception string.
-
-    Args:
-        exception (Exception): An exception object.
-
-    Returns:
-        string: a summary of the exception with line number and details.
-    """
-    name = exception.__class__.__name__
-    return sys.platform + ": " + name \
-        + ": " + " ".join(map(str, exception.args))
-
-
 def configure_notecard(card, product_uid):
     """Submit a simple JSON-based request to the Notecard.
 
@@ -39,11 +25,7 @@ def configure_notecard(card, product_uid):
     req["product"] = product_uid
     req["mode"] = "continuous"
 
-    try:
-        card.Transaction(req)
-    except Exception as exception:
-        print("Transaction error: " + NotecardExceptionInfo(exception))
-        time.sleep(5)
+    card.Transaction(req)
 
 
 def get_temp_and_voltage(card):
@@ -53,20 +35,13 @@ def get_temp_and_voltage(card):
         card (object): An instance of the Notecard class
 
     """
-    temp = 0
-    voltage = 0
+    req = {"req": "card.temp"}
+    rsp = card.Transaction(req)
+    temp = rsp["value"]
 
-    try:
-        req = {"req": "card.temp"}
-        rsp = card.Transaction(req)
-        temp = rsp["value"]
-
-        req = {"req": "card.voltage"}
-        rsp = card.Transaction(req)
-        voltage = rsp["value"]
-    except Exception as exception:
-        print("Transaction error: " + NotecardExceptionInfo(exception))
-        time.sleep(5)
+    req = {"req": "card.voltage"}
+    rsp = card.Transaction(req)
+    voltage = rsp["value"]
 
     return temp, voltage
 
@@ -75,7 +50,8 @@ def run_example(product_uid, use_uart=True):
     """Connect to Notcard and run a transaction test."""
     print("Opening port...")
     if use_uart:
-        port = busio.UART(board.TX, board.RX, baudrate=9600)
+        port = busio.UART(board.TX, board.RX, baudrate=9600,
+                          receiver_buffer_size=128)
     else:
         port = busio.I2C(board.SCL, board.SDA)
 
