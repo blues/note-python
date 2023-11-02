@@ -53,21 +53,19 @@ def setup_host(port, platform, mpy_board):
     mkdir_on_host(pyb, '/lib/notecard')
     copy_files_to_host(pyb, notecard_files, '/lib/notecard')
 
-    # Copy over mpy_example.py. We'll run this example code on the MicroPython
-    # host to 1) verify that the host is able to use note-python to communicate
-    # with the Notecard and 2) verify that the example isn't broken.
+    examples_dir = note_python_root_dir / 'examples'
+    example_files = [examples_dir / 'binary-mode' / 'binary_loopback_example.py']
     if platform == 'circuitpython':
-        example_file = 'cpy_example.py'
+        example_files.append(examples_dir / 'notecard-basics' / 'cpy_example.py')
     else:
-        example_file = 'mpy_example.py'
+        example_files.append(examples_dir / 'notecard-basics' / 'mpy_example.py')
         if mpy_board:
             boards_dir = note_python_root_dir / 'mpy_board'
             board_file_path = boards_dir / f"{mpy_board}.py"
             copy_file_to_host(pyb, board_file_path, '/board.py')
 
-    examples_dir = note_python_root_dir / 'examples'
-    example_file_path = examples_dir / 'notecard-basics' / example_file
-    copy_file_to_host(pyb, example_file_path, '/example.py')
+    for file in example_files:
+        copy_file_to_host(pyb, file, f'/{file.name}')
 
     pyb.close()
 
