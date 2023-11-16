@@ -702,6 +702,8 @@ class OpenI2C(Notecard):
         # Notecard with requests.
         time.sleep(0.005)
 
+        # Query the Notecard every 50 ms to see if there's data available to
+        # read.
         start = start_timeout()
         available = 0
         while available == 0:
@@ -710,6 +712,8 @@ class OpenI2C(Notecard):
             if timeout_secs != 0 and has_timed_out(start, timeout_secs):
                 raise Exception('Timed out while querying Notecard for ' + \
                                 'available data.')
+
+            time.sleep(0.05)
 
         return self.receive()
 
