@@ -181,9 +181,9 @@ class Notecard:
 
         # Compute the CRC over the response, with the 'crc' field removed.
         bytes_for_crc = rsp_str_crc_removed.encode('utf-8')
-        #computed_crc = '{:08x}'.format(crc32(bytes_for_crc)).upper()
+        # computed_crc = '{:08x}'.format(crc32(bytes_for_crc)).upper()
         computed_crc = crc32(bytes_for_crc)
-        #expected_seq_number = '{:04x}'.format(self._last_request_seq_number).upper()
+        # expected_seq_number = '{:04x}'.format(self._last_request_seq_number).upper()
         expected_seq_number = self._last_request_seq_number
 
         if seq_number != expected_seq_number:
