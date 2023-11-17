@@ -168,7 +168,9 @@ class Notecard:
         # the decoding process. When re-encoded, the string representation is
         # also truncated, and so the CRC will be computed over a different
         # string than was originally sent, resulting in a CRC error.
-        seq_number, crc = rsp_json['crc'].split(':')
+        seq_number_str, crc_str = rsp_json['crc'].split(':')
+        seq_number = int(seq_number_str,16)
+        crc = int(crc_str, 16)
         # Remove the 'crc' field from the response.
         rsp_str = rsp_bytes.decode()
         rsp_str_crc_removed = rsp_str.split('"crc":')[0]
@@ -179,17 +181,21 @@ class Notecard:
 
         # Compute the CRC over the response, with the 'crc' field removed.
         bytes_for_crc = rsp_str_crc_removed.encode('utf-8')
-        computed_crc = '{:08x}'.format(crc32(bytes_for_crc)).upper()
-        expected_seq_number = '{:04x}'.format(self._last_request_seq_number)
+        #computed_crc = '{:08x}'.format(crc32(bytes_for_crc)).upper()
+        computed_crc = crc32(bytes_for_crc)
+        #expected_seq_number = '{:04x}'.format(self._last_request_seq_number).upper()
+        expected_seq_number = self._last_request_seq_number
 
         if seq_number != expected_seq_number:
             if self._debug:
+                expected_seq_str = '{:04x}'.format(expected_seq_number)
                 print('Sequence number mismatch. Expected ' + \
-                      f'{expected_seq_number}, received {seq_number}.')
+                      f'{expected_seq_str}, received {seq_number_str}.')
             return True
         elif crc != computed_crc:
             if self._debug:
-                print(f'CRC error. Computed {computed_crc}, received {crc}.')
+                computed_crc_str = '{:08x}'.format(computed_crc).upper()
+                print(f'CRC error. Computed {computed_crc_str}, received {crc_str}.')
             return True
 
         return False
