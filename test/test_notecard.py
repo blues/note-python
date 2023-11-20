@@ -80,6 +80,25 @@ class TestNotecard:
 
         assert error == crc_supported
 
+    def test_crc_error_returns_error_if_sequence_number_int_conversion_fails(
+            self):
+        card = notecard.Notecard()
+        # Sequence number is invalid hex.
+        rsp_bytes = b'{"crc":"000Z:A3A6BF43"}\r\n'
+
+        error = card._crc_error(rsp_bytes)
+
+        assert error
+
+    def test_crc_error_returns_error_if_crc_int_conversion_fails(self):
+        card = notecard.Notecard()
+        # CRC is invalid hex.
+        rsp_bytes = b'{"crc":"0001:A3A6BF4Z"}\r\n'
+
+        error = card._crc_error(rsp_bytes)
+
+        assert error
+
     def test_crc_error_returns_error_if_sequence_number_wrong(self):
         card = notecard.Notecard()
         seq_number = 37
@@ -106,16 +125,20 @@ class TestNotecard:
         'rsp_bytes',
         [
             # Without CRC, the response is {}.
-            b'{"crc":"0025:A3A6BF43"}\r\n',
+            b'{"crc":"002A:A3A6BF43"}\r\n',
+            # Make sure case of sequence number hex doesn't matter.
+            b'{"crc":"002a:A3A6BF43"}\r\n',
+            # Make sure case of CRC hex doesn't matter.
+            b'{"crc":"002A:a3a6bf43"}\r\n',
             # Without CRC, the response is {"connected": true}. This makes sure
             # _crc_error handles the "," between the two fields properly.
-            b'{"connected": true,"crc": "0025:025A2457"}\r\n'
+            b'{"connected": true,"crc": "002A:025A2457"}\r\n',
         ]
     )
     def test_crc_error_returns_no_error_if_sequence_number_and_crc_ok(
             self, rsp_bytes):
         card = notecard.Notecard()
-        seq_number = 37
+        seq_number = 42
         card._last_request_seq_number = seq_number
 
         error = card._crc_error(rsp_bytes)

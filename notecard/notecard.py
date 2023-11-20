@@ -169,6 +169,23 @@ class Notecard:
         # also truncated, and so the CRC will be computed over a different
         # string than was originally sent, resulting in a CRC error.
         seq_number, crc = rsp_json['crc'].split(':')
+
+        # Convert the received CRC and sequence number to integers for later
+        # comparison.
+        try:
+            seq_number_as_int = int(seq_number, 16)
+        except ValueError:
+            if self._debug:
+                print(f'Received sequence number "{seq_number}" cannot be ' + \
+                      'converted to integer.')
+            return True
+        try:
+            crc_as_int = int(crc, 16)
+        except ValueError:
+            if self._debug:
+                print(f'Received CRC "{crc}" cannot be converted to integer.')
+            return True
+
         # Remove the 'crc' field from the response.
         rsp_str = rsp_bytes.decode()
         rsp_str_crc_removed = rsp_str.split('"crc":')[0]
@@ -178,18 +195,19 @@ class Notecard:
             rsp_str_crc_removed = rsp_str_crc_removed.rstrip() + '}'
 
         # Compute the CRC over the response, with the 'crc' field removed.
-        bytes_for_crc = rsp_str_crc_removed.encode('utf-8')
-        computed_crc = '{:08x}'.format(crc32(bytes_for_crc)).upper()
-        expected_seq_number = '{:04x}'.format(self._last_request_seq_number)
+        bytes_for_crc_calc = rsp_str_crc_removed.encode('utf-8')
+        computed_crc = crc32(bytes_for_crc_calc)
 
-        if seq_number != expected_seq_number:
+        if seq_number_as_int != self._last_request_seq_number:
             if self._debug:
                 print('Sequence number mismatch. Expected ' + \
-                      f'{expected_seq_number}, received {seq_number}.')
+                      f'{self._last_request_seq_number}, received ' + \
+                      f'{seq_number_as_int}.')
             return True
-        elif crc != computed_crc:
+        elif crc_as_int != computed_crc:
             if self._debug:
-                print(f'CRC error. Computed {computed_crc}, received {crc}.')
+                print(f'CRC error. Computed {computed_crc}, received ' + \
+                      f'{crc_as_int}.')
             return True
 
         return False
