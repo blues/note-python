@@ -37,14 +37,15 @@ jobs:
         MICROPYTHON_VERSION: [1.20.0]
         MICROPYTHON_DATE: [20230426]
         MICROPYTHON_MCU: [ESP32_GENERIC]
-        MPY_BOARD: [huzzah32]   # the --mpyboard parameter to the tests
-        flash_device: # has to be an array - use the input from workflow_dispatch if present, otherwlse true
+        MPY_BOARD: [espressif_esp32] # the --mpyboard parameter to the tests
+        flash_device: # has to be an array - use the input from workflow_dispatch if present, otherwise true
             - ${{ github.event.inputs.flash_device=='' && true || github.event.inputs.flash_device }}
     env:
       VENV: .venv-runner-mpy
       USB_MSD_ATTACH_TIME: 15
       MICROPYTHON_BIN: "${{matrix.MICROPYTHON_MCU}}-${{matrix.MICROPYTHON_DATE}}-v${{matrix.MICROPYTHON_VERSION}}.bin"
       MICROPYTHON_VERSION: ${{matrix.MICROPYTHON_VERSION}}
+      MPY_BOARD: ${{matrix.MPY_BOARD}}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
