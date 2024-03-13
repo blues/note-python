@@ -294,6 +294,16 @@ class TestNotecard:
             assert card._transact.call_count == \
                    notecard.CARD_TRANSACTION_RETRIES
 
+    def test_transaction_does_not_retry_on_not_supported_error_in_response(
+            self, arrange_transaction_test):
+        card = arrange_transaction_test()
+        req = {"req": "hub.status"}
+
+        with patch('notecard.notecard.json.loads',
+                   return_value={'err': 'some error {io} {not-supported}'}):
+            card.Transaction(req)
+            assert card._transact.call_count == 1
+
     def test_transaction_does_not_retry_on_bad_bin_error_in_response(
             self, arrange_transaction_test):
         card = arrange_transaction_test()
