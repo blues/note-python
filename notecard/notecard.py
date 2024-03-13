@@ -344,7 +344,7 @@ class Notecard:
                         continue
 
                     if 'err' in rsp_json:
-                        if '{io}' in rsp_json['err']:
+                        if '{io}' in rsp_json['err'] and '{not-supported}' not in rsp_json['err']:
                             if self._debug:
                                 print('Response has error field indicating ' + \
                                       f'I/O error: {rsp_json}')
