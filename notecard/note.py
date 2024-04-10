@@ -14,7 +14,7 @@ from .validators import validate_card_object
 
 
 @validate_card_object
-def add(card, file=None, body=None, payload=None, sync=None):
+def add(card, file=None, body=None, payload=None, sync=None, port=None):
     """Add a Note to a Notefile.
 
     Args:
@@ -23,6 +23,8 @@ def add(card, file=None, body=None, payload=None, sync=None):
         body (JSON object): A developer-defined tracker ID.
         payload (string): An optional base64-encoded string.
         sync (bool): Perform an immediate sync after adding.
+        port (int): If provided, a unique number to represent a notefile.
+            Required for Notecard LoRa.
 
     Returns:
         string: The result of the Notecard request.
@@ -34,6 +36,8 @@ def add(card, file=None, body=None, payload=None, sync=None):
         req["body"] = body
     if payload:
         req["payload"] = payload
+    if port:
+        req["port"] = port
     if sync is not None:
         req["sync"] = sync
     return card.Transaction(req)
