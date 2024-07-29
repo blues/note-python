@@ -14,7 +14,7 @@ from .validators import validate_card_object
 
 
 @validate_card_object
-def add(card, file=None, body=None, payload=None, sync=None):
+def add(card, file=None, body=None, payload=None, sync=None, port=None):
     """Add a Note to a Notefile.
 
     Args:
@@ -23,6 +23,8 @@ def add(card, file=None, body=None, payload=None, sync=None):
         body (JSON object): A developer-defined tracker ID.
         payload (string): An optional base64-encoded string.
         sync (bool): Perform an immediate sync after adding.
+        port (int): If provided, a unique number to represent a notefile.
+            Required for Notecard LoRa.
 
     Returns:
         string: The result of the Notecard request.
@@ -34,6 +36,8 @@ def add(card, file=None, body=None, payload=None, sync=None):
         req["body"] = body
     if payload:
         req["payload"] = payload
+    if port:
+        req["port"] = port
     if sync is not None:
         req["sync"] = sync
     return card.Transaction(req)
@@ -150,7 +154,7 @@ def update(card, file=None, note_id=None, body=None, payload=None):
 
 
 @validate_card_object
-def template(card, file=None, body=None, length=None):
+def template(card, file=None, body=None, length=None, port=None, compact=False):
     """Create a template for new Notes in a Notefile.
 
     Args:
@@ -160,6 +164,11 @@ def template(card, file=None, body=None, length=None):
             values as "hints" for the data type.
         length (int): If provided, the maximum length of a payload that
             can be sent in Notes for the template Notefile.
+        port (int): If provided, a unique number to represent a notefile.
+            Required for Notecard LoRa.
+        compact (boolean): If true, sets the format to compact to tell the
+            Notecard to omit this additional metadata to save on storage
+            and bandwidth. Required for Notecard LoRa.
 
     Returns:
         string: The result of the Notecard request.
@@ -171,4 +180,8 @@ def template(card, file=None, body=None, length=None):
         req["body"] = body
     if length:
         req["length"] = length
+    if port:
+        req["port"] = port
+    if compact:
+        req["format"] = "compact"
     return card.Transaction(req)
