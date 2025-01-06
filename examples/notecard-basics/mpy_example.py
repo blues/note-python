@@ -6,7 +6,6 @@ library on a MicroPython device.
 import sys
 import time
 import notecard
-import board
 
 if sys.implementation.name != "micropython":
     raise Exception("Please run this example in a MicroPython environment.")
@@ -52,11 +51,11 @@ def run_example(product_uid, use_uart=True):
     """Connect to Notcard and run a transaction test."""
     print("Opening port...")
     if use_uart:
-        port = UART(board.UART, 9600)
+        port = UART(1, 115200)
         port.init(9600, bits=8, parity=None, stop=1,
                   timeout=3000, timeout_char=100)
     else:
-        port = I2C(board.I2C_ID, scl=Pin(board.SCL), sda=Pin(board.SDA))
+        port = I2C(1, freq=100000)
 
     print("Opening Notecard...")
     if use_uart:
