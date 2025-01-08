@@ -1,8 +1,8 @@
 """Helper methods for doing binary transfers to/from a Notecard."""
 
 import sys
-from .cobs import cobs_encode, cobs_decode
-from .notecard import Notecard, CARD_INTRA_TRANSACTION_TIMEOUT_SEC
+from notecard.cobs import cobs_encode, cobs_decode
+from notecard.notecard import Notecard, CARD_INTRA_TRANSACTION_TIMEOUT_SEC
 
 BINARY_RETRIES = 2
 

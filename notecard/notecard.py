@@ -34,14 +34,14 @@ import sys
 import os
 import json
 import time
-from .timeout import start_timeout, has_timed_out
-from .transaction_manager import TransactionManager, NoOpTransactionManager
-from .crc32 import crc32
+from notecard.timeout import start_timeout, has_timed_out
+from notecard.transaction_manager import TransactionManager, NoOpTransactionManager
+from notecard.crc32 import crc32
 
 use_periphery = False
 use_serial_lock = False
 
-if sys.implementation.name == 'cpython' and (sys.platform == 'linux' or sys.platform == 'linux2'):
+if sys.implementation.name == 'cpython' and (sys.platform == 'linux' or sys.platform == 'linux2' or sys.platform == 'darwin'):
     use_periphery = True
     from periphery import I2C
 

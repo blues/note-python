@@ -3,8 +3,8 @@
 import sys
 import time
 
-from .timeout import start_timeout, has_timed_out
-from .gpio import GPIO
+from notecard.timeout import start_timeout, has_timed_out
+from notecard.gpio import GPIO
 
 
 class TransactionManager:
