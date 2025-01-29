@@ -159,7 +159,6 @@ def test_file_stats_response_structure(card):
         'changes': 78,
         'sync': True
     }
-    
     response = file.stats(card)
     assert 'total' in response
     assert isinstance(response['total'], int)

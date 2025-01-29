@@ -295,17 +295,35 @@ Delete individual notefiles and their contents.
 #### Returns
 string The result of the Notecard request.
 
-#### `public def `[`stats`](#namespacenotecard_1_1file_1afd6ecece175a8ba9052b07889cf757f4)`(card)` 
+#### `public def `[`stats`](#namespacenotecard_1_1file_1afd6ecece175a8ba9052b07889cf757f4)`(card,file)` 
 
 Obtain statistics about local notefiles.
 
 #### Parameters
 * `card` The current Notecard object.
+* `file` (optional, string) Returns stats for the specified Notefile only.
 
 #### Returns
+dict containing:
+* `total` (integer): Total number of Notes across all Notefiles
+* `changes` (integer): Number of Notes pending sync
+* `sync` (boolean): True if sync is recommended based on pending notes
 
-#### Returns
-string The result of the Notecard request.
+Example request:
+```json
+{
+    "req": "file.stats"
+}
+```
+
+Example response:
+```json
+{
+    "total": 83,
+    "changes": 78,
+    "sync": true
+}
+```
 
 #### `public def `[`pendingChanges`](#namespacenotecard_1_1file_1aac52d0739fcba481f9a0bd4cfd35362e)`(card)` 
 
