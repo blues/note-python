@@ -67,49 +67,63 @@ def set(card, product=None, sn=None, mode=None, outbound=None,
 
 
 @validate_card_object
-def sync(card):
+def sync(card, allow=None):
     """Initiate a sync of the Notecard to Notehub.
 
     Args:
         card (Notecard): The current Notecard object.
+        allow (bool): When True, allows syncing over a non-terrestrial
+            network even if the Notefile is not in compact mode.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request containing sync status.
     """
     req = {"req": "hub.sync"}
+    if allow is not None:
+        req["allow"] = allow
     return card.Transaction(req)
 
 
 @validate_card_object
-def syncStatus(card, sync=None):
+def syncStatus(card, sync=None, ntn=None):
     """Retrieve the status of a sync request.
 
     Args:
         card (Notecard): The current Notecard object.
         sync (bool): True if sync should be auto-initiated pending
             outbound data.
+        ntn (bool): When True, returns additional status information about
+            non-terrestrial network sync status.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request containing sync status,
+        including NTN details when requested.
     """
     req = {"req": "hub.sync.status"}
     if sync is not None:
         req["sync"] = sync
+    if ntn is not None:
+        req["ntn"] = ntn
 
     return card.Transaction(req)
 
 
 @validate_card_object
-def status(card):
+def status(card, ntn=None):
     """Retrieve the status of the Notecard's connection.
 
     Args:
         card (Notecard): The current Notecard object.
+        ntn (bool): When True, returns additional status information about
+            non-terrestrial network connectivity.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request containing connection status,
+        including NTN details when requested.
     """
     req = {"req": "hub.status"}
+    if ntn is not None:
+        req["ntn"] = ntn
     return card.Transaction(req)
 
 
