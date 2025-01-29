@@ -76,7 +76,6 @@ def test_template_compact_format(mock_card):
     assert mock_card.Transaction.call_args[0][0]["format"] == "compact"
 
 
-
 def test_template_compact_with_allowed_metadata(mock_card):
     body = {
         "field": "value",
@@ -90,7 +89,6 @@ def test_template_compact_with_allowed_metadata(mock_card):
     assert mock_card.Transaction.call_args[0][0]["body"] == body
 
 
-
 def test_template_compact_with_invalid_metadata(mock_card):
     body = {
         "field": "value",
@@ -100,7 +98,6 @@ def test_template_compact_with_invalid_metadata(mock_card):
     assert "err" in result
     assert "_invalid" in result["err"]
     assert not mock_card.Transaction.called
-
 
 
 def test_template_full_configuration(mock_card):
