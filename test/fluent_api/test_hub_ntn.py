@@ -1,6 +1,4 @@
 """Test NTN support in hub module."""
-import pytest
-
 from notecard import hub
 
 
@@ -25,29 +23,23 @@ def test_sync_with_ntn(run_fluent_api_notecard_api_mapping_test):
     )
 
 
-def test_sync_status_with_ntn(run_fluent_api_notecard_api_mapping_test):
-    """Test hub.syncStatus with NTN support."""
+def test_sync_status(run_fluent_api_notecard_api_mapping_test):
+    """Test hub.syncStatus."""
     run_fluent_api_notecard_api_mapping_test(
         hub.syncStatus,
         "hub.sync.status",
-        {"ntn": True}
+        {"sync": True}
     )
 
     run_fluent_api_notecard_api_mapping_test(
         hub.syncStatus,
         "hub.sync.status",
-        {"sync": True, "ntn": True}
+        {}
     )
 
 
-def test_status_with_ntn(run_fluent_api_notecard_api_mapping_test):
-    """Test hub.status with NTN support."""
-    run_fluent_api_notecard_api_mapping_test(
-        hub.status,
-        "hub.status",
-        {"ntn": True}
-    )
-
+def test_status(run_fluent_api_notecard_api_mapping_test):
+    """Test hub.status."""
     run_fluent_api_notecard_api_mapping_test(
         hub.status,
         "hub.status",
