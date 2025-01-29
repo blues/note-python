@@ -10,6 +10,14 @@ import notecard  # noqa: E402
 
 
 @pytest.fixture
+def card():
+    """Create a mock Notecard instance for testing."""
+    card = notecard.Notecard()
+    card.Transaction = MagicMock()
+    return card
+
+
+@pytest.fixture
 def run_fluent_api_notecard_api_mapping_test():
     def _run_test(fluent_api, notecard_api_name, req_params, rename_map=None):
         card = notecard.Notecard()
