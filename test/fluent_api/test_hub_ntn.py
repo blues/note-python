@@ -48,7 +48,6 @@ def test_sync_with_ntn(run_fluent_api_notecard_api_mapping_test):
 def test_sync_boolean_serialization(card):
     """Test that boolean values are properly serialized in hub.sync."""
     hub.sync(card, in_=True, out=False, allow=True)
-    
     # Verify the Transaction was called with correct boolean values
     expected_req = {
         'req': 'hub.sync',
@@ -57,7 +56,6 @@ def test_sync_boolean_serialization(card):
         'allow': True
     }
     card.Transaction.assert_called_once_with(expected_req)
-    
     # Verify JSON serialization format
     args = card.Transaction.call_args
     req_dict = args[0][0]
