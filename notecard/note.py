@@ -178,13 +178,13 @@ def template(card, file=None, body=None, length=None, port=None, compact=False):
     req = {"req": "note.template"}
     if file:
         req["file"] = file
-    
+
     if body:
         for key, value in body.items():
             if not isinstance(value, (bool, int, float, str)):
                 return {
                     "err": (f"Field '{key}' has unsupported type. "
-                           "Must be boolean, integer, float, or string.")
+                                   "Must be boolean, integer, float, or string.")
                 }
             if isinstance(value, float) and value.is_integer():
                 body[key] = int(value)
@@ -193,14 +193,14 @@ def template(card, file=None, body=None, length=None, port=None, compact=False):
     if length is not None:
         if not isinstance(length, int) or length < 0:
             return {"err": "Length must be a non-negative integer"}
-        req["length"] = length
+        req["length"] = str(length)
         # Enable binary record support when length is specified
-        req["binary"] = True
+        req["binary"] = "true"
 
     if port is not None:
         if not isinstance(port, int) or not (1 <= port <= 100):
             return {"err": "Port must be an integer between 1 and 100"}
-        req["port"] = port
+        req["port"] = str(port)
 
     if compact:
         req["format"] = "compact"

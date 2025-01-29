@@ -1,8 +1,10 @@
 """Tests for note.template API."""
 
+
 import pytest
 from unittest.mock import MagicMock
 from notecard import note
+
 
 @pytest.fixture
 def mock_card():
@@ -10,13 +12,15 @@ def mock_card():
     card.Transaction.return_value = {"success": True}
     return card
 
+
 def test_template_basic(mock_card):
-    result = note.template(mock_card, file="test.qo")
+    note.template(mock_card, file="test.qo")
     assert mock_card.Transaction.called
     assert mock_card.Transaction.call_args[0][0] == {
         "req": "note.template",
         "file": "test.qo"
     }
+
 
 def test_template_with_valid_types(mock_card):
     body = {
@@ -25,14 +29,16 @@ def test_template_with_valid_types(mock_card):
         "float_field": 3.14,
         "string_field": "test"
     }
-    result = note.template(mock_card, file="test.qo", body=body)
+    note.template(mock_card, file="test.qo", body=body)
     assert mock_card.Transaction.called
     assert mock_card.Transaction.call_args[0][0]["body"] == body
 
+
 def test_template_float_to_int_conversion(mock_card):
     body = {"whole_number": 42.0}
-    result = note.template(mock_card, body=body)
+    note.template(mock_card, body=body)
     assert mock_card.Transaction.call_args[0][0]["body"]["whole_number"] == 42
+
 
 def test_template_invalid_type(mock_card):
     body = {"invalid_field": {"nested": "object"}}
@@ -41,18 +47,21 @@ def test_template_invalid_type(mock_card):
     assert "invalid_field" in result["err"]
     assert not mock_card.Transaction.called
 
+
 def test_template_invalid_length(mock_card):
     result = note.template(mock_card, length=-1)
     assert "err" in result
     assert "Length" in result["err"]
     assert not mock_card.Transaction.called
 
+
 def test_template_with_binary(mock_card):
-    result = note.template(mock_card, length=32)
+    note.template(mock_card, length=32)
     assert mock_card.Transaction.called
     req = mock_card.Transaction.call_args[0][0]
     assert req["length"] == 32
     assert req["binary"] is True
+
 
 def test_template_invalid_port(mock_card):
     result = note.template(mock_card, port=101)
@@ -60,10 +69,13 @@ def test_template_invalid_port(mock_card):
     assert "Port" in result["err"]
     assert not mock_card.Transaction.called
 
+
 def test_template_compact_format(mock_card):
-    result = note.template(mock_card, compact=True)
+    note.template(mock_card, compact=True)
     assert mock_card.Transaction.called
     assert mock_card.Transaction.call_args[0][0]["format"] == "compact"
+
+
 
 def test_template_compact_with_allowed_metadata(mock_card):
     body = {
@@ -73,9 +85,11 @@ def test_template_compact_with_allowed_metadata(mock_card):
         "_lon": 56.78,
         "_loc": "NYC"
     }
-    result = note.template(mock_card, body=body, compact=True)
+    note.template(mock_card, body=body, compact=True)
     assert mock_card.Transaction.called
     assert mock_card.Transaction.call_args[0][0]["body"] == body
+
+
 
 def test_template_compact_with_invalid_metadata(mock_card):
     body = {
@@ -87,6 +101,8 @@ def test_template_compact_with_invalid_metadata(mock_card):
     assert "_invalid" in result["err"]
     assert not mock_card.Transaction.called
 
+
+
 def test_template_full_configuration(mock_card):
     body = {
         "temperature": 21.5,
@@ -95,7 +111,7 @@ def test_template_full_configuration(mock_card):
         "location": "warehouse",
         "_time": "2023-01-01"
     }
-    result = note.template(
+    note.template(
         mock_card,
         file="sensors.qo",
         body=body,
