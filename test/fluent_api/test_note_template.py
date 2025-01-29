@@ -61,7 +61,6 @@ def test_template_with_binary(mock_card):
     assert mock_card.Transaction.called
     req = mock_card.Transaction.call_args[0][0]
     assert req["length"] == 32
-    assert req["binary"] is True
 
 
 def test_template_invalid_port(mock_card):
@@ -74,7 +73,7 @@ def test_template_invalid_port(mock_card):
 def test_template_compact_format(mock_card):
     note.template(mock_card, compact=True)
     assert mock_card.Transaction.called
-    assert mock_card.Transaction.call_args[0][0]["format"] == "compact"
+    assert mock_card.Transaction.call_args[0][0]["compact"] == True
 
 
 def test_template_compact_with_allowed_metadata(mock_card):
@@ -122,6 +121,5 @@ def test_template_full_configuration(mock_card):
     assert req["file"] == "sensors.qo"
     assert req["body"] == body
     assert req["length"] == 32
-    assert req["binary"] is True
     assert req["port"] == 1
-    assert req["format"] == "compact"
+    assert req["compact"] == True

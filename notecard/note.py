@@ -193,8 +193,6 @@ def template(card, file=None, body=None, length=None, port=None, compact=False):
         if not isinstance(length, int) or length < 0:
             return {"err": "Length must be a non-negative integer"}
         req["length"] = length
-        # Enable binary record support when length is specified
-        req["binary"] = True
 
     if port is not None:
         if not isinstance(port, int) or not (1 <= port <= 100):
@@ -202,7 +200,7 @@ def template(card, file=None, body=None, length=None, port=None, compact=False):
         req["port"] = port
 
     if compact:
-        req["format"] = "compact"
+        req["compact"] = True
         # Allow specific metadata fields in compact mode
         if body:
             allowed_metadata = {"_time", "_lat", "_lon", "_loc"}
