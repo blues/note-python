@@ -40,6 +40,7 @@ def test_sync_status_with_ntn(run_fluent_api_notecard_api_mapping_test):
     )
 
 
+
 def test_status_with_ntn(run_fluent_api_notecard_api_mapping_test):
     """Test hub.status with NTN support."""
     run_fluent_api_notecard_api_mapping_test(
