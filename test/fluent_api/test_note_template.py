@@ -73,7 +73,7 @@ def test_template_invalid_port(mock_card):
 def test_template_compact_format(mock_card):
     note.template(mock_card, compact=True)
     assert mock_card.Transaction.called
-    assert mock_card.Transaction.call_args[0][0]["compact"] is True
+    assert mock_card.Transaction.call_args[0][0]["format"] == "compact"
 
 
 def test_template_compact_with_allowed_metadata(mock_card):
@@ -122,4 +122,4 @@ def test_template_full_configuration(mock_card):
     assert req["body"] == body
     assert req["length"] == 32
     assert req["port"] == 1
-    assert req["compact"] is True
+    assert req["format"] == "compact"

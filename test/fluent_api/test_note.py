@@ -70,7 +70,7 @@ from notecard import note
                 },
                 'length': 32,
                 'port': 1,
-                'compact': True
+                'format': 'compact'
             },
             None
         ),

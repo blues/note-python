@@ -154,7 +154,7 @@ def update(card, file=None, note_id=None, body=None, payload=None):
 
 
 @validate_card_object
-def template(card, file=None, body=None, length=None, port=None, compact=False):
+def template(card, file=None, body=None, length=None, port=None, compact=False, format=None):
     """Create a template for new Notes in a Notefile.
 
     Args:
@@ -167,9 +167,10 @@ def template(card, file=None, body=None, length=None, port=None, compact=False):
             can be sent in Notes for the template Notefile.
         port (int): If provided, a unique number to represent a notefile.
             Required for Notecard LoRa.
-        compact (boolean): If true, sets the format to compact to tell the
-            Notecard to omit this additional metadata to save on storage
-            and bandwidth. Required for Notecard LoRa.
+        compact (boolean): If true, sets the format to compact. Deprecated,
+            use format="compact" instead.
+        format (string): If set to "compact", tells the Notecard to omit
+            additional metadata to save on storage and bandwidth.
 
     Returns:
         dict: The result of the Notecard request. Returns error object if
@@ -199,8 +200,8 @@ def template(card, file=None, body=None, length=None, port=None, compact=False):
             return {"err": "Port must be an integer between 1 and 100"}
         req["port"] = port
 
-    if compact:
-        req["compact"] = True
+    if format == "compact" or compact:
+        req["format"] = "compact"
         if body:
             allowed_metadata = {"_time", "_lat", "_lon", "_loc"}
             for key in body.keys():
