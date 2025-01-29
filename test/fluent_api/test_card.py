@@ -47,6 +47,28 @@ from notecard import card
             }
         ),
         (
+            card.voltage,
+            'card.voltage',
+            {
+                'usb': True
+            }
+        ),
+        (
+            card.voltage,
+            'card.voltage',
+            {
+                'alert': True
+            }
+        ),
+        (
+            card.voltage,
+            'card.voltage',
+            {
+                'usb': True,
+                'alert': True
+            }
+        ),
+        (
             card.wireless,
             'card.wireless',
             {
