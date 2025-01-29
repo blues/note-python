@@ -1,7 +1,7 @@
 # Summary
 
- Members                        | Descriptions                                
---------------------------------|---------------------------------------------
+Members | Descriptions
+--------|-------------
 `namespace `[`notecard::card`](#namespacenotecard_1_1card) | 
 `namespace `[`notecard::env`](#namespacenotecard_1_1env) | 
 `namespace `[`notecard::file`](#namespacenotecard_1_1file) | 
@@ -14,8 +14,8 @@
 
 ## Summary
 
- Members                        | Descriptions                                
---------------------------------|---------------------------------------------
+Members | Descriptions
+--------|-------------
 `public def `[`attn`](#namespacenotecard_1_1card_1ad11e82dd52c3c9f5ae3f1de5f7f5a9b9)`(card,mode,files,seconds,payload,start)`            | Configure interrupt detection between a host and Notecard.
 `public def `[`time`](#namespacenotecard_1_1card_1a0de0f6e72a2387d09aaaa4a719383313)`(card)`            | Retrieve the current time and date from the Notecard.
 `public def `[`status`](#namespacenotecard_1_1card_1a13f03abe1576ab81ea8190e3074576ce)`(card)`            | Retrieve the status of the Notecard.
@@ -118,21 +118,33 @@ Retrieve current and historical voltage info from the Notecard.
 #### Returns
 string The result of the Notecard request.
 
-#### `public def `[`wireless`](#namespacenotecard_1_1card_1a10f5f4667d80f47674d1876df69b8e22)`(card,mode,apn)` 
+#### `public def `[`wireless`](#namespacenotecard_1_1card_1a10f5f4667d80f47674d1876df69b8e22)`(card,mode,apn,method,allow)` 
 
-Retrieve wireless modem info or customize modem behavior.
+Retrieve wireless modem info or customize modem behavior, including Non-Terrestrial Network (NTN) support.
 
 #### Parameters
 * `card` The current Notecard object. 
-
-* `mode` The wireless module mode to set. 
-
+* `mode` The wireless module mode to set. Must be one of:
+  * "-" to reset to the default mode
+  * "auto" to perform automatic band scan mode (default)
+  * "m" to restrict the modem to Cat-M1
+  * "nb" to restrict the modem to Cat-NB1
+  * "gprs" to restrict the modem to EGPRS
 * `apn` Access Point Name (APN) when using an external SIM.
+  Use "-" to reset to the Notecard default APN.
+* `method` The connectivity method to enable. Must be one of:
+  * "-" to reset to device default
+  * "ntn" to enable Non-Terrestrial Network mode
+  * "wifi-ntn" to prioritize WiFi with NTN fallback
+  * "cell-ntn" to prioritize cellular with NTN fallback
+  * "wifi-cell-ntn" to prioritize WiFi, then cellular, then NTN
+* `allow` When True, allows adding Notes to non-compact Notefiles
+  while connected over a non-terrestrial network.
 
 #### Returns
 
 #### Returns
-string The result of the Notecard request.
+dict The result of the Notecard request containing network status and signal information.
 
 # namespace `notecard::env` 
 
@@ -393,8 +405,8 @@ string The result of the Notecard request.
 
 ## Summary
 
- Members                        | Descriptions                                
---------------------------------|---------------------------------------------
+Members | Descriptions
+--------|-------------
 `public def `[`changes`](#namespacenotecard_1_1note_1a660dda3f8fa6f9afff52e0a3be6bef84)`(card,file,tracker,maximum,start,stop,deleted,`[`delete`](#namespacenotecard_1_1note_1a591ece0048b58f38acf22d97a533577f)`)`            | Incrementally retrieve changes within a Notefile.
 `public def `[`get`](#namespacenotecard_1_1note_1ad7a4c296382c14a8efb54278c127d73b)`(card,file,note_id,`[`delete`](#namespacenotecard_1_1note_1a591ece0048b58f38acf22d97a533577f)`,deleted)`            | Retrieve a note from an inbound or DB Notefile.
 `public def `[`delete`](#namespacenotecard_1_1note_1a591ece0048b58f38acf22d97a533577f)`(card,file,note_id)`            | Delete a DB note in a Notefile by its ID.
@@ -507,8 +519,8 @@ string The result of the Notecard request.
 
 ## Summary
 
- Members                        | Descriptions                                
---------------------------------|---------------------------------------------
+Members | Descriptions
+--------|-------------
 `public def `[`serialReadByte`](#namespacenotecard_1_1notecard_1a86722827e14af53ddcd38c47ff9a119a)`(port)`            | Read a single byte from a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
 `public def `[`serialReset`](#namespacenotecard_1_1notecard_1aa1badb3c10bdc0321b9a556e8cd49148)`(port)`            | Send a reset command to a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
 `public def `[`serialTransaction`](#namespacenotecard_1_1notecard_1aee094fc03befdcbe4ee4a9d658d09841)`(port,req,debug)`            | Perform a single write to and read from a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
@@ -543,8 +555,8 @@ Primary [Notecard](#classnotecard_1_1notecard_1_1_notecard) Class, which provide
 
 ## Summary
 
- Members                        | Descriptions                                
---------------------------------|---------------------------------------------
+Members | Descriptions
+--------|-------------
 `public def `[`__init__`](#classnotecard_1_1notecard_1_1_notecard_1a126d43070dfa4b552bc92c06be1c6d1e)`(self)` | Initialize the [Notecard](#classnotecard_1_1notecard_1_1_notecard) through a reset.
 
 ## Members
@@ -614,8 +626,8 @@ class notecard::notecard::OpenSerial
 
 ## Summary
 
- Members                        | Descriptions                                
---------------------------------|---------------------------------------------
+Members | Descriptions
+--------|-------------
 `public  `[`uart`](#classnotecard_1_1notecard_1_1_open_serial_1a535a6dffc769a9f55214ea22095f598f) | 
 `public  `[`lock`](#classnotecard_1_1notecard_1_1_open_serial_1afbc7e0e12502762f8d7a205085ec9deb) | 
 `public def `[`Command`](#classnotecard_1_1notecard_1_1_open_serial_1aa6f70223bc2bfdaf9da2667f4181d4ad)`(self,req)` | Perform a [Notecard](#classnotecard_1_1notecard_1_1_notecard) command and exit with no response.
@@ -649,8 +661,8 @@ Initialize the [Notecard](#classnotecard_1_1notecard_1_1_notecard) before a rese
 
 ## Summary
 
- Members                        | Descriptions                                
---------------------------------|---------------------------------------------
+Members | Descriptions
+--------|-------------
 `public def `[`validate_card_object`](#namespacenotecard_1_1validators_1a67c61d583c23a6be17354d84575bdc93)`(func)`            | Ensure that the passed-in card is a Notecard.
 
 ## Members
