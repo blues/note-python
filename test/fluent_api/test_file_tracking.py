@@ -20,24 +20,12 @@ def test_file_monitor_with_files(run_fluent_api_notecard_api_mapping_test):
     )
 
 
-def test_file_monitor_with_usage(run_fluent_api_notecard_api_mapping_test):
-    """Test monitoring with resource usage enabled."""
+def test_file_monitor_with_files_list(run_fluent_api_notecard_api_mapping_test):
+    """Test monitoring with multiple files."""
     run_fluent_api_notecard_api_mapping_test(
         file.monitor,
         'file.monitor',
-        {'usage': 'true'}
-    )
-
-
-def test_file_monitor_with_files_and_usage(run_fluent_api_notecard_api_mapping_test):
-    """Test monitoring with both files and resource usage."""
-    run_fluent_api_notecard_api_mapping_test(
-        file.monitor,
-        'file.monitor',
-        {
-            'files': ['data.qo', 'settings.db'],
-            'usage': 'true'
-        }
+        {'files': ['data.qo', 'settings.db']}
     )
 
 
@@ -76,8 +64,7 @@ def test_file_monitor_with_all_params(run_fluent_api_notecard_api_mapping_test):
         file.monitor,
         'file.monitor',
         {
-            'files': ['data.qo', 'settings.db'],
-            'usage': 'true'
+            'files': ['data.qo', 'settings.db']
         }
     )
 
@@ -176,10 +163,10 @@ def test_file_stats_basic(run_fluent_api_notecard_api_mapping_test):
     )
 
 
-def test_file_stats_extended(run_fluent_api_notecard_api_mapping_test):
-    """Test file stats with extended resource usage info."""
+def test_file_stats_with_file(run_fluent_api_notecard_api_mapping_test):
+    """Test file stats with specific file parameter."""
     run_fluent_api_notecard_api_mapping_test(
         file.stats,
         'file.stats',
-        {'usage': 'true'}
+        {'file': 'data.qo'}
     )

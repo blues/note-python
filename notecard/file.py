@@ -50,20 +50,22 @@ def delete(card, files=None):
 
 
 @validate_card_object
-def stats(card, usage=None):
+def stats(card, file=None):
     """Obtain statistics about local notefiles.
 
     Args:
         card (Notecard): The current Notecard object.
-        usage (str, optional): When 'true', include detailed resource usage
-            stats.
+        file (str, optional): Returns stats for the specified Notefile only.
 
     Returns:
-        dict: The result of the Notecard request.
+        dict: The result of the Notecard request containing:
+            - total (int): Total number of Notes across all Notefiles
+            - changes (int): Number of Notes pending sync
+            - sync (bool): True if sync is recommended based on pending notes
     """
     req = {"req": "file.stats"}
-    if usage:
-        req["usage"] = usage
+    if file:
+        req["file"] = file
     return card.Transaction(req)
 
 
@@ -82,23 +84,19 @@ def pendingChanges(card):
 
 
 @validate_card_object
-def monitor(card, files=None, usage=None):
-    """Monitor one or more files in detail, including resource usage stats.
+def monitor(card, files=None):
+    """Monitor one or more files in detail.
 
     Args:
         card (Notecard): The current Notecard object.
         files (list, optional): List of Notefiles to monitor. Defaults to None.
-        usage (str, optional): When 'true', include detailed resource usage
-            stats.
 
     Returns:
-        dict: Detailed information about each file, including usage metrics.
+        dict: Detailed information about each file.
     """
     req = {"req": "file.monitor"}
     if files is not None:
         req["files"] = files
-    if usage:
-        req["usage"] = usage
     return card.Transaction(req)
 
 
