@@ -46,7 +46,6 @@ def add(card, file=None, body=None, payload=None, binary=None, sync=None, port=N
     if binary:
         if not isinstance(binary, bytearray):
             return {"err": "Binary data must be a bytearray"}
-        
         try:
             binary_helpers.binary_store_reset(card)
             binary_helpers.binary_store_transmit(card, binary, 0)
