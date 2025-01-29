@@ -9,7 +9,6 @@
 # This module contains helper methods for calling note.* Notecard API commands.
 # This module is optional and not required for use with the Notecard.
 
-import notecard
 from notecard.validators import validate_card_object
 
 
@@ -154,7 +153,8 @@ def update(card, file=None, note_id=None, body=None, payload=None):
 
 
 @validate_card_object
-def template(card, file=None, body=None, length=None, port=None, compact=False, format=None):
+def template(card, file=None, body=None, length=None, port=None,
+             format=None, compact=None):
     """Create a template for new Notes in a Notefile.
 
     Args:
@@ -167,10 +167,10 @@ def template(card, file=None, body=None, length=None, port=None, compact=False, 
             can be sent in Notes for the template Notefile.
         port (int): If provided, a unique number to represent a notefile.
             Required for Notecard LoRa.
-        compact (boolean): If true, sets the format to compact. Deprecated,
-            use format="compact" instead.
         format (string): If set to "compact", tells the Notecard to omit
             additional metadata to save on storage and bandwidth.
+        compact (bool): Legacy parameter. If True, equivalent to setting
+            format="compact". Retained for backward compatibility.
 
     Returns:
         dict: The result of the Notecard request. Returns error object if
@@ -184,7 +184,9 @@ def template(card, file=None, body=None, length=None, port=None, compact=False, 
         for key, value in body.items():
             if not isinstance(value, (bool, int, float, str)):
                 return {
-                    "err": f"Field '{key}' has unsupported type. Must be boolean, integer, float, or string."
+                    "err": (
+                        f"Field '{key}' has unsupported type. "
+                        "Must be boolean, integer, float, or string.")
                 }
             if isinstance(value, float) and value.is_integer():
                 body[key] = int(value)
@@ -200,12 +202,19 @@ def template(card, file=None, body=None, length=None, port=None, compact=False, 
             return {"err": "Port must be an integer between 1 and 100"}
         req["port"] = port
 
-    if format == "compact" or compact:
+    if compact is True:
+        format = "compact"
+
+    if format == "compact":
         req["format"] = "compact"
         if body:
             allowed_metadata = {"_time", "_lat", "_lon", "_loc"}
             for key in body.keys():
                 if key.startswith("_") and key not in allowed_metadata:
-                    return {"err": f"Field '{key}' is not allowed in compact mode. Only {allowed_metadata} are allowed."}
+                    return {
+                        "err": (
+                            f"Field '{key}' is not allowed in compact mode. "
+                            f"Only {allowed_metadata} are allowed.")
+                    }
 
     return card.Transaction(req)

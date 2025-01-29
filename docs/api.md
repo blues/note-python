@@ -485,7 +485,7 @@ Update a note in a DB Notefile by ID.
 #### Returns
 string The result of the Notecard request.
 
-#### `public def `[`template`](#namespacenotecard_1_1note_1a1e625660366b3766ec9efa8270a7f5bb)`(card,file,body,length,port,compact)` 
+#### `public def `[`template`](#namespacenotecard_1_1note_1a1e625660366b3766ec9efa8270a7f5bb)`(card,file,body,length,port,format)` 
 
 Create a template for new Notes in a Notefile.
 
@@ -500,7 +500,9 @@ Create a template for new Notes in a Notefile.
 
 * `port` If provided, a unique number between 1 and 100 to represent a notefile. Required for Notecard LoRa.
 
-* `compact` If true, sets the format to compact mode, which omits additional metadata to save storage and bandwidth. In compact mode, only standard metadata fields (_time, _lat, _lon, _loc) are allowed.
+* `format` If set to "compact", tells the Notecard to omit additional metadata to save storage and bandwidth. In compact mode, only standard metadata fields (_time, _lat, _lon, _loc) are allowed.
+
+* `compact` Legacy parameter. If True, equivalent to setting format="compact". Retained for backward compatibility. New code should use format="compact" instead.
 
 #### Returns
 

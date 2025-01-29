@@ -71,7 +71,19 @@ def test_template_invalid_port(mock_card):
 
 
 def test_template_compact_format(mock_card):
+    note.template(mock_card, format="compact")
+    assert mock_card.Transaction.called
+    assert mock_card.Transaction.call_args[0][0]["format"] == "compact"
+
+
+def test_template_with_compact_true(mock_card):
     note.template(mock_card, compact=True)
+    assert mock_card.Transaction.called
+    assert mock_card.Transaction.call_args[0][0]["format"] == "compact"
+
+
+def test_template_with_both_compact_params(mock_card):
+    note.template(mock_card, format="compact", compact=True)
     assert mock_card.Transaction.called
     assert mock_card.Transaction.call_args[0][0]["format"] == "compact"
 
@@ -84,7 +96,7 @@ def test_template_compact_with_allowed_metadata(mock_card):
         "_lon": 56.78,
         "_loc": "NYC"
     }
-    note.template(mock_card, body=body, compact=True)
+    note.template(mock_card, body=body, format="compact")
     assert mock_card.Transaction.called
     assert mock_card.Transaction.call_args[0][0]["body"] == body
 
@@ -94,7 +106,7 @@ def test_template_compact_with_invalid_metadata(mock_card):
         "field": "value",
         "_invalid": "not allowed"
     }
-    result = note.template(mock_card, body=body, compact=True)
+    result = note.template(mock_card, body=body, format="compact")
     assert "err" in result
     assert "_invalid" in result["err"]
     assert not mock_card.Transaction.called
@@ -114,7 +126,7 @@ def test_template_full_configuration(mock_card):
         body=body,
         length=32,
         port=1,
-        compact=True
+        format="compact"
     )
     assert mock_card.Transaction.called
     req = mock_card.Transaction.call_args[0][0]
