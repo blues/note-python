@@ -13,7 +13,7 @@ from notecard.validators import validate_card_object
 
 
 @validate_card_object
-def add(card, file=None, body=None, payload=None, sync=None, port=None):
+def add(card, file=None, body=None, payload=None, binary=None, sync=None, port=None):
     """Add a Note to a Notefile.
 
     Args:
@@ -21,6 +21,7 @@ def add(card, file=None, body=None, payload=None, sync=None, port=None):
         file (string): The name of the file.
         body (JSON object): A developer-defined tracker ID.
         payload (string): An optional base64-encoded string.
+        binary (bytearray): Binary data to be stored in the note.
         sync (bool): Perform an immediate sync after adding.
         port (int): If provided, a unique number to represent a notefile.
             Required for Notecard LoRa.
@@ -28,6 +29,8 @@ def add(card, file=None, body=None, payload=None, sync=None, port=None):
     Returns:
         string: The result of the Notecard request.
     """
+    from notecard import binary_helpers
+
     req = {"req": "note.add"}
     if file:
         req["file"] = file
@@ -39,6 +42,18 @@ def add(card, file=None, body=None, payload=None, sync=None, port=None):
         req["port"] = port
     if sync is not None:
         req["sync"] = sync
+
+    if binary:
+        if not isinstance(binary, bytearray):
+            return {"err": "Binary data must be a bytearray"}
+        
+        try:
+            binary_helpers.binary_store_reset(card)
+            binary_helpers.binary_store_transmit(card, binary, 0)
+            req["binary"] = "true"
+        except Exception as e:
+            return {"err": f"Failed to store binary data: {str(e)}"}
+
     return card.Transaction(req)
 
 
@@ -92,8 +107,11 @@ def get(card, file="data.qi", note_id=None, delete=None, deleted=None):
         deleted (bool): Whether to allow retrieval of a deleted note.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request. If the note contains binary data,
+        the 'binary' field in the response will contain the binary data as a bytearray.
     """
+    from notecard import binary_helpers
+
     req = {"req": "note.get"}
     req["file"] = file
     if note_id:
@@ -102,6 +120,7 @@ def get(card, file="data.qi", note_id=None, delete=None, deleted=None):
         req["delete"] = delete
     if deleted is not None:
         req["deleted"] = deleted
+
     return card.Transaction(req)
 
 
