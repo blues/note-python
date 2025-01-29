@@ -61,8 +61,16 @@ from notecard import note
             'note.template',
             {
                 'file': 'my-settings.db',
-                'body': {'key_a:', 'val_a', 'key_b', 42},
-                'length': 42
+                'body': {
+                    'temperature': 21.5,
+                    'humidity': 45,
+                    'active': True,
+                    'location': 'warehouse',
+                    '_time': '2023-01-01'
+                },
+                'length': 32,
+                'port': 1,
+                'compact': True
             },
             None
         ),

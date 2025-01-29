@@ -485,7 +485,7 @@ Update a note in a DB Notefile by ID.
 #### Returns
 string The result of the Notecard request.
 
-#### `public def `[`template`](#namespacenotecard_1_1note_1a1e625660366b3766ec9efa8270a7f5bb)`(card,file,body,length)` 
+#### `public def `[`template`](#namespacenotecard_1_1note_1a1e625660366b3766ec9efa8270a7f5bb)`(card,file,body,length,port,compact)` 
 
 Create a template for new Notes in a Notefile.
 
@@ -494,14 +494,18 @@ Create a template for new Notes in a Notefile.
 
 * `file` The file name of the notefile. 
 
-* `body` A sample JSON body that specifies field names and values as "hints" for the data type. 
+* `body` A sample JSON body that specifies field names and values as "hints" for the data type. Supported types are boolean, integer, float, and string. Float values that represent whole numbers are automatically converted to integers.
 
-* `length` If provided, the maximum length of a payload that can be sent in Notes for the template Notefile.
+* `length` If provided, the maximum length of a payload (in bytes) that can be sent in Notes for the template Notefile. When specified, enables binary record mode for optimized storage.
+
+* `port` If provided, a unique number between 1 and 100 to represent a notefile. Required for Notecard LoRa.
+
+* `compact` If true, sets the format to compact mode, which omits additional metadata to save storage and bandwidth. In compact mode, only standard metadata fields (_time, _lat, _lon, _loc) are allowed.
 
 #### Returns
 
 #### Returns
-string The result of the Notecard request.
+dict The result of the Notecard request. Returns error object with an "err" field containing a descriptive message on validation failure.
 
 # namespace `notecard::notecard` 
 

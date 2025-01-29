@@ -161,7 +161,8 @@ def template(card, file=None, body=None, length=None, port=None, compact=False):
         card (Notecard): The current Notecard object.
         file (string): The file name of the notefile.
         body (JSON): A sample JSON body that specifies field names and
-            values as "hints" for the data type.
+            values as "hints" for the data type. Supported types are:
+            boolean, integer, float, and string.
         length (int): If provided, the maximum length of a payload that
             can be sent in Notes for the template Notefile.
         port (int): If provided, a unique number to represent a notefile.
@@ -171,17 +172,43 @@ def template(card, file=None, body=None, length=None, port=None, compact=False):
             and bandwidth. Required for Notecard LoRa.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request. Returns error object if
+        validation fails.
     """
     req = {"req": "note.template"}
     if file:
         req["file"] = file
+    
     if body:
+        for key, value in body.items():
+            if not isinstance(value, (bool, int, float, str)):
+                return {
+                    "err": (f"Field '{key}' has unsupported type. "
+                           "Must be boolean, integer, float, or string.")
+                }
+            if isinstance(value, float) and value.is_integer():
+                body[key] = int(value)
         req["body"] = body
-    if length:
+
+    if length is not None:
+        if not isinstance(length, int) or length < 0:
+            return {"err": "Length must be a non-negative integer"}
         req["length"] = length
-    if port:
+        # Enable binary record support when length is specified
+        req["binary"] = True
+
+    if port is not None:
+        if not isinstance(port, int) or not (1 <= port <= 100):
+            return {"err": "Port must be an integer between 1 and 100"}
         req["port"] = port
+
     if compact:
         req["format"] = "compact"
+        # Allow specific metadata fields in compact mode
+        if body:
+            allowed_metadata = {"_time", "_lat", "_lon", "_loc"}
+            for key in body.keys():
+                if key.startswith("_") and key not in allowed_metadata:
+                    return {"err": f"Field '{key}' is not allowed in compact mode. Only {allowed_metadata} are allowed."}
+
     return card.Transaction(req)
