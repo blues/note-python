@@ -3,12 +3,13 @@
 
 import pytest
 from unittest.mock import MagicMock
-from notecard import note, notecard
+from notecard import note
+from notecard.notecard import Notecard
 
 
 @pytest.fixture
 def mock_card(run_fluent_api_notecard_api_mapping_test):
-    card = notecard.Notecard()
+    card = Notecard()
     card.Transaction = MagicMock(return_value={"success": True})
     return card
 
