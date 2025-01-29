@@ -20,15 +20,6 @@ def test_file_monitor_with_files(run_fluent_api_notecard_api_mapping_test):
     )
 
 
-def test_file_monitor_with_files_list(run_fluent_api_notecard_api_mapping_test):
-    """Test monitoring with multiple files."""
-    run_fluent_api_notecard_api_mapping_test(
-        file.monitor,
-        'file.monitor',
-        {'files': ['data.qo', 'settings.db']}
-    )
-
-
 def test_file_track_with_invalid_interval(run_fluent_api_notecard_api_mapping_test):
     """Test tracking with invalid interval value."""
     run_fluent_api_notecard_api_mapping_test(
@@ -44,17 +35,6 @@ def test_file_track_with_invalid_duration(run_fluent_api_notecard_api_mapping_te
         file.track,
         'file.track',
         {'duration': -1}
-    )
-
-
-def test_file_monitor_with_files_and_detail_level(run_fluent_api_notecard_api_mapping_test):
-    """Test monitoring with files list."""
-    run_fluent_api_notecard_api_mapping_test(
-        file.monitor,
-        'file.monitor',
-        {
-            'files': ['data.qo', 'settings.db']
-        }
     )
 
 
@@ -170,3 +150,20 @@ def test_file_stats_with_file(run_fluent_api_notecard_api_mapping_test):
         'file.stats',
         {'file': 'data.qo'}
     )
+
+
+def test_file_stats_response_structure(card):
+    """Test file.stats response contains required fields with correct types."""
+    card.Transaction.return_value = {
+        'total': 83,
+        'changes': 78,
+        'sync': True
+    }
+    
+    response = file.stats(card)
+    assert 'total' in response
+    assert isinstance(response['total'], int)
+    assert 'changes' in response
+    assert isinstance(response['changes'], int)
+    assert 'sync' in response
+    assert isinstance(response['sync'], bool)
