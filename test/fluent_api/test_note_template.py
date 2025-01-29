@@ -8,8 +8,8 @@ from notecard import note
 
 @pytest.fixture
 def mock_card():
-    card = MagicMock()
-    card.Transaction.return_value = {"success": True}
+    card = notecard.Notecard()
+    card.Transaction = MagicMock(return_value={"success": True})
     return card
 
 
