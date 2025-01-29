@@ -53,6 +53,38 @@ from notecard import card
                 'mode': 'auto',
                 'apn': 'myapn.nb'
             }
+        ),
+        (
+            card.wireless,
+            'card.wireless',
+            {
+                'method': 'ntn',
+                'allow': True
+            }
+        ),
+        (
+            card.wireless,
+            'card.wireless',
+            {
+                'method': 'wifi-ntn'
+            }
+        ),
+        (
+            card.wireless,
+            'card.wireless',
+            {
+                'method': 'cell-ntn'
+            }
+        ),
+        (
+            card.wireless,
+            'card.wireless',
+            {
+                'method': 'wifi-cell-ntn',
+                'mode': 'auto',
+                'apn': 'custom.apn',
+                'allow': True
+            }
         )
     ]
 )
