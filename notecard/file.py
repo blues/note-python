@@ -9,7 +9,6 @@
 # This module contains helper methods for calling file.* Notecard API commands.
 # This module is optional and not required for use with the Notecard.
 
-import notecard
 from notecard.validators import validate_card_object
 
 
@@ -51,17 +50,20 @@ def delete(card, files=None):
 
 
 @validate_card_object
-def stats(card):
+def stats(card, usage=None):
     """Obtain statistics about local notefiles.
 
     Args:
         card (Notecard): The current Notecard object.
+        usage (str, optional): When 'true', include detailed resource usage
+            stats.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request.
     """
     req = {"req": "file.stats"}
-
+    if usage:
+        req["usage"] = usage
     return card.Transaction(req)
 
 
@@ -73,8 +75,53 @@ def pendingChanges(card):
         card (Notecard): The current Notecard object.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request.
     """
     req = {"req": "file.changes.pending"}
+    return card.Transaction(req)
 
+
+@validate_card_object
+def monitor(card, files=None, usage=None):
+    """Monitor one or more files in detail, including resource usage stats.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        files (list, optional): List of Notefiles to monitor. Defaults to None.
+        usage (str, optional): When 'true', include detailed resource usage
+            stats.
+
+    Returns:
+        dict: Detailed information about each file, including usage metrics.
+    """
+    req = {"req": "file.monitor"}
+    if files is not None:
+        req["files"] = files
+    if usage:
+        req["usage"] = usage
+    return card.Transaction(req)
+
+
+@validate_card_object
+def track(card, files=None, interval=None, duration=None):
+    """Enable continuous tracking of file changes.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        files (list, optional): List of Notefiles to track. Defaults to None.
+        interval (int, optional): Polling interval in seconds. Defaults to
+            None.
+        duration (int, optional): Total tracking duration in seconds. Defaults
+            to None.
+
+    Returns:
+        dict: The result of the Notecard request with tracking configuration.
+    """
+    req = {"req": "file.track"}
+    if files:
+        req["files"] = files
+    if interval is not None:
+        req["interval"] = interval
+    if duration is not None:
+        req["duration"] = duration
     return card.Transaction(req)
