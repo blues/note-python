@@ -201,7 +201,6 @@ def template(card, file=None, body=None, length=None, port=None, compact=False):
 
     if compact:
         req["compact"] = True
-        # Allow specific metadata fields in compact mode
         if body:
             allowed_metadata = {"_time", "_lat", "_lon", "_loc"}
             for key in body.keys():
