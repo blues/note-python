@@ -210,19 +210,94 @@ Perform an [env.default](#namespacenotecard_1_1env_1a6ff91175ae591e8a3a87c2a4ef9
 #### Returns
 string The result of the Notecard request.
 
-#### `public def `[`get`](#namespacenotecard_1_1env_1a28ed0423d0aff1d109371427139e0a73)`(card,name)` 
+#### `public def `[`get`](#namespacenotecard_1_1env_1a28ed0423d0aff1d109371427139e0a73)`(card,name,names,time)` 
 
 Perform an [env.get](#namespacenotecard_1_1env_1a28ed0423d0aff1d109371427139e0a73) request against a Notecard.
 
 #### Parameters
-* `card` The current Notecard object. 
+* `card` The current Notecard object.
 
-* `name` The name of an environment variable to get.
+* `name` (optional) The name of an environment variable to get.
+
+* `names` (optional) List of environment variable names to retrieve.
+
+* `time` (optional) UNIX epoch time to get variables modified after.
 
 #### Returns
+dict The result of the Notecard request containing either:
+* `text` Value of the requested variable if name was specified
+* `body` Object with name/value pairs if names was specified or if neither name nor names was specified
+* `time` UNIX epoch time of the last variable change
+
+Example request with single variable:
+```json
+{
+    "req": "env.get",
+    "name": "my_var"
+}
+```
+
+Example request with multiple variables:
+```json
+{
+    "req": "env.get",
+    "names": ["var1", "var2"]
+}
+```
+
+Example response for single variable:
+```json
+{
+    "text": "value1"
+}
+```
+
+Example response for multiple variables:
+```json
+{
+    "body": {
+        "var1": "value1",
+        "var2": "value2"
+    },
+    "time": 1609459200
+}
+```
+
+#### `public def `[`template`](#namespacenotecard_1_1env_1a10f5f4667d80f47674d1876df69b8e22)`(card,body)` 
+
+Perform an env.template request against a Notecard.
+
+#### Parameters
+* `card` The current Notecard object.
+
+* `body` (optional) Schema with variable names and type hints.
+  * Boolean: must be specified as true
+  * String: numeric string for max length (pre v3.2.1) or variable-length (v3.2.1+)
+  * Integer: 11-14, 18 for signed, 21-24 for unsigned
+  * Float: 12.1 (2-byte), 14.1 (4-byte), 18.1 (8-byte)
 
 #### Returns
-string The result of the Notecard request.
+dict The result of the Notecard request, including 'bytes' field indicating storage size.
+
+Example request:
+```json
+{
+    "req": "env.template",
+    "body": {
+        "active": true,
+        "name": "32",
+        "temperature": 14.1,
+        "counter": 12
+    }
+}
+```
+
+Example response:
+```json
+{
+    "bytes": 42
+}
+```
 
 #### `public def `[`modified`](#namespacenotecard_1_1env_1aa672554b72786c9ec1e5f76b3e11eb34)`(card)` 
 
