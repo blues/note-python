@@ -9,7 +9,6 @@
 # This module contains helper methods for calling hub.* Notecard API commands.
 # This module is optional and not required for use with the Notecard.
 
-import notecard
 from notecard.validators import validate_card_object
 
 
@@ -67,16 +66,32 @@ def set(card, product=None, sn=None, mode=None, outbound=None,
 
 
 @validate_card_object
-def sync(card):
+def sync(card, allow=None, out=None, in_=None):
     """Initiate a sync of the Notecard to Notehub.
 
     Args:
         card (Notecard): The current Notecard object.
+        allow (bool): Set to true to remove the Notecard from certain
+            types of penalty boxes (default is false). Serialized as a JSON
+            boolean in the request.
+        out (bool): Set to true to only sync pending outbound Notefiles.
+            Serialized as a JSON boolean in the request.
+        in_ (bool): Set to true to only sync pending inbound Notefiles.
+            Required when using NTN mode with Starnote. Note: This parameter
+            is named 'in_' in Python code but appears as 'in' in the JSON
+            request to the Notecard. Serialized as a JSON boolean.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request containing sync status.
+            Example request: {"req": "hub.sync", "in": true, "out": false}
     """
     req = {"req": "hub.sync"}
+    if allow is not None:
+        req["allow"] = allow
+    if out is not None:
+        req["out"] = out
+    if in_ is not None:
+        req["in"] = in_
     return card.Transaction(req)
 
 
@@ -90,12 +105,11 @@ def syncStatus(card, sync=None):
             outbound data.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request containing sync status.
     """
     req = {"req": "hub.sync.status"}
     if sync is not None:
         req["sync"] = sync
-
     return card.Transaction(req)
 
 
@@ -107,7 +121,7 @@ def status(card):
         card (Notecard): The current Notecard object.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request containing connection status.
     """
     req = {"req": "hub.status"}
     return card.Transaction(req)
