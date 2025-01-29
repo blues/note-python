@@ -192,14 +192,14 @@ def template(card, file=None, body=None, length=None, port=None, compact=False):
     if length is not None:
         if not isinstance(length, int) or length < 0:
             return {"err": "Length must be a non-negative integer"}
-        req["length"] = str(length)
+        req["length"] = length
         # Enable binary record support when length is specified
-        req["binary"] = "true"
+        req["binary"] = True
 
     if port is not None:
         if not isinstance(port, int) or not (1 <= port <= 100):
             return {"err": "Port must be an integer between 1 and 100"}
-        req["port"] = str(port)
+        req["port"] = port
 
     if compact:
         req["format"] = "compact"
