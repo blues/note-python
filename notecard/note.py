@@ -183,8 +183,7 @@ def template(card, file=None, body=None, length=None, port=None, compact=False):
         for key, value in body.items():
             if not isinstance(value, (bool, int, float, str)):
                 return {
-                    "err": (f"Field '{key}' has unsupported type. "
-                           "Must be boolean, integer, float, or string.")
+                    "err": f"Field '{key}' has unsupported type. Must be boolean, integer, float, or string."
                 }
             if isinstance(value, float) and value.is_integer():
                 body[key] = int(value)
