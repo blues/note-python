@@ -19,6 +19,26 @@ def test_sync_with_ntn(run_fluent_api_notecard_api_mapping_test):
     run_fluent_api_notecard_api_mapping_test(
         hub.sync,
         "hub.sync",
+        {"out": True}
+    )
+
+    run_fluent_api_notecard_api_mapping_test(
+        hub.sync,
+        "hub.sync",
+        {"in_": True},
+        {"in_": "in"}
+    )
+
+    run_fluent_api_notecard_api_mapping_test(
+        hub.sync,
+        "hub.sync",
+        {"out": True, "in_": True},
+        {"in_": "in"}
+    )
+
+    run_fluent_api_notecard_api_mapping_test(
+        hub.sync,
+        "hub.sync",
         {}
     )
 
