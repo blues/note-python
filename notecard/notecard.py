@@ -574,8 +574,15 @@ class OpenSerial(Notecard):
         """Unlock access to the serial bus."""
         self.lock_handle.release()
 
-    def __init__(self, uart_id, debug=False):
-        """Initialize the Notecard before a reset."""
+    def __init__(self, uart_id, debug=False, lock_path=None):
+        """Initialize the Notecard before a reset.
+
+        Args:
+            uart_id: The serial port identifier.
+            debug: Enable debug output if True.
+            lock_path: Optional path for the serial lock file. Defaults to /tmp/serial.lock
+                or the value of NOTECARD_SERIAL_LOCK_PATH environment variable.
+        """
         super().__init__(debug)
         self._user_agent['req_interface'] = 'serial'
         self._user_agent['req_port'] = str(uart_id)
@@ -583,7 +590,9 @@ class OpenSerial(Notecard):
         self.uart = uart_id
 
         if use_serial_lock:
-            self.lock_handle = FileLock('serial.lock')
+            if lock_path is None:
+                lock_path = os.environ.get('NOTECARD_SERIAL_LOCK_PATH', '/tmp/serial.lock')
+            self.lock_handle = FileLock(lock_path)
         else:
             self.lock_handle = NoOpSerialLock()
 
