@@ -172,7 +172,7 @@ def update(card, file=None, note_id=None, body=None, payload=None):
 
 @validate_card_object
 def template(card, file=None, body=None, length=None, port=None,
-             format=None, compact=None):
+             format=None, compact=None, verify=None, delete=None):
     """Create a template for new Notes in a Notefile.
 
     Args:
@@ -189,6 +189,9 @@ def template(card, file=None, body=None, length=None, port=None,
             additional metadata to save on storage and bandwidth.
         compact (bool): Legacy parameter. If True, equivalent to setting
             format="compact". Retained for backward compatibility.
+        verify (bool): When True, verifies the template against existing
+            notes in the Notefile.
+        delete (bool): When True, deletes the template from the Notefile.
 
     Returns:
         dict: The result of the Notecard request. Returns error object if
@@ -209,6 +212,10 @@ def template(card, file=None, body=None, length=None, port=None,
             if isinstance(value, float) and value.is_integer():
                 body[key] = int(value)
         req["body"] = body
+
+    if verify is not None:
+        if not isinstance(verify, bool):
+            return {"err": "verify parameter must be a boolean"}
 
     if length is not None:
         if not isinstance(length, int) or length < 0:
@@ -234,5 +241,10 @@ def template(card, file=None, body=None, length=None, port=None,
                             f"Field '{key}' is not allowed in compact mode. "
                             f"Only {allowed_metadata} are allowed.")
                     }
+
+    if verify is not None:
+        req["verify"] = verify
+    if delete is not None:
+        req["delete"] = delete
 
     return card.Transaction(req)

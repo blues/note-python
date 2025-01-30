@@ -112,6 +112,25 @@ def test_template_compact_with_invalid_metadata(mock_card):
     assert not mock_card.Transaction.called
 
 
+def test_template_verify_parameter(mock_card):
+    note.template(mock_card, verify=True)
+    assert mock_card.Transaction.called
+    assert mock_card.Transaction.call_args[0][0]["verify"] is True
+
+
+def test_template_verify_invalid_type(mock_card):
+    result = note.template(mock_card, verify="yes")
+    assert "err" in result
+    assert "verify parameter must be a boolean" in result["err"]
+    assert not mock_card.Transaction.called
+
+
+def test_template_delete_parameter(mock_card):
+    note.template(mock_card, delete=True)
+    assert mock_card.Transaction.called
+    assert mock_card.Transaction.call_args[0][0]["delete"] is True
+
+
 def test_template_full_configuration(mock_card):
     body = {
         "temperature": 21.5,
@@ -126,7 +145,9 @@ def test_template_full_configuration(mock_card):
         body=body,
         length=32,
         port=1,
-        format="compact"
+        format="compact",
+        verify=True,
+        delete=False
     )
     assert mock_card.Transaction.called
     req = mock_card.Transaction.call_args[0][0]
@@ -135,3 +156,5 @@ def test_template_full_configuration(mock_card):
     assert req["length"] == 32
     assert req["port"] == 1
     assert req["format"] == "compact"
+    assert req["verify"] is True
+    assert req["delete"] is False
