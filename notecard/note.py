@@ -49,7 +49,7 @@ def add(card, file=None, body=None, payload=None, binary=None, sync=None, port=N
         try:
             binary_helpers.binary_store_reset(card)
             binary_helpers.binary_store_transmit(card, binary, 0)
-            req["binary"] = "true"
+            req["binary"] = True
         except Exception as e:
             return {"err": f"Failed to store binary data: {str(e)}"}
 
