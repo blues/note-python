@@ -23,3 +23,27 @@ def test_file_delete_response(card):
         'req': 'file.delete',
         'files': ['file1.qo']
     }
+
+
+def test_file_delete_nonexistent_files(card):
+    """Test file.delete with non-existent files."""
+    card.Transaction.return_value = {"err": "File not found"}
+    response = file.delete(card, files=["nonexistent.qo"])
+    assert "err" in response
+    assert "File not found" in response["err"]
+
+
+def test_file_delete_mixed_existence(card):
+    """Test file.delete with mix of existing and non-existent files."""
+    card.Transaction.return_value = {"err": "Some files not found"}
+    response = file.delete(card, files=["existing.qo", "nonexistent.qo"])
+    assert "err" in response
+    assert "not found" in response["err"].lower()
+
+
+def test_file_delete_invalid_filename(card):
+    """Test file.delete with invalid filename format."""
+    card.Transaction.return_value = {"err": "Invalid filename format"}
+    response = file.delete(card, files=["invalid/path.qo"])
+    assert "err" in response
+    assert "Invalid filename" in response["err"]

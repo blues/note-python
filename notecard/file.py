@@ -30,9 +30,23 @@ def changes(card, tracker=None, files=None):
     req = {"req": "file.changes"}
     if tracker:
         req["tracker"] = tracker
-    if files:
+    if files is not None:  # Allow empty list
         req["files"] = files
-    return card.Transaction(req)
+
+    response = card.Transaction(req)
+    if "err" in response:
+        return response
+    # Check for required fields first
+    if not all(key in response for key in ['total', 'changes', 'info']):
+        return {"err": "Missing required fields in response"}
+    # Then validate field types
+    if not isinstance(response['total'], int):
+        return {"err": "Malformed response: total must be an integer"}
+    if not isinstance(response['changes'], int):
+        return {"err": "Malformed response: changes must be an integer"}
+    if not isinstance(response['info'], dict):
+        return {"err": "Malformed response: info must be a dictionary"}
+    return response
 
 
 @validate_card_object
@@ -50,7 +64,8 @@ def delete(card, files=None):
     req = {"req": "file.delete"}
     if files:
         req["files"] = files
-    return card.Transaction(req)
+    response = card.Transaction(req)
+    return response
 
 
 @validate_card_object
@@ -70,7 +85,20 @@ def stats(card, file=None):
     req = {"req": "file.stats"}
     if file:
         req["file"] = file
-    return card.Transaction(req)
+    response = card.Transaction(req)
+    if "err" in response:
+        return response
+    # Check for required fields
+    if not all(key in response for key in ['total', 'changes', 'sync']):
+        return {"err": "Missing required fields in response"}
+    # Validate field types
+    if not isinstance(response['total'], int):
+        return {"err": "Malformed response: total must be an integer"}
+    if not isinstance(response['changes'], int):
+        return {"err": "Malformed response: changes must be an integer"}
+    if not isinstance(response['sync'], bool):
+        return {"err": "Malformed response: sync must be a boolean"}
+    return response
 
 
 @validate_card_object
@@ -85,5 +113,15 @@ def pendingChanges(card):
             information.
     """
     req = {"req": "file.changes.pending"}
-
-    return card.Transaction(req)
+    response = card.Transaction(req)
+    if "err" in response:
+        return response
+    # Validate response format - should contain total and changes
+    if not all(key in response for key in ['total', 'changes']):
+        return {"err": "Missing required fields in response"}
+    # Validate field types
+    if not isinstance(response.get('total'), int):
+        return {"err": "Malformed response: total must be an integer"}
+    if not isinstance(response.get('changes'), int):
+        return {"err": "Malformed response: changes must be an integer"}
+    return response
