@@ -1,0 +1,26 @@
+"""Tests for file.delete functionality."""
+import pytest
+from notecard import file
+
+
+def test_file_delete_basic(run_fluent_api_notecard_api_mapping_test):
+    """Test file.delete with no parameters."""
+    run_fluent_api_notecard_api_mapping_test(
+        file.delete, 'file.delete', {})
+
+
+def test_file_delete_with_files(run_fluent_api_notecard_api_mapping_test):
+    """Test file.delete with files parameter."""
+    run_fluent_api_notecard_api_mapping_test(
+        file.delete, 'file.delete', {'files': ['file1.qo', 'file2.qo']})
+
+
+def test_file_delete_response(card):
+    """Test file.delete response structure."""
+    card.Transaction.return_value = {}
+    response = file.delete(card, files=['file1.qo'])
+    assert response == {}, "file.delete should return an empty object on success"
+    assert card.Transaction.call_args[0][0] == {
+        'req': 'file.delete',
+        'files': ['file1.qo']
+    }

@@ -23,7 +23,10 @@ def changes(card, tracker=None, files=None):
         files (array): A list of Notefiles to retrieve changes for.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request containing:
+            - changes (int): Number of Notes with pending changes
+            - total (int): Total number of Notes
+            - info (dict): Per-file details with changes and total counts
     """
     req = {"req": "file.changes"}
     if tracker:
@@ -42,7 +45,7 @@ def delete(card, files=None):
         files (array): A list of Notefiles to delete.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request. An empty object {} indicates success.
     """
     req = {"req": "file.delete"}
     if files:
@@ -51,17 +54,22 @@ def delete(card, files=None):
 
 
 @validate_card_object
-def stats(card):
-    """Obtain statistics about local notefiles.
+def stats(card, file=None):
+    """Get resource statistics about local Notefiles.
 
     Args:
         card (Notecard): The current Notecard object.
+        file (string, optional): Return stats for the specified Notefile only.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request containing:
+            - total (int): Total number of Notes across all Notefiles
+            - changes (int): Number of Notes pending sync
+            - sync (bool): True if sync is recommended based on pending notes
     """
     req = {"req": "file.stats"}
-
+    if file:
+        req["file"] = file
     return card.Transaction(req)
 
 
@@ -73,7 +81,7 @@ def pendingChanges(card):
         card (Notecard): The current Notecard object.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request containing pending changes information.
     """
     req = {"req": "file.changes.pending"}
 
