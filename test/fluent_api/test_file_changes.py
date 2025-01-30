@@ -1,5 +1,4 @@
 """Tests for file.changes functionality."""
-import pytest
 from notecard import file
 
 
@@ -21,13 +20,12 @@ def test_file_changes_with_files(run_fluent_api_notecard_api_mapping_test):
         file.changes, 'file.changes', {'files': ['file1.qo', 'file2.qo']})
 
 
-def test_file_changes_with_all_params(run_fluent_api_notecard_api_mapping_test):
+def test_file_changes_with_all_params(
+        run_fluent_api_notecard_api_mapping_test):
     """Test file.changes with all parameters."""
+    params = {'tracker': 'my_tracker', 'files': ['file1.qo', 'file2.qo']}
     run_fluent_api_notecard_api_mapping_test(
-        file.changes, 'file.changes', {
-            'tracker': 'my_tracker',
-            'files': ['file1.qo', 'file2.qo']
-        })
+        file.changes, 'file.changes', params)
 
 
 def test_file_changes_response(card):

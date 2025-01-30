@@ -1,5 +1,4 @@
 """Tests for file.delete functionality."""
-import pytest
 from notecard import file
 
 
@@ -19,7 +18,7 @@ def test_file_delete_response(card):
     """Test file.delete response structure."""
     card.Transaction.return_value = {}
     response = file.delete(card, files=['file1.qo'])
-    assert response == {}, "file.delete should return an empty object on success"
+    assert response == {}, "Expected empty object on success"
     assert card.Transaction.call_args[0][0] == {
         'req': 'file.delete',
         'files': ['file1.qo']

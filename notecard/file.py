@@ -9,7 +9,6 @@
 # This module contains helper methods for calling file.* Notecard API commands.
 # This module is optional and not required for use with the Notecard.
 
-import notecard
 from notecard.validators import validate_card_object
 
 
@@ -24,9 +23,9 @@ def changes(card, tracker=None, files=None):
 
     Returns:
         dict: The result of the Notecard request containing:
-            - changes (int): Number of Notes with pending changes
-            - total (int): Total number of Notes
-            - info (dict): Per-file details with changes and total counts
+            - changes (int): Notes with pending changes
+            - total (int): Total Notes
+            - info (dict): Per-file details
     """
     req = {"req": "file.changes"}
     if tracker:
@@ -45,7 +44,8 @@ def delete(card, files=None):
         files (array): A list of Notefiles to delete.
 
     Returns:
-        dict: The result of the Notecard request. An empty object {} indicates success.
+        dict: The result of the Notecard request. An empty object {} indicates
+            success.
     """
     req = {"req": "file.delete"}
     if files:
@@ -63,9 +63,9 @@ def stats(card, file=None):
 
     Returns:
         dict: The result of the Notecard request containing:
-            - total (int): Total number of Notes across all Notefiles
-            - changes (int): Number of Notes pending sync
-            - sync (bool): True if sync is recommended based on pending notes
+            - total (int): Total Notes across all Notefiles
+            - changes (int): Notes pending sync
+            - sync (bool): True if sync is recommended
     """
     req = {"req": "file.stats"}
     if file:
@@ -81,7 +81,8 @@ def pendingChanges(card):
         card (Notecard): The current Notecard object.
 
     Returns:
-        dict: The result of the Notecard request containing pending changes information.
+        dict: The result of the Notecard request containing pending changes
+            information.
     """
     req = {"req": "file.changes.pending"}
 

@@ -1,5 +1,4 @@
 """Tests for file.stats functionality."""
-import pytest
 from notecard import file
 
 
