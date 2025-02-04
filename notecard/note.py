@@ -221,20 +221,7 @@ def template(
 
     if body:
         # Validate that all values in body are of supported types
-        def validate_value(val):
-            if isinstance(val, (bool, int, float, str)):
-                return True
-            if isinstance(val, (list, tuple)):
-                return all(isinstance(x, (bool, int, float, str)) for x in val)
-            return False
-
-        for key, value in body.items():
-            if not validate_value(value):
-                return {
-                    "err": "Body values must be boolean, integer, float, "
-                           "or string"
-                }
-        req["body"] = body
+        req["body"] = body  # Must be boolean, integer, float, or string.
 
     if length is not None:
         if not isinstance(length, int):
