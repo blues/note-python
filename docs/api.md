@@ -98,9 +98,9 @@ Retrieve firmware version information from the Notecard.
 #### Returns
 string The result of the Notecard request.
 
-#### `public def `[`voltage`](#namespacenotecard_1_1card_1a1f9f65c34f1bd959d7902285a7537ce6)`(card,hours,offset,vmax,vmin,usb,alert)` 
+#### `public def `[`voltage`](#namespacenotecard_1_1card_1a1f9f65c34f1bd959d7902285a7537ce6)`(card,hours,offset,vmax,vmin)` 
 
-Retrieve current and historical voltage info from the Notecard, with optional USB power state monitoring.
+Retrieve current and historical voltage info from the Notecard.
 
 #### Parameters
 * `card` The current Notecard object. 
@@ -113,57 +113,10 @@ Retrieve current and historical voltage info from the Notecard, with optional US
 
 * `vmin` min voltage level to report.
 
-* `usb` Enable USB power state monitoring. When True, the Notecard will monitor USB power state changes.
-
-* `alert` Enable alerts for USB power state changes. Only works when usb=True. When enabled, power state changes are recorded in the health.qo Notefile.
-
 #### Returns
 
 #### Returns
-dict The result of the Notecard request containing voltage and power state information.
-
-Example request:
-```json
-{
-    "req": "card.voltage",
-    "usb": true,
-    "alert": true
-}
-```
-
-#### `public def `[`power`](#namespacenotecard_1_1card_1a10f5f4667d80f47674d1876df69b8e22)`(card,minutes,reset)` 
-
-Configure and query Mojo-based power consumption monitoring.
-
-#### Parameters
-* `card` The current Notecard object.
-
-* `minutes` (optional) How often to log power consumption in minutes. Default is 720 minutes (12 hours).
-
-* `reset` (optional) Reset consumption counters if True.
-
-#### Returns
-dict The result of the Notecard request containing power monitoring data.
-
-Example request:
-```json
-{
-    "req": "card.power",
-    "minutes": 120,
-    "reset": true
-}
-```
-
-Example response:
-```json
-{
-    "temperature": 26.0,
-    "voltage": 4.2,
-    "milliamp_hours": 2.45
-}
-```
-
-Note: Requires Notecard firmware v8.1.3 or later and a connected Mojo device.
+string The result of the Notecard request.
 
 #### `public def `[`wireless`](#namespacenotecard_1_1card_1a10f5f4667d80f47674d1876df69b8e22)`(card,mode,apn)` 
 
