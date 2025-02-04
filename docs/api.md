@@ -403,22 +403,6 @@ string The result of the Notecard request.
 
 ## Members
 
-#### `public def `[`add`](#namespacenotecard_1_1note_1a660dda3f8fa6f9afff52e0a3be6bef84)`(card,file,body,payload,binary,sync,port)` 
-
-Add a Note to a Notefile with optional binary data support.
-
-#### Parameters
-* `card` The current Notecard object.
-* `file` The name of the file.
-* `body` A JSON object to add to the note.
-* `payload` An optional base64-encoded string.
-* `binary` Binary data (bytearray) to be stored in the note.
-* `sync` Perform an immediate sync after adding.
-* `port` If provided, a unique number to represent a notefile. Required for Notecard LoRa.
-
-#### Returns
-dict The result of the Notecard request. If binary data is included, returns error object with 'err' field on validation failure.
-
 #### `public def `[`changes`](#namespacenotecard_1_1note_1a660dda3f8fa6f9afff52e0a3be6bef84)`(card,file,tracker,maximum,start,stop,deleted,`[`delete`](#namespacenotecard_1_1note_1a591ece0048b58f38acf22d97a533577f)`)` 
 
 Incrementally retrieve changes within a Notefile.
@@ -447,7 +431,7 @@ string The result of the Notecard request.
 
 #### `public def `[`get`](#namespacenotecard_1_1note_1ad7a4c296382c14a8efb54278c127d73b)`(card,file,note_id,`[`delete`](#namespacenotecard_1_1note_1a591ece0048b58f38acf22d97a533577f)`,deleted)` 
 
-Retrieve a note from an inbound or DB Notefile with binary data support.
+Retrieve a note from an inbound or DB Notefile.
 
 #### Parameters
 * `card` The current Notecard object. 
@@ -461,7 +445,9 @@ Retrieve a note from an inbound or DB Notefile with binary data support.
 * `deleted` Whether to allow retrieval of a deleted note.
 
 #### Returns
-dict The result of the Notecard request. If the note contains binary data, the 'binary' field in the response will contain the binary data as a bytearray. Returns error object with 'err' field on binary data retrieval failure.
+
+#### Returns
+string The result of the Notecard request.
 
 #### `public def `[`delete`](#namespacenotecard_1_1note_1a591ece0048b58f38acf22d97a533577f)`(card,file,note_id)` 
 
@@ -499,7 +485,7 @@ Update a note in a DB Notefile by ID.
 #### Returns
 string The result of the Notecard request.
 
-#### `public def `[`template`](#namespacenotecard_1_1note_1a1e625660366b3766ec9efa8270a7f5bb)`(card,file,body,length,port,format)` 
+#### `public def `[`template`](#namespacenotecard_1_1note_1a1e625660366b3766ec9efa8270a7f5bb)`(card,file,body,length)` 
 
 Create a template for new Notes in a Notefile.
 
@@ -508,20 +494,14 @@ Create a template for new Notes in a Notefile.
 
 * `file` The file name of the notefile. 
 
-* `body` A sample JSON body that specifies field names and values as "hints" for the data type. Supported types are boolean, integer, float, and string. Float values that represent whole numbers are automatically converted to integers.
+* `body` A sample JSON body that specifies field names and values as "hints" for the data type. 
 
-* `length` If provided, the maximum length of a payload (in bytes) that can be sent in Notes for the template Notefile. When specified, enables binary record mode for optimized storage.
-
-* `port` If provided, a unique number between 1 and 100 to represent a notefile. Required for Notecard LoRa.
-
-* `format` If set to "compact", tells the Notecard to omit additional metadata to save storage and bandwidth. In compact mode, only standard metadata fields (_time, _lat, _lon, _loc) are allowed.
-
-* `compact` Legacy parameter. If True, equivalent to setting format="compact". Retained for backward compatibility. New code should use format="compact" instead.
+* `length` If provided, the maximum length of a payload that can be sent in Notes for the template Notefile.
 
 #### Returns
 
 #### Returns
-dict The result of the Notecard request. Returns error object with an "err" field containing a descriptive message on validation failure.
+string The result of the Notecard request.
 
 # namespace `notecard::notecard` 
 
