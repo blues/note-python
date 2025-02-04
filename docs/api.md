@@ -98,9 +98,9 @@ Retrieve firmware version information from the Notecard.
 #### Returns
 string The result of the Notecard request.
 
-#### `public def `[`voltage`](#namespacenotecard_1_1card_1a1f9f65c34f1bd959d7902285a7537ce6)`(card,hours,offset,vmax,vmin,usb,alert)` 
+#### `public def `[`voltage`](#namespacenotecard_1_1card_1a1f9f65c34f1bd959d7902285a7537ce6)`(card,hours,offset,vmax,vmin)` 
 
-Retrieve current and historical voltage info from the Notecard, with optional USB power state monitoring.
+Retrieve current and historical voltage info from the Notecard.
 
 #### Parameters
 * `card` The current Notecard object. 
@@ -113,57 +113,10 @@ Retrieve current and historical voltage info from the Notecard, with optional US
 
 * `vmin` min voltage level to report.
 
-* `usb` Enable USB power state monitoring. When True, the Notecard will monitor USB power state changes.
-
-* `alert` Enable alerts for USB power state changes. Only works when usb=True. When enabled, power state changes are recorded in the health.qo Notefile.
-
 #### Returns
 
 #### Returns
-dict The result of the Notecard request containing voltage and power state information.
-
-Example request:
-```json
-{
-    "req": "card.voltage",
-    "usb": true,
-    "alert": true
-}
-```
-
-#### `public def `[`power`](#namespacenotecard_1_1card_1a10f5f4667d80f47674d1876df69b8e22)`(card,minutes,reset)` 
-
-Configure and query Mojo-based power consumption monitoring.
-
-#### Parameters
-* `card` The current Notecard object.
-
-* `minutes` (optional) How often to log power consumption in minutes. Default is 720 minutes (12 hours).
-
-* `reset` (optional) Reset consumption counters if True.
-
-#### Returns
-dict The result of the Notecard request containing power monitoring data.
-
-Example request:
-```json
-{
-    "req": "card.power",
-    "minutes": 120,
-    "reset": true
-}
-```
-
-Example response:
-```json
-{
-    "temperature": 26.0,
-    "voltage": 4.2,
-    "milliamp_hours": 2.45
-}
-```
-
-Note: Requires Notecard firmware v8.1.3 or later and a connected Mojo device.
+string The result of the Notecard request.
 
 #### `public def `[`wireless`](#namespacenotecard_1_1card_1a10f5f4667d80f47674d1876df69b8e22)`(card,mode,apn)` 
 
@@ -210,94 +163,19 @@ Perform an [env.default](#namespacenotecard_1_1env_1a6ff91175ae591e8a3a87c2a4ef9
 #### Returns
 string The result of the Notecard request.
 
-#### `public def `[`get`](#namespacenotecard_1_1env_1a28ed0423d0aff1d109371427139e0a73)`(card,name,names,time)` 
+#### `public def `[`get`](#namespacenotecard_1_1env_1a28ed0423d0aff1d109371427139e0a73)`(card,name)` 
 
 Perform an [env.get](#namespacenotecard_1_1env_1a28ed0423d0aff1d109371427139e0a73) request against a Notecard.
 
 #### Parameters
-* `card` The current Notecard object.
+* `card` The current Notecard object. 
 
-* `name` (optional) The name of an environment variable to get.
-
-* `names` (optional) List of environment variable names to retrieve.
-
-* `time` (optional) UNIX epoch time to get variables modified after.
+* `name` The name of an environment variable to get.
 
 #### Returns
-dict The result of the Notecard request containing either:
-* `text` Value of the requested variable if name was specified
-* `body` Object with name/value pairs if names was specified or if neither name nor names was specified
-* `time` UNIX epoch time of the last variable change
-
-Example request with single variable:
-```json
-{
-    "req": "env.get",
-    "name": "my_var"
-}
-```
-
-Example request with multiple variables:
-```json
-{
-    "req": "env.get",
-    "names": ["var1", "var2"]
-}
-```
-
-Example response for single variable:
-```json
-{
-    "text": "value1"
-}
-```
-
-Example response for multiple variables:
-```json
-{
-    "body": {
-        "var1": "value1",
-        "var2": "value2"
-    },
-    "time": 1609459200
-}
-```
-
-#### `public def `[`template`](#namespacenotecard_1_1env_1a10f5f4667d80f47674d1876df69b8e22)`(card,body)` 
-
-Perform an env.template request against a Notecard.
-
-#### Parameters
-* `card` The current Notecard object.
-
-* `body` (optional) Schema with variable names and type hints.
-  * Boolean: must be specified as true
-  * String: numeric string for max length (pre v3.2.1) or variable-length (v3.2.1+)
-  * Integer: 11-14, 18 for signed, 21-24 for unsigned
-  * Float: 12.1 (2-byte), 14.1 (4-byte), 18.1 (8-byte)
 
 #### Returns
-dict The result of the Notecard request, including 'bytes' field indicating storage size.
-
-Example request:
-```json
-{
-    "req": "env.template",
-    "body": {
-        "active": true,
-        "name": "32",
-        "temperature": 14.1,
-        "counter": 12
-    }
-}
-```
-
-Example response:
-```json
-{
-    "bytes": 42
-}
-```
+string The result of the Notecard request.
 
 #### `public def `[`modified`](#namespacenotecard_1_1env_1aa672554b72786c9ec1e5f76b3e11eb34)`(card)` 
 
@@ -370,35 +248,17 @@ Delete individual notefiles and their contents.
 #### Returns
 string The result of the Notecard request.
 
-#### `public def `[`stats`](#namespacenotecard_1_1file_1afd6ecece175a8ba9052b07889cf757f4)`(card,file)` 
+#### `public def `[`stats`](#namespacenotecard_1_1file_1afd6ecece175a8ba9052b07889cf757f4)`(card)` 
 
 Obtain statistics about local notefiles.
 
 #### Parameters
 * `card` The current Notecard object.
-* `file` (optional, string) Returns stats for the specified Notefile only.
 
 #### Returns
-dict containing:
-* `total` (integer): Total number of Notes across all Notefiles
-* `changes` (integer): Number of Notes pending sync
-* `sync` (boolean): True if sync is recommended based on pending notes
 
-Example request:
-```json
-{
-    "req": "file.stats"
-}
-```
-
-Example response:
-```json
-{
-    "total": 83,
-    "changes": 78,
-    "sync": true
-}
-```
+#### Returns
+string The result of the Notecard request.
 
 #### `public def `[`pendingChanges`](#namespacenotecard_1_1file_1aac52d0739fcba481f9a0bd4cfd35362e)`(card)` 
 
