@@ -9,7 +9,6 @@
 # This module contains helper methods for calling card.* Notecard API commands.
 # This module is optional and not required for use with the Notecard.
 
-import notecard
 from notecard.validators import validate_card_object
 
 
@@ -132,21 +131,40 @@ def voltage(card, hours=None, offset=None, vmax=None, vmin=None):
 
 
 @validate_card_object
-def wireless(card, mode=None, apn=None):
+def wireless(card, mode=None, apn=None, method=None, allow=None):
     """Retrieve wireless modem info or customize modem behavior.
 
     Args:
         card (Notecard): The current Notecard object.
-        mode (string): The wireless module mode to set.
+        mode (string): The wireless module mode to set. Must be one of:
+            "-" to reset to the default mode
+            "auto" to perform automatic band scan mode (default)
+            "m" to restrict the modem to Cat-M1
+            "nb" to restrict the modem to Cat-NB1
+            "gprs" to restrict the modem to EGPRS
         apn (string): Access Point Name (APN) when using an external SIM.
+            Use "-" to reset to the Notecard default APN.
+        method (string): The connectivity method to enable. Must be one of:
+            "-" to reset to device default
+            "ntn" to enable Non-Terrestrial Network mode
+            "wifi-ntn" to prioritize WiFi with NTN fallback
+            "cell-ntn" to prioritize cellular with NTN fallback
+            "wifi-cell-ntn" to prioritize WiFi, then cellular, then NTN
+        allow (bool): When True, allows adding Notes to non-compact Notefiles
+            while connected over a non-terrestrial network.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request containing network status and
+        signal information.
     """
     req = {"req": "card.wireless"}
     if mode:
         req["mode"] = mode
     if apn:
         req["apn"] = apn
+    if method:
+        req["method"] = method
+    if allow is not None:
+        req["allow"] = allow
 
     return card.Transaction(req)
