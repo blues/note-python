@@ -412,7 +412,7 @@ Add a Note to a Notefile with optional binary data support.
 * `file` The name of the file.
 * `body` A JSON object to add to the note.
 * `payload` An optional base64-encoded string.
-* `binary` Binary data (bytearray) to be stored in the note.
+* `binary` When true, indicates the note contains binary data.
 * `sync` Perform an immediate sync after adding.
 * `port` If provided, a unique number to represent a notefile. Required for Notecard LoRa.
 

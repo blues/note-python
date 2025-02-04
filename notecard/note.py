@@ -21,7 +21,7 @@ def add(card, file=None, body=None, payload=None, binary=None, sync=None, port=N
         file (string): The name of the file.
         body (JSON object): A developer-defined tracker ID.
         payload (string): An optional base64-encoded string.
-        binary (bytearray): Binary data to be stored in the note.
+        binary (bool): When true, indicates the note contains binary data.
         sync (bool): Perform an immediate sync after adding.
         port (int): If provided, a unique number to represent a notefile.
             Required for Notecard LoRa.
@@ -43,15 +43,10 @@ def add(card, file=None, body=None, payload=None, binary=None, sync=None, port=N
     if sync is not None:
         req["sync"] = sync
 
-    if binary:
-        if not isinstance(binary, bytearray):
-            return {"err": "Binary data must be a bytearray"}
-        try:
-            binary_helpers.binary_store_reset(card)
-            binary_helpers.binary_store_transmit(card, binary, 0)
-            req["binary"] = "true"
-        except Exception as e:
-            return {"err": f"Failed to store binary data: {str(e)}"}
+    if binary is not None:
+        if not isinstance(binary, bool):
+            return {"err": "binary parameter must be a boolean"}
+        req["binary"] = binary
 
     return card.Transaction(req)
 
