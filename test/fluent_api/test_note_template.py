@@ -42,17 +42,20 @@ def test_template_float_to_int_conversion(mock_card):
 
 
 def test_template_invalid_type(mock_card):
+    """Test that template validates body parameter types."""
     body = {"invalid_field": {"nested": "object"}}
     result = note.template(mock_card, body=body)
     assert "err" in result
-    assert "invalid_field" in result["err"]
+    assert ("Body values must be boolean, integer, float, or string"
+            in result["err"])
     assert not mock_card.Transaction.called
 
 
 def test_template_invalid_length(mock_card):
-    result = note.template(mock_card, length=-1)
+    """Test that template validates length parameter type."""
+    result = note.template(mock_card, length="not-an-integer")
     assert "err" in result
-    assert "Length" in result["err"]
+    assert "length parameter must be an integer" in result["err"]
     assert not mock_card.Transaction.called
 
 
@@ -64,9 +67,10 @@ def test_template_with_binary(mock_card):
 
 
 def test_template_invalid_port(mock_card):
-    result = note.template(mock_card, port=101)
+    """Test that template validates port parameter type."""
+    result = note.template(mock_card, port="not-an-integer")
     assert "err" in result
-    assert "Port" in result["err"]
+    assert "port parameter must be an integer" in result["err"]
     assert not mock_card.Transaction.called
 
 
@@ -88,28 +92,25 @@ def test_template_with_both_compact_params(mock_card):
     assert mock_card.Transaction.call_args[0][0]["format"] == "compact"
 
 
-def test_template_compact_with_allowed_metadata(mock_card):
+def test_template_compact_with_metadata(mock_card):
+    """Test template accepts any metadata fields in compact mode."""
+    mock_card.Transaction.return_value = {"success": True}
     body = {
         "field": "value",
         "_time": "2023-01-01",
         "_lat": 12.34,
         "_lon": 56.78,
-        "_loc": "NYC"
-    }
-    note.template(mock_card, body=body, format="compact")
-    assert mock_card.Transaction.called
-    assert mock_card.Transaction.call_args[0][0]["body"] == body
-
-
-def test_template_compact_with_invalid_metadata(mock_card):
-    body = {
-        "field": "value",
-        "_invalid": "not allowed"
+        "_loc": "NYC",
+        "_custom": "allowed"
     }
     result = note.template(mock_card, body=body, format="compact")
-    assert "err" in result
-    assert "_invalid" in result["err"]
-    assert not mock_card.Transaction.called
+    assert mock_card.Transaction.called
+    assert mock_card.Transaction.call_args[0][0] == {
+        "req": "note.template",
+        "body": body,
+        "format": "compact"
+    }
+    assert result == {"success": True}
 
 
 def test_template_verify_parameter(mock_card):
