@@ -36,15 +36,12 @@ def changes(card, tracker=None, files=None):
     response = card.Transaction(req)
     if "err" in response:
         return response
-    # Check for required fields first
-    if not all(key in response for key in ['total', 'changes', 'info']):
-        return {"err": "Missing required fields in response"}
-    # Then validate field types
-    if not isinstance(response['total'], int):
+
+    if "total" in response and not isinstance(response["total"], int):
         return {"err": "Malformed response: total must be an integer"}
-    if not isinstance(response['changes'], int):
+    if "changes" in response and not isinstance(response["changes"], int):
         return {"err": "Malformed response: changes must be an integer"}
-    if not isinstance(response['info'], dict):
+    if "info" in response and not isinstance(response["info"], dict):
         return {"err": "Malformed response: info must be a dictionary"}
     return response
 
@@ -88,15 +85,12 @@ def stats(card, file=None):
     response = card.Transaction(req)
     if "err" in response:
         return response
-    # Check for required fields
-    if not all(key in response for key in ['total', 'changes', 'sync']):
-        return {"err": "Missing required fields in response"}
-    # Validate field types
-    if not isinstance(response['total'], int):
+
+    if "total" in response and not isinstance(response["total"], int):
         return {"err": "Malformed response: total must be an integer"}
-    if not isinstance(response['changes'], int):
+    if "changes" in response and not isinstance(response["changes"], int):
         return {"err": "Malformed response: changes must be an integer"}
-    if not isinstance(response['sync'], bool):
+    if "sync" in response and not isinstance(response["sync"], bool):
         return {"err": "Malformed response: sync must be a boolean"}
     return response
 
@@ -116,12 +110,9 @@ def pendingChanges(card):
     response = card.Transaction(req)
     if "err" in response:
         return response
-    # Validate response format - should contain total and changes
-    if not all(key in response for key in ['total', 'changes']):
-        return {"err": "Missing required fields in response"}
-    # Validate field types
-    if not isinstance(response.get('total'), int):
+
+    if "total" in response and not isinstance(response["total"], int):
         return {"err": "Malformed response: total must be an integer"}
-    if not isinstance(response.get('changes'), int):
+    if "changes" in response and not isinstance(response["changes"], int):
         return {"err": "Malformed response: changes must be an integer"}
     return response

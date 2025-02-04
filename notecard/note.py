@@ -21,7 +21,8 @@ def add(card, file=None, body=None, payload=None, binary=None, sync=None, port=N
         file (string): The name of the file.
         body (JSON object): A developer-defined tracker ID.
         payload (string): An optional base64-encoded string.
-        binary (bool): When true, indicates the note contains binary data.
+        binary (bool): When True, indicates that the note's payload field contains
+            binary data that should be base64-encoded before transmission.
         sync (bool): Perform an immediate sync after adding.
         port (int): If provided, a unique number to represent a notefile.
             Required for Notecard LoRa.
@@ -197,15 +198,11 @@ def template(card, file=None, body=None, length=None, port=None,
         req["file"] = file
 
     if body:
-        for key, value in body.items():
-            if not isinstance(value, (bool, int, float, str)):
-                return {
-                    "err": (
-                        f"Field '{key}' has unsupported type. "
-                        "Must be boolean, integer, float, or string.")
-                }
-            if isinstance(value, float) and value.is_integer():
-                body[key] = int(value)
+        if isinstance(body, dict):
+            # Convert integer-valued floats to ints
+            for key, value in body.items():
+                if isinstance(value, float) and value.is_integer():
+                    body[key] = int(value)
         req["body"] = body
 
     if verify is not None:

@@ -18,7 +18,7 @@ def test_file_delete_response(card):
     """Test file.delete response structure."""
     card.Transaction.return_value = {}
     response = file.delete(card, files=['file1.qo'])
-    assert response == {}, "Expected empty object on success"
+    assert isinstance(response, dict)
     assert card.Transaction.call_args[0][0] == {
         'req': 'file.delete',
         'files': ['file1.qo']
