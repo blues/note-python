@@ -178,10 +178,26 @@ def template(card, file=None, body=None, length=None, port=None, compact=False):
         req["file"] = file
     if body:
         req["body"] = body
-    if length:
-        req["length"] = length
+    if length is not None:
+        if length >= 0:
+            req["length"] = length
+        # Negative length resets to default by omitting the field
     if port:
         req["port"] = port
+    format = None
     if compact:
+        format = "compact"
+
+    if format == "compact":
         req["format"] = "compact"
+        if body:
+            allowed_metadata = {"_time", "_lat", "_lon", "_ltime"}
+            for key in body.keys():
+                if key.startswith("_") and key not in allowed_metadata:
+                    return {
+                        "err": (
+                            f"Field '{key}' is not allowed in compact mode. "
+                            f"Only {allowed_metadata} are allowed.")
+                    }
+
     return card.Transaction(req)

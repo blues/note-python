@@ -27,9 +27,21 @@ def changes(card, tracker=None, files=None):
     req = {"req": "file.changes"}
     if tracker:
         req["tracker"] = tracker
-    if files:
+    if files is not None:  # Allow empty list
         req["files"] = files
-    return card.Transaction(req)
+
+    response = card.Transaction(req)
+    if "err" in response:
+        return response
+
+    # Only validate types when fields are present
+    if "total" in response and not isinstance(response["total"], int):
+        return {"err": "Malformed response: total must be an integer"}
+    if "changes" in response and not isinstance(response["changes"], int):
+        return {"err": "Malformed response: changes must be an integer"}
+    if "info" in response and not isinstance(response["info"], dict):
+        return {"err": "Malformed response: info must be a dictionary"}
+    return response
 
 
 @validate_card_object
@@ -66,7 +78,18 @@ def stats(card, file=None):
     req = {"req": "file.stats"}
     if file:
         req["file"] = file
-    return card.Transaction(req)
+    response = card.Transaction(req)
+    if "err" in response:
+        return response
+
+    # Only validate types when fields are present
+    if "total" in response and not isinstance(response["total"], int):
+        return {"err": "Malformed response: total must be an integer"}
+    if "changes" in response and not isinstance(response["changes"], int):
+        return {"err": "Malformed response: changes must be an integer"}
+    if "sync" in response and not isinstance(response["sync"], bool):
+        return {"err": "Malformed response: sync must be a boolean"}
+    return response
 
 
 @validate_card_object
@@ -80,7 +103,16 @@ def pendingChanges(card):
         dict: The result of the Notecard request.
     """
     req = {"req": "file.changes.pending"}
-    return card.Transaction(req)
+    response = card.Transaction(req)
+    if "err" in response:
+        return response
+
+    # Only validate types when fields are present
+    if "total" in response and not isinstance(response["total"], int):
+        return {"err": "Malformed response: total must be an integer"}
+    if "changes" in response and not isinstance(response["changes"], int):
+        return {"err": "Malformed response: changes must be an integer"}
+    return response
 
 
 @validate_card_object
