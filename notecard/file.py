@@ -42,7 +42,7 @@ def changes(card, tracker=None, files=None):
         return {"err": "Malformed response: total must be an integer"}
     if 'info' in response and not isinstance(response['info'], dict):
         return {"err": "Malformed response: info must be a dictionary"}
-    
+
     return response
 
 
