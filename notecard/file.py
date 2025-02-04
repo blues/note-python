@@ -34,15 +34,15 @@ def changes(card, tracker=None, files=None):
         req["files"] = files
 
     response = card.Transaction(req)
-    if "err" in response:
-        return response
-
-    if "total" in response and not isinstance(response["total"], int):
-        return {"err": "Malformed response: total must be an integer"}
-    if "changes" in response and not isinstance(response["changes"], int):
+    
+    # Only validate types if fields are present
+    if 'changes' in response and not isinstance(response['changes'], int):
         return {"err": "Malformed response: changes must be an integer"}
-    if "info" in response and not isinstance(response["info"], dict):
+    if 'total' in response and not isinstance(response['total'], int):
+        return {"err": "Malformed response: total must be an integer"}
+    if 'info' in response and not isinstance(response['info'], dict):
         return {"err": "Malformed response: info must be a dictionary"}
+    
     return response
 
 
@@ -82,16 +82,17 @@ def stats(card, file=None):
     req = {"req": "file.stats"}
     if file:
         req["file"] = file
+    
     response = card.Transaction(req)
-    if "err" in response:
-        return response
-
-    if "total" in response and not isinstance(response["total"], int):
+    
+    # Only validate types if fields are present (omitempty)
+    if 'total' in response and not isinstance(response['total'], int):
         return {"err": "Malformed response: total must be an integer"}
-    if "changes" in response and not isinstance(response["changes"], int):
+    if 'changes' in response and not isinstance(response['changes'], int):
         return {"err": "Malformed response: changes must be an integer"}
-    if "sync" in response and not isinstance(response["sync"], bool):
+    if 'sync' in response and not isinstance(response['sync'], bool):
         return {"err": "Malformed response: sync must be a boolean"}
+    
     return response
 
 
@@ -108,11 +109,11 @@ def pendingChanges(card):
     """
     req = {"req": "file.changes.pending"}
     response = card.Transaction(req)
-    if "err" in response:
-        return response
-
-    if "total" in response and not isinstance(response["total"], int):
+    
+    # Only validate types if fields are present (omitempty)
+    if 'total' in response and not isinstance(response['total'], int):
         return {"err": "Malformed response: total must be an integer"}
-    if "changes" in response and not isinstance(response["changes"], int):
+    if 'changes' in response and not isinstance(response['changes'], int):
         return {"err": "Malformed response: changes must be an integer"}
+    
     return response
