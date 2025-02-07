@@ -13,8 +13,7 @@ from notecard.validators import validate_card_object
 
 
 @validate_card_object
-def add(card, file=None, body=None, payload=None, binary=None,
-        sync=None, port=None):
+def add(card, file=None, body=None, payload=None, binary=None, sync=None, port=None):
     """Add a Note to a Notefile.
 
     Args:
@@ -55,8 +54,16 @@ def add(card, file=None, body=None, payload=None, binary=None,
 
 
 @validate_card_object
-def changes(card, file=None, tracker=None, maximum=None,
-            start=None, stop=None, deleted=None, delete=None):
+def changes(
+    card,
+    file=None,
+    tracker=None,
+    maximum=None,
+    start=None,
+    stop=None,
+    deleted=None,
+    delete=None,
+):
     """Incrementally retrieve changes within a Notefile.
 
     Args:
@@ -182,16 +189,17 @@ def update(card, file=None, note_id=None, body=None, payload=None):
 
 @validate_card_object
 def template(
-        card,
-        *,  # Force keyword arguments for clarity
-        file=None,
-        body=None,
-        length=None,
-        port=None,
-        format=None,
-        compact=None,
-        verify=None,
-        delete=None):
+    card,
+    *,  # Force keyword arguments for clarity
+    file=None,
+    body=None,
+    length=None,
+    port=None,
+    format=None,
+    compact=None,
+    verify=None,
+    delete=None
+):
     """Create a template for new Notes in a Notefile.
 
     Args:
@@ -220,10 +228,6 @@ def template(
         req["file"] = file
 
     if body:
-        # Validate that all values in body are of supported types
-        for key, value in body.items():
-            if not isinstance(value, (bool, int, float, str)):
-                return {"err": "Body values must be boolean, integer, float, or string"}
         req["body"] = body
 
     if length is not None:
