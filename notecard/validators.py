@@ -12,6 +12,7 @@ if sys.implementation.name == "cpython":
 
     def validate_card_object(func):
         """Ensure that the passed-in card is a Notecard."""
+
         @functools.wraps(func)
         def wrap_validator(*args, **kwargs):
             """Check the instance of the passed-in card."""
@@ -22,11 +23,13 @@ if sys.implementation.name == "cpython":
             return func(*args, **kwargs)
 
         return wrap_validator
+
 else:
     # MicroPython and CircuitPython do not support
     # functools. Do not perform validation for these platforms
     def validate_card_object(func):
         """Skip validation."""
+
         def wrap_validator(*args, **kwargs):
             """Check the instance of the passed-in card."""
             card = args[0]

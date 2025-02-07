@@ -9,7 +9,6 @@
 # This module contains helper methods for calling file.* Notecard API commands.
 # This module is optional and not required for use with the Notecard.
 
-import notecard
 from notecard.validators import validate_card_object
 
 
@@ -28,9 +27,21 @@ def changes(card, tracker=None, files=None):
     req = {"req": "file.changes"}
     if tracker:
         req["tracker"] = tracker
-    if files:
+    if files is not None:  # Allow empty list
         req["files"] = files
-    return card.Transaction(req)
+
+    response = card.Transaction(req)
+    if "err" in response:
+        return response
+
+    # Only validate types when fields are present
+    if "total" in response and not isinstance(response["total"], int):
+        return {"err": "Malformed response: total must be an integer"}
+    if "changes" in response and not isinstance(response["changes"], int):
+        return {"err": "Malformed response: changes must be an integer"}
+    if "info" in response and not isinstance(response["info"], dict):
+        return {"err": "Malformed response: info must be a dictionary"}
+    return response
 
 
 @validate_card_object
@@ -51,18 +62,34 @@ def delete(card, files=None):
 
 
 @validate_card_object
-def stats(card):
+def stats(card, file=None):
     """Obtain statistics about local notefiles.
 
     Args:
         card (Notecard): The current Notecard object.
+        file (str, optional): Returns stats for the specified Notefile only.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request containing:
+            - total (int): Total number of Notes across all Notefiles
+            - changes (int): Number of Notes pending sync
+            - sync (bool): True if sync is recommended based on pending notes
     """
     req = {"req": "file.stats"}
+    if file:
+        req["file"] = file
+    response = card.Transaction(req)
+    if "err" in response:
+        return response
 
-    return card.Transaction(req)
+    # Only validate types when fields are present
+    if "total" in response and not isinstance(response["total"], int):
+        return {"err": "Malformed response: total must be an integer"}
+    if "changes" in response and not isinstance(response["changes"], int):
+        return {"err": "Malformed response: changes must be an integer"}
+    if "sync" in response and not isinstance(response["sync"], bool):
+        return {"err": "Malformed response: sync must be a boolean"}
+    return response
 
 
 @validate_card_object
@@ -73,8 +100,58 @@ def pendingChanges(card):
         card (Notecard): The current Notecard object.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request.
     """
     req = {"req": "file.changes.pending"}
+    response = card.Transaction(req)
+    if "err" in response:
+        return response
 
+    # Only validate types when fields are present
+    if "total" in response and not isinstance(response["total"], int):
+        return {"err": "Malformed response: total must be an integer"}
+    if "changes" in response and not isinstance(response["changes"], int):
+        return {"err": "Malformed response: changes must be an integer"}
+    return response
+
+
+@validate_card_object
+def monitor(card, files=None):
+    """Monitor one or more files in detail.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        files (list, optional): List of Notefiles to monitor. Defaults to None.
+
+    Returns:
+        dict: Detailed information about each file.
+    """
+    req = {"req": "file.monitor"}
+    if files is not None:
+        req["files"] = files
+    return card.Transaction(req)
+
+
+@validate_card_object
+def track(card, files=None, interval=None, duration=None):
+    """Enable continuous tracking of file changes.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        files (list, optional): List of Notefiles to track. Defaults to None.
+        interval (int, optional): Polling interval in seconds. Defaults to
+            None.
+        duration (int, optional): Total tracking duration in seconds. Defaults
+            to None.
+
+    Returns:
+        dict: The result of the Notecard request with tracking configuration.
+    """
+    req = {"req": "file.track"}
+    if files:
+        req["files"] = files
+    if interval is not None:
+        req["interval"] = interval
+    if duration is not None:
+        req["duration"] = duration
     return card.Transaction(req)

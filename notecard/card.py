@@ -9,7 +9,6 @@
 # This module contains helper methods for calling card.* Notecard API commands.
 # This module is optional and not required for use with the Notecard.
 
-import notecard
 from notecard.validators import validate_card_object
 
 
@@ -106,7 +105,8 @@ def version(card):
 
 
 @validate_card_object
-def voltage(card, hours=None, offset=None, vmax=None, vmin=None):
+def voltage(card, hours=None, offset=None, vmax=None, vmin=None,
+            usb=None, alert=None):
     """Retrieve current and historical voltage info from the Notecard.
 
     Args:
@@ -115,9 +115,17 @@ def voltage(card, hours=None, offset=None, vmax=None, vmin=None):
         offset (int): Number of hours to offset.
         vmax (decimal): max voltage level to report.
         vmin (decimal): min voltage level to report.
+        usb (bool): Enable USB power state monitoring.
+        alert (bool): Enable alerts for USB power state changes. Only works
+            when usb=True.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request containing voltage and power
+        state information.
+
+    Note:
+        For Mojo-based power consumption monitoring with temperature and
+        milliamp-hour tracking, see card.power().
     """
     req = {"req": "card.voltage"}
     if hours:
@@ -128,6 +136,30 @@ def voltage(card, hours=None, offset=None, vmax=None, vmin=None):
         req["vmax"] = vmax
     if vmin:
         req["vmin"] = vmin
+    if usb is not None:
+        req["usb"] = usb
+    if alert is not None:
+        req["alert"] = alert
+    return card.Transaction(req)
+
+
+@validate_card_object
+def power(card, minutes=None, reset=None):
+    """Configure and query the Mojo-based power consumption monitoring.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        minutes (int, optional): How often to log power consumption.
+        reset (bool, optional): Reset consumption counters if True.
+
+    Returns:
+        dict: Contains temperature, voltage, and milliamp_hours readings.
+    """
+    req = {"req": "card.power"}
+    if minutes is not None:
+        req["minutes"] = minutes
+    if reset:
+        req["reset"] = True
     return card.Transaction(req)
 
 
