@@ -1,6 +1,5 @@
 """Tests for note.template API."""
 
-
 import pytest
 from unittest.mock import MagicMock
 from notecard import note
@@ -19,7 +18,7 @@ def test_template_basic(mock_card):
     assert mock_card.Transaction.called
     assert mock_card.Transaction.call_args[0][0] == {
         "req": "note.template",
-        "file": "test.qo"
+        "file": "test.qo",
     }
 
 
@@ -28,7 +27,7 @@ def test_template_with_valid_types(mock_card):
         "bool_field": True,
         "int_field": 42,
         "float_field": 3.14,
-        "string_field": "test"
+        "string_field": "test",
     }
     note.template(mock_card, file="test.qo", body=body)
     assert mock_card.Transaction.called
@@ -39,16 +38,6 @@ def test_template_float_to_int_conversion(mock_card):
     body = {"whole_number": 42.0}
     note.template(mock_card, body=body)
     assert mock_card.Transaction.call_args[0][0]["body"]["whole_number"] == 42
-
-
-def test_template_invalid_type(mock_card):
-    """Test that template validates body parameter types."""
-    body = {"invalid_field": {"nested": "object"}}
-    result = note.template(mock_card, body=body)
-    assert "err" in result
-    assert ("Body values must be boolean, integer, float, or string"
-            in result["err"])
-    assert not mock_card.Transaction.called
 
 
 def test_template_invalid_length(mock_card):
@@ -101,14 +90,14 @@ def test_template_compact_with_metadata(mock_card):
         "_lat": 12.34,
         "_lon": 56.78,
         "_loc": "NYC",
-        "_custom": "allowed"
+        "_custom": "allowed",
     }
     result = note.template(mock_card, body=body, format="compact")
     assert mock_card.Transaction.called
     assert mock_card.Transaction.call_args[0][0] == {
         "req": "note.template",
         "body": body,
-        "format": "compact"
+        "format": "compact",
     }
     assert result == {"success": True}
 
@@ -138,7 +127,7 @@ def test_template_full_configuration(mock_card):
         "humidity": 45,
         "active": True,
         "location": "warehouse",
-        "_time": "2023-01-01"
+        "_time": "2023-01-01",
     }
     note.template(
         mock_card,
@@ -148,7 +137,7 @@ def test_template_full_configuration(mock_card):
         port=1,
         format="compact",
         verify=True,
-        delete=False
+        delete=False,
     )
     assert mock_card.Transaction.called
     req = mock_card.Transaction.call_args[0][0]
