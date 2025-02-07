@@ -110,13 +110,8 @@ def template(card, body=None):
     Returns:
         dict: The result of the Notecard request, including 'bytes' field
             indicating storage size.
-
-    Raises:
-        ValueError: If type hints in body are invalid.
     """
     req = {"req": "env.template"}
     if body is not None:
-        from .validators import validate_template_hints
-        validate_template_hints(body)
         req["body"] = body
     return card.Transaction(req)
