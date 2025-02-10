@@ -38,16 +38,10 @@ def add(card, file=None, body=None, payload=None, binary=None, sync=None, port=N
     if payload:
         req["payload"] = payload
     if port:
-        if not isinstance(port, int):
-            return {"err": "port parameter must be an integer"}
         req["port"] = port
     if sync is not None:
-        if not isinstance(sync, bool):
-            return {"err": "sync parameter must be a boolean"}
         req["sync"] = sync
     if binary is not None:
-        if not isinstance(binary, bool):
-            return {"err": "binary parameter must be a boolean"}
         req["binary"] = binary
 
     return card.Transaction(req)
@@ -86,24 +80,14 @@ def changes(
     if tracker:
         req["tracker"] = tracker
     if maximum:
-        if not isinstance(maximum, int):
-            return {"err": "maximum parameter must be an integer"}
         req["max"] = maximum
     if start is not None:
-        if not isinstance(start, bool):
-            return {"err": "start parameter must be a boolean"}
         req["start"] = start
     if stop is not None:
-        if not isinstance(stop, bool):
-            return {"err": "stop parameter must be a boolean"}
         req["stop"] = stop
     if deleted is not None:
-        if not isinstance(deleted, bool):
-            return {"err": "deleted parameter must be a boolean"}
         req["deleted"] = deleted
     if delete is not None:
-        if not isinstance(delete, bool):
-            return {"err": "delete parameter must be a boolean"}
         req["delete"] = delete
     return card.Transaction(req)
 
@@ -129,12 +113,8 @@ def get(card, file="data.qi", note_id=None, delete=None, deleted=None):
     if note_id:
         req["note"] = note_id
     if delete is not None:
-        if not isinstance(delete, bool):
-            return {"err": "delete parameter must be a boolean"}
         req["delete"] = delete
     if deleted is not None:
-        if not isinstance(deleted, bool):
-            return {"err": "deleted parameter must be a boolean"}
         req["deleted"] = deleted
 
     return card.Transaction(req)
@@ -236,8 +216,6 @@ def template(
         req["length"] = length
 
     if port is not None:
-        if not isinstance(port, int):
-            return {"err": "port parameter must be an integer"}
         req["port"] = port
 
     if compact is True:
@@ -247,12 +225,8 @@ def template(
         req["format"] = "compact"
 
     if verify is not None:
-        if not isinstance(verify, bool):
-            return {"err": "verify parameter must be a boolean"}
         req["verify"] = verify
     if delete is not None:
-        if not isinstance(delete, bool):
-            return {"err": "delete parameter must be a boolean"}
         req["delete"] = delete
 
     return card.Transaction(req)
