@@ -191,6 +191,7 @@ def template(card, file=None, body=None, length=None, port=None, compact=False):
     if port:
         req["port"] = port
 
+    format = None
     if compact:
         format = "compact"
 
