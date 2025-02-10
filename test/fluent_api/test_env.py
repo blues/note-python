@@ -16,6 +16,16 @@ from notecard import env
             {'name': 'my_var'}
         ),
         (
+            env.get,
+            'env.get',
+            {'names': ['var1', 'var2']}
+        ),
+        (
+            env.get,
+            'env.get',
+            {'time': 1609459200}
+        ),
+        (
             env.modified,
             'env.modified',
             {}

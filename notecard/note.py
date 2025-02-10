@@ -44,8 +44,16 @@ def add(card, file=None, body=None, payload=None, sync=None, port=None):
 
 
 @validate_card_object
-def changes(card, file=None, tracker=None, maximum=None,
-            start=None, stop=None, deleted=None, delete=None):
+def changes(
+    card,
+    file=None,
+    tracker=None,
+    maximum=None,
+    start=None,
+    stop=None,
+    deleted=None,
+    delete=None,
+):
     """Incrementally retrieve changes within a Notefile.
 
     Args:
@@ -178,10 +186,16 @@ def template(card, file=None, body=None, length=None, port=None, compact=False):
         req["file"] = file
     if body:
         req["body"] = body
-    if length:
+    if length is not None:
         req["length"] = length
     if port:
         req["port"] = port
+
+    format = None
     if compact:
+        format = "compact"
+
+    if format == "compact":
         req["format"] = "compact"
+
     return card.Transaction(req)
