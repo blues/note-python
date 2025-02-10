@@ -40,12 +40,11 @@ def test_template_float_to_int_conversion(mock_card):
     assert mock_card.Transaction.call_args[0][0]["body"]["whole_number"] == 42
 
 
-def test_template_invalid_length(mock_card):
-    """Test that template validates length parameter type."""
-    result = note.template(mock_card, length="not-an-integer")
-    assert "err" in result
-    assert "length parameter must be an integer" in result["err"]
-    assert not mock_card.Transaction.called
+def test_template_accepts_any_length(mock_card):
+    """Test that template accepts any length value without validation."""
+    note.template(mock_card, length="not-an-integer")
+    assert mock_card.Transaction.called
+    assert mock_card.Transaction.call_args[0][0]["length"] == "not-an-integer"
 
 
 def test_template_with_binary(mock_card):
@@ -55,12 +54,11 @@ def test_template_with_binary(mock_card):
     assert req["length"] == 32
 
 
-def test_template_invalid_port(mock_card):
-    """Test that template validates port parameter type."""
-    result = note.template(mock_card, port="not-an-integer")
-    assert "err" in result
-    assert "port parameter must be an integer" in result["err"]
-    assert not mock_card.Transaction.called
+def test_template_accepts_any_port(mock_card):
+    """Test that template accepts any port value without validation."""
+    note.template(mock_card, port="not-an-integer")
+    assert mock_card.Transaction.called
+    assert mock_card.Transaction.call_args[0][0]["port"] == "not-an-integer"
 
 
 def test_template_compact_format(mock_card):
@@ -108,11 +106,11 @@ def test_template_verify_parameter(mock_card):
     assert mock_card.Transaction.call_args[0][0]["verify"] is True
 
 
-def test_template_verify_invalid_type(mock_card):
-    result = note.template(mock_card, verify="yes")
-    assert "err" in result
-    assert "verify parameter must be a boolean" in result["err"]
-    assert not mock_card.Transaction.called
+def test_template_accepts_any_verify(mock_card):
+    """Test that template accepts any verify value without validation."""
+    note.template(mock_card, verify="yes")
+    assert mock_card.Transaction.called
+    assert mock_card.Transaction.call_args[0][0]["verify"] == "yes"
 
 
 def test_template_delete_parameter(mock_card):
