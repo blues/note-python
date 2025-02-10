@@ -26,6 +26,11 @@ from notecard import file
             {}
         ),
         (
+            file.stats,
+            'file.stats',
+            {'file': 'test.qo'}
+        ),
+        (
             file.pendingChanges,
             'file.changes.pending',
             {}

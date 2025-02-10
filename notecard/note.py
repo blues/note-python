@@ -9,19 +9,20 @@
 # This module contains helper methods for calling note.* Notecard API commands.
 # This module is optional and not required for use with the Notecard.
 
-import notecard
 from notecard.validators import validate_card_object
 
 
 @validate_card_object
-def add(card, file=None, body=None, payload=None, sync=None, port=None):
+def add(card, file=None, body=None, payload=None, binary=None, sync=None, port=None):
     """Add a Note to a Notefile.
 
     Args:
         card (Notecard): The current Notecard object.
         file (string): The name of the file.
-        body (JSON object): A developer-defined tracker ID.
+        body (dict): A JSON object containing the note data.
         payload (string): An optional base64-encoded string.
+        binary (bool): When True, indicates that the note's payload field
+            contains binary data that should be base64-encoded.
         sync (bool): Perform an immediate sync after adding.
         port (int): If provided, a unique number to represent a notefile.
             Required for Notecard LoRa.
@@ -40,12 +41,23 @@ def add(card, file=None, body=None, payload=None, sync=None, port=None):
         req["port"] = port
     if sync is not None:
         req["sync"] = sync
+    if binary is not None:
+        req["binary"] = binary
+
     return card.Transaction(req)
 
 
 @validate_card_object
-def changes(card, file=None, tracker=None, maximum=None,
-            start=None, stop=None, deleted=None, delete=None):
+def changes(
+    card,
+    file=None,
+    tracker=None,
+    maximum=None,
+    start=None,
+    stop=None,
+    deleted=None,
+    delete=None,
+):
     """Incrementally retrieve changes within a Notefile.
 
     Args:
@@ -93,7 +105,8 @@ def get(card, file="data.qi", note_id=None, delete=None, deleted=None):
         deleted (bool): Whether to allow retrieval of a deleted note.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request. If binary data is present,
+        the 'binary' field contains the decoded data.
     """
     req = {"req": "note.get"}
     req["file"] = file
@@ -103,6 +116,7 @@ def get(card, file="data.qi", note_id=None, delete=None, deleted=None):
         req["delete"] = delete
     if deleted is not None:
         req["deleted"] = deleted
+
     return card.Transaction(req)
 
 
@@ -154,34 +168,63 @@ def update(card, file=None, note_id=None, body=None, payload=None):
 
 
 @validate_card_object
-def template(card, file=None, body=None, length=None, port=None, compact=False):
+def template(
+    card,
+    *,  # Force keyword arguments for clarity
+    file=None,
+    body=None,
+    length=None,
+    port=None,
+    format=None,
+    compact=None,
+    verify=None,
+    delete=None
+):
     """Create a template for new Notes in a Notefile.
 
     Args:
         card (Notecard): The current Notecard object.
         file (string): The file name of the notefile.
-        body (JSON): A sample JSON body that specifies field names and
-            values as "hints" for the data type.
+        body (dict): A sample JSON body that specifies field names and
+            values as type hints. Supported: bool, int, float, str.
         length (int): If provided, the maximum length of a payload that
             can be sent in Notes for the template Notefile.
         port (int): If provided, a unique number to represent a notefile.
             Required for Notecard LoRa.
-        compact (boolean): If true, sets the format to compact to tell the
-            Notecard to omit this additional metadata to save on storage
-            and bandwidth. Required for Notecard LoRa.
+        format (string): If "compact", omits additional metadata to save
+            storage and bandwidth.
+        compact (bool): Legacy parameter. If True, equivalent to setting
+            format="compact". Retained for backward compatibility.
+        verify (bool): When True, verifies the template against existing
+            notes in the Notefile.
+        delete (bool): When True, deletes the template from the Notefile.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request. Returns error object if
+        validation fails.
     """
     req = {"req": "note.template"}
     if file:
         req["file"] = file
+
     if body:
         req["body"] = body
-    if length:
+
+    if length is not None:
         req["length"] = length
-    if port:
+
+    if port is not None:
         req["port"] = port
-    if compact:
+
+    if compact is True:
+        format = "compact"
+
+    if format == "compact":
         req["format"] = "compact"
+
+    if verify is not None:
+        req["verify"] = verify
+    if delete is not None:
+        req["delete"] = delete
+
     return card.Transaction(req)
