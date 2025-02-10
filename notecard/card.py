@@ -131,7 +131,7 @@ def voltage(card, hours=None, offset=None, vmax=None, vmin=None):
 
 
 @validate_card_object
-def wireless(card, mode=None, apn=None, method=None, allow=None):
+def wireless(card, mode=None, apn=None, method=None):
     """Retrieve wireless modem info or customize modem behavior.
 
     Args:
@@ -150,8 +150,6 @@ def wireless(card, mode=None, apn=None, method=None, allow=None):
             "wifi-ntn" to prioritize WiFi with NTN fallback
             "cell-ntn" to prioritize cellular with NTN fallback
             "wifi-cell-ntn" to prioritize WiFi, then cellular, then NTN
-        allow (bool): When True, allows adding Notes to non-compact Notefiles
-            while connected over a non-terrestrial network.
 
     Returns:
         dict: The result of the Notecard request containing network status and
@@ -164,7 +162,5 @@ def wireless(card, mode=None, apn=None, method=None, allow=None):
         req["apn"] = apn
     if method:
         req["method"] = method
-    if allow is not None:
-        req["allow"] = allow
 
     return card.Transaction(req)
