@@ -211,8 +211,6 @@ def template(
         req["body"] = body
 
     if length is not None:
-        if not isinstance(length, int):
-            return {"err": "length parameter must be an integer"}
         req["length"] = length
 
     if port is not None:
