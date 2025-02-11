@@ -106,7 +106,9 @@ class NoOpSerialLock():
         pass
 
 
-class Notecard:
+from abc import ABC, abstractmethod
+
+class Notecard(ABC):
     """Base Notecard class."""
 
     def __init__(self, debug=False):
@@ -418,6 +420,54 @@ class Notecard:
     def SetTransactionPins(self, rtx_pin, ctx_pin):
         """Set the pins used for RTX and CTX."""
         self._transaction_manager = TransactionManager(rtx_pin, ctx_pin)
+
+    @abstractmethod
+    def Reset(self):
+        """Reset the Notecard. Must be implemented by subclasses."""
+        pass
+
+    @abstractmethod
+    def lock(self):
+        """Lock access to the Notecard. Must be implemented by subclasses."""
+        pass
+
+    @abstractmethod
+    def unlock(self):
+        """Unlock access to the Notecard. Must be implemented by subclasses."""
+        pass
+
+    @abstractmethod
+    def _transact(self, req_bytes, rsp_expected, timeout_secs):
+        """Perform a transaction with the Notecard. Must be implemented by subclasses."""
+        pass
+
+    def transport(self, method=None, allow=None):
+        """Configure the Notecard's connectivity method.
+
+        Args:
+            method (string): The connectivity method to enable. Must be one of:
+                "-" to reset to device default
+                "wifi-cell" to prioritize WiFi with cellular fallback
+                "wifi" to enable WiFi only
+                "cell" to enable cellular only
+                "ntn" to enable Non-Terrestrial Network mode
+                "wifi-ntn" to prioritize WiFi with NTN fallback
+                "cell-ntn" to prioritize cellular with NTN fallback
+                "wifi-cell-ntn" to prioritize WiFi, then cellular, then NTN
+            allow (bool): When True, allows adding Notes to non-compact Notefiles
+                while connected over a non-terrestrial network.
+
+        Returns:
+            dict: The result of the Notecard request.
+        """
+        req = {"req": "card.transport"}
+        if method:
+            req["method"] = method
+        if allow is not None:
+            if not isinstance(allow, bool):
+                return {"err": "allow parameter must be a boolean"}
+            req["allow"] = allow
+        return self.Transaction(req)
 
 
 class OpenSerial(Notecard):
