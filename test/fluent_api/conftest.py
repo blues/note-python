@@ -17,16 +17,16 @@ def card():
     class MockNotecard(notecard.Notecard):
         def Reset(self):
             pass
-            
+
         def lock(self):
             pass
-            
+
         def unlock(self):
             pass
-            
+
         def _transact(self, req_bytes, rsp_expected, timeout_secs):
             pass
-    
+
     card = MockNotecard()
     card.Transaction = MagicMock()
     return card
