@@ -150,3 +150,34 @@ def wireless(card, mode=None, apn=None):
         req["apn"] = apn
 
     return card.Transaction(req)
+
+
+@validate_card_object
+def transport(card, method=None, allow=None):
+    """Configure the Notecard's connectivity method.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        method (string): The connectivity method to enable. Must be one of:
+            "-" to reset to device default
+            "wifi-cell" to prioritize WiFi with cellular fallback
+            "wifi" to enable WiFi only
+            "cell" to enable cellular only
+            "ntn" to enable Non-Terrestrial Network mode
+            "wifi-ntn" to prioritize WiFi with NTN fallback
+            "cell-ntn" to prioritize cellular with NTN fallback
+            "wifi-cell-ntn" to prioritize WiFi, then cellular, then NTN
+        allow (bool): When True, allows adding Notes to non-compact Notefiles
+            while connected over a non-terrestrial network.
+
+    Returns:
+        dict: The result of the Notecard request.
+    """
+    req = {"req": "card.transport"}
+    if method:
+        req["method"] = method
+    if allow is not None:
+        if not isinstance(allow, bool):
+            return {"err": "allow parameter must be a boolean"}
+        req["allow"] = "true" if allow else "false"
+    return card.Transaction(req)
