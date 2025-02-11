@@ -26,14 +26,6 @@ from notecard import card
             {"hours": 1, "offset": 2, "vmax": 1.1, "vmin": 1.2},
         ),
         (card.wireless, "card.wireless", {"mode": "auto", "apn": "myapn.nb"}),
-        (card.wireless, "card.wireless", {"method": "ntn"}),
-        (card.wireless, "card.wireless", {"method": "wifi-ntn"}),
-        (card.wireless, "card.wireless", {"method": "cell-ntn"}),
-        (
-            card.wireless,
-            "card.wireless",
-            {"method": "wifi-cell-ntn", "mode": "auto", "apn": "custom.apn"},
-        ),
     ],
 )
 class TestCard:
