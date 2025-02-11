@@ -184,5 +184,5 @@ def transport(card, method=None, allow=None):
     if allow is not None:
         if not isinstance(allow, bool):
             return {"err": "allow parameter must be a boolean"}
-        req["allow"] = allow
+        req["allow"] = "true" if allow else "false"
     return card.Transaction(req)
