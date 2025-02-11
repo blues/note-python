@@ -35,23 +35,35 @@ def card():
 @pytest.fixture
 def run_fluent_api_notecard_api_mapping_test():
     def _run_test(fluent_api, notecard_api_name, req_params, rename_map=None):
-        card = notecard.Notecard()
+        from unittest.mock import MagicMock
+        
+        class MockNotecard(notecard.Notecard):
+            def Reset(self):
+                pass
+
+            def lock(self):
+                pass
+
+            def unlock(self):
+                pass
+
+            def _transact(self, req_bytes, rsp_expected, timeout_secs):
+                pass
+
+        card = MockNotecard()
         card.Transaction = MagicMock()
-
-        fluent_api(card, **req_params)
-        expected_notecard_api_req = {'req': notecard_api_name, **req_params}
-
-        # There are certain fluent APIs that have keyword arguments that don't
-        # map exactly onto the Notecard API. For example, note.changes takes a
-        # 'maximum' parameter, but in the JSON request that gets sent to the
-        # Notecard, it's sent as 'max'. The rename_map allows a test to specify
-        # how a fluent API's keyword args map to Notecard API args, in cases
-        # where they differ.
-        if rename_map is not None:
+        
+        fluent_api(card)
+        
+        expected_req = {"req": notecard_api_name}
+        expected_req.update(req_params)
+        
+        if rename_map:
             for old_key, new_key in rename_map.items():
-                expected_notecard_api_req[new_key] = expected_notecard_api_req.pop(old_key)
-
-        card.Transaction.assert_called_once_with(expected_notecard_api_req)
+                if old_key in expected_req:
+                    expected_req[new_key] = expected_req.pop(old_key)
+        
+        card.Transaction.assert_called_once_with(expected_req)
 
     return _run_test
 
