@@ -34,6 +34,7 @@ import sys
 import os
 import json
 import time
+from abc import ABC, abstractmethod
 from notecard.timeout import start_timeout, has_timed_out
 from notecard.transaction_manager import TransactionManager, NoOpTransactionManager
 from notecard.crc32 import crc32
@@ -105,8 +106,6 @@ class NoOpSerialLock():
         """Release the no-op lock."""
         pass
 
-
-from abc import ABC, abstractmethod
 
 class Notecard(ABC):
     """Base Notecard class."""
