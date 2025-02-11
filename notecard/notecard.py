@@ -335,6 +335,11 @@ class Notecard(ABC):
                         continue
 
                     try:
+                        if rsp_bytes is None:
+                            error = True
+                            retries_left -= 1
+                            time.sleep(0.5)
+                            continue
                         rsp_json = json.loads(rsp_bytes)
                     except Exception as e:
                         if self._debug:
@@ -466,7 +471,7 @@ class Notecard(ABC):
         if allow is not None:
             if not isinstance(allow, bool):
                 return {"err": "allow parameter must be a boolean"}
-            req["allow"] = allow
+            req["allow"] = "true" if allow else "false"
         return self.Transaction(req)
 
 
