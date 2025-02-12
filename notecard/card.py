@@ -9,7 +9,6 @@
 # This module contains helper methods for calling card.* Notecard API commands.
 # This module is optional and not required for use with the Notecard.
 
-import notecard
 from notecard.validators import validate_card_object
 
 
@@ -137,18 +136,24 @@ def wireless(card, mode=None, apn=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        mode (string): The wireless module mode to set.
+        mode (string): The wireless module mode to set. Must be one of:
+            "-" to reset to the default mode
+            "auto" to perform automatic band scan mode (default)
+            "m" to restrict the modem to Cat-M1
+            "nb" to restrict the modem to Cat-NB1
+            "gprs" to restrict the modem to EGPRS
         apn (string): Access Point Name (APN) when using an external SIM.
+            Use "-" to reset to the Notecard default APN.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request containing network status and
+        signal information.
     """
     req = {"req": "card.wireless"}
     if mode:
         req["mode"] = mode
     if apn:
         req["apn"] = apn
-
     return card.Transaction(req)
 
 
@@ -177,7 +182,5 @@ def transport(card, method=None, allow=None):
     if method:
         req["method"] = method
     if allow is not None:
-        if not isinstance(allow, bool):
-            return {"err": "allow parameter must be a boolean"}
-        req["allow"] = "true" if allow else "false"
+        req["allow"] = allow
     return card.Transaction(req)

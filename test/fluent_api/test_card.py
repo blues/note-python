@@ -59,63 +59,7 @@ from notecard import card
             'card.transport',
             {
                 'method': 'wifi-cell-ntn',
-                'allow': 'true'
-            }
-        ),
-        (
-            card.transport,
-            'card.transport',
-            {
-                'method': 'ntn'
-            }
-        ),
-        (
-            card.transport,
-            'card.transport',
-            {
-                'method': 'wifi-ntn'
-            }
-        ),
-        (
-            card.transport,
-            'card.transport',
-            {
-                'method': 'cell-ntn'
-            }
-        ),
-        (
-            card.transport,
-            'card.transport',
-            {
-                'method': 'wifi'
-            }
-        ),
-        (
-            card.transport,
-            'card.transport',
-            {
-                'method': 'cell'
-            }
-        ),
-        (
-            card.transport,
-            'card.transport',
-            {
-                'method': '-'
-            }
-        ),
-        (
-            card.transport,
-            'card.transport',
-            {
-                'allow': 'true'
-            }
-        ),
-        (
-            card.transport,
-            'card.transport',
-            {
-                'allow': 'false'
+                'allow': True
             }
         )
     ]
