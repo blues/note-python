@@ -53,6 +53,14 @@ from notecard import card
                 'mode': 'auto',
                 'apn': 'myapn.nb'
             }
+        ),
+        (
+            card.transport,
+            'card.transport',
+            {
+                'method': 'wifi-cell-ntn',
+                'allow': True
+            }
         )
     ]
 )
