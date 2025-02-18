@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="note-python",
-    version="1.5.0",
+    version="1.5.1",
     author="Blues Inc.",
     author_email="support@blues.com",
     description="Cross-platform Python Library for the Blues Wireless Notecard,",
@@ -16,16 +16,16 @@ setuptools.setup(
     license="MIT",
     classifiers=[
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Intended Audience :: Developers",
         "Natural Language :: English",
     ],
     install_requires=["filelock"],
-    python_requires='>=3.6',
+    python_requires='>=3.9',
 )
