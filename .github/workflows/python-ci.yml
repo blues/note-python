@@ -46,17 +46,19 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+      - name: Install pipenv
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pipenv
+      - name: Install dependencies
+        run: |
+          pipenv install --dev --python $(which python)
       - name: Lint with flake8
         run: |
-          # stop the build if there are Python syntax errors or undefined names
-          make flake8
+          pipenv run make flake8
       - name: Lint Docs with Pydocstyle
         run: |
-          make docstyle
+          pipenv run make docstyle
       - name: Send running tests notification
         if: ${{ inputs.notehub_notify }}
         run: |
@@ -77,13 +79,13 @@ jobs:
           DD_SERVICE: note-python
           DD_ENV: ci
         run: |
-          coverage run -m pytest --ddtrace --ddtrace-patch-all --ignore=test/hitl
+          pipenv run coverage run -m pytest --ddtrace --ddtrace-patch-all --ignore=test/hitl
       - name: Publish to Coveralls
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ inputs.coveralls }}
         run: |
-          coveralls --service=github
+          pipenv run coveralls --service=github
 
       - name: Check if the job has succeeded
         if: ${{ success() && inputs.notehub_notify }}

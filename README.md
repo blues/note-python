@@ -150,25 +150,36 @@ this project, you agree to abide by the Blues Inc [code of conduct].
 For details on contributions we accept and the process for contributing, see
 our [contribution guide](CONTRIBUTING.md).
 
-## Running the Tests
+## Development Setup
 
-If you're planning to contribute to this repo, please be sure to run the tests
-before submitting a PR. First run:
+If you're planning to contribute to this repo, please be sure to run the tests, linting and style checks before submitting a PR.
 
-```bash
-pip install -r requirements.txt
-```
+1. Install Pipenv if you haven't already:
+   ```bash
+   pip install pipenv
+   ```
 
-Then, run the linter and tests using the included `Makefile`.
+2. Clone the repository and install dependencies:
+   ```bash
+   git clone https://github.com/blues/note-python.git
+   cd note-python
+   pipenv install --dev
+   ```
 
-```bash
-make
-```
+3. Activate the virtual environment:
+   ```bash
+   pipenv shell
+   ```
 
-Alternatively, you can inspect the contents of the [Makefile](Makefile) and run
-`flake8` and `pytest` directly. Be aware, however, that the commands in the
-`Makefile` run against every pull request, so your best bet is to ensure these
-tests are successful before submitting your PR.
+4. Run the tests:
+   ```bash
+   make test
+   ```
+
+5. Run linting and style checks:
+   ```bash
+   make precommit
+   ```
 
 ## Installing the `pre-commit` Hook
 
