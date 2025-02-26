@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-filelock = "==3.0.12"
+filelock = ">=3.4.1"
 
 [dev-packages]
 future = "==0.18.3"
@@ -17,8 +17,8 @@ pytest = "==7.0.1"
 pytest-cov = "==2.8.1"
 pydocstyle = "==5.0.2"
 packaging = ">=20.4"
-pre-commit = "*"
 coveralls = "==3.3.1"
 ddtrace = "==2.21.1"
 build = "*"
 twine = "*"
+pre-commit = "*"
