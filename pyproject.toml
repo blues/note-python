@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "note-python"
+version = "1.5.1"
+description = "Cross-platform Python Library for the Blues Wireless Notecard"
+authors = [
+    {name = "Blues Inc.", email = "support@blues.com"},
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+]
+dependencies = [
+    "filelock==3.0.12",
+]
+
+[project.urls]
+Homepage = "https://github.com/blues/note-python"
+Repository = "https://github.com/blues/note-python"
+
+[tool.setuptools]
+packages = ["notecard"]
+
+[tool.pytest.ini_options]
+addopts = "--ignore=test/hitl/"
