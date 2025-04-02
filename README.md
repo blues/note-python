@@ -4,7 +4,7 @@ Python library for communicating with the Blues Wireless Notecard over serial
 or I²C.
 
 ![Build](https://github.com/blues/note-python/workflows/Python%20package/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/blues/note-python/badge.svg)](https://coveralls.io/github/blues/note-python)
+[![Coverage Status](https://coveralls.io/repos/github/blues/note-python/badge.svg?branch=main)](https://coveralls.io/github/blues/note-python?branch=main)
 ![Python Version Support](https://img.shields.io/pypi/pyversions/note-python)
 ![PyPi Version](https://img.shields.io/pypi/v/note-python)
 ![Wheel Support](https://img.shields.io/pypi/wheel/note-python)
