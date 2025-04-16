@@ -2,12 +2,19 @@
 
  Members                        | Descriptions                                
 --------------------------------|---------------------------------------------
+`namespace `[`notecard::binary_helpers`](#namespacenotecard_1_1binary__helpers) | Helper methods for performing binary transfers to and from a Notecard.
 `namespace `[`notecard::card`](#namespacenotecard_1_1card) | 
+`namespace `[`notecard::cobs`](#namespacenotecard_1_1cobs) | Functions for COBS encoding and decoding of bytearrays.
+`namespace `[`notecard::crc32`](#namespacenotecard_1_1crc32) | Functions for computing CRC32 checksums.
 `namespace `[`notecard::env`](#namespacenotecard_1_1env) | 
 `namespace `[`notecard::file`](#namespacenotecard_1_1file) | 
+`namespace `[`notecard::gpio`](#namespacenotecard_1_1gpio) | GPIO abstractions for different platforms.
 `namespace `[`notecard::hub`](#namespacenotecard_1_1hub) | 
+`namespace `[`notecard::md5`](#namespacenotecard_1_1md5) | Functions for computing MD5 hashes.
 `namespace `[`notecard::note`](#namespacenotecard_1_1note) | 
 `namespace `[`notecard::notecard`](#namespacenotecard_1_1notecard) | 
+`namespace `[`notecard::timeout`](#namespacenotecard_1_1timeout) | Functions for managing timeouts.
+`namespace `[`notecard::transaction_manager`](#namespacenotecard_1_1transaction__manager) | Classes for managing Notecard transactions.
 `namespace `[`notecard::validators`](#namespacenotecard_1_1validators) | 
 
 # namespace `notecard::card` 
@@ -20,6 +27,7 @@
 `public def `[`time`](#namespacenotecard_1_1card_1a0de0f6e72a2387d09aaaa4a719383313)`(card)`            | Retrieve the current time and date from the Notecard.
 `public def `[`status`](#namespacenotecard_1_1card_1a13f03abe1576ab81ea8190e3074576ce)`(card)`            | Retrieve the status of the Notecard.
 `public def `[`temp`](#namespacenotecard_1_1card_1aa15a26b60d8f8be7f994338f0af563cf)`(card,minutes)`            | Retrieve the current temperature from the Notecard.
+`public def `[`transport`](#namespacenotecard_1_1card_1a9b8a6f1b58c7b5e55f8b961f9a847113)`(card,method,allow)`            | Configure the Notecard's connectivity method.
 `public def `[`version`](#namespacenotecard_1_1card_1ac0a7ef1176b55152d42de04d39dfac54)`(card)`            | Retrieve firmware version information from the Notecard.
 `public def `[`voltage`](#namespacenotecard_1_1card_1a1f9f65c34f1bd959d7902285a7537ce6)`(card,hours,offset,vmax,vmin)`            | Retrieve current and historical voltage info from the Notecard.
 `public def `[`wireless`](#namespacenotecard_1_1card_1a10f5f4667d80f47674d1876df69b8e22)`(card,mode,apn)`            | Retrieve wireless modem info or customize modem behavior.
@@ -128,6 +136,22 @@ Retrieve wireless modem info or customize modem behavior.
 * `mode` The wireless module mode to set. 
 
 * `apn` Access Point Name (APN) when using an external SIM.
+
+#### Returns
+
+#### Returns
+string The result of the Notecard request.
+
+#### `public def `[`transport`](#namespacenotecard_1_1card_1a9b8a6f1b58c7b5e55f8b961f9a847113)`(card,method,allow)` 
+
+Configure the Notecard's connectivity method.
+
+#### Parameters
+* `card` The current Notecard object. 
+
+* `method` The connectivity method to use. 
+
+* `allow` List of allowed connectivity methods.
 
 #### Returns
 
@@ -485,7 +509,7 @@ Update a note in a DB Notefile by ID.
 #### Returns
 string The result of the Notecard request.
 
-#### `public def `[`template`](#namespacenotecard_1_1note_1a1e625660366b3766ec9efa8270a7f5bb)`(card,file,body,length)` 
+#### `public def `[`template`](#namespacenotecard_1_1note_1a1e625660366b3766ec9efa8270a7f5bb)`(card,file,body,length,port,compact)` 
 
 Create a template for new Notes in a Notefile.
 
@@ -497,6 +521,10 @@ Create a template for new Notes in a Notefile.
 * `body` A sample JSON body that specifies field names and values as "hints" for the data type. 
 
 * `length` If provided, the maximum length of a payload that can be sent in Notes for the template Notefile.
+
+* `port` If provided, the port to use for the template Notefile.
+
+* `compact` If True, use compact formatting for the template.
 
 #### Returns
 
@@ -513,6 +541,10 @@ string The result of the Notecard request.
 `public def `[`serialReset`](#namespacenotecard_1_1notecard_1aa1badb3c10bdc0321b9a556e8cd49148)`(port)`            | Send a reset command to a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
 `public def `[`serialTransaction`](#namespacenotecard_1_1notecard_1aee094fc03befdcbe4ee4a9d658d09841)`(port,req,debug)`            | Perform a single write to and read from a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
 `public def `[`serialCommand`](#namespacenotecard_1_1notecard_1af2b5752d8f67ffcebeda99511e37e7a1)`(port,req,debug)`            | Perform a single write to and read from a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
+`public def `[`GetUserAgent`](#namespacenotecard_1_1notecard_1a5f8e8f2b6a9f7c5e4e6b2f9f8a9d6e7c)`()`            | Returns the User Agent String for the host.
+`public def `[`SetAppUserAgent`](#namespacenotecard_1_1notecard_1a4b3c2d1f6e8f7a9c0e5d6b8f7c5e4e6b)`(app_user_agent)`            | Sets the User Agent info for the app.
+`public def `[`UserAgentSent`](#namespacenotecard_1_1notecard_1a7c5e4e6b2f9f8a9d6e7c5f8e8f7a9c0)`()`            | Returns true if the User Agent has been sent to the Notecard.
+`public def `[`SetTransactionPins`](#namespacenotecard_1_1notecard_1a9c0e5d6b8f7c5e4e6b2f9f8a9d6e7c5)`(rtx_pin,ctx_pin)`            | Sets the pins used for RTX and CTX.
 `class `[`notecard::notecard::Notecard`](#classnotecard_1_1notecard_1_1_notecard) | Base [Notecard](#classnotecard_1_1notecard_1_1_notecard) class.
 `class `[`notecard::notecard::OpenI2C`](#classnotecard_1_1notecard_1_1_open_i2_c) | [Notecard](#classnotecard_1_1notecard_1_1_notecard) class for I2C communication.
 `class `[`notecard::notecard::OpenSerial`](#classnotecard_1_1notecard_1_1_open_serial) | [Notecard](#classnotecard_1_1notecard_1_1_notecard) class for Serial communication.
@@ -534,6 +566,35 @@ Perform a single write to and read from a [Notecard](#classnotecard_1_1notecard_
 #### `public def `[`serialCommand`](#namespacenotecard_1_1notecard_1af2b5752d8f67ffcebeda99511e37e7a1)`(port,req,debug)` 
 
 Perform a single write to and read from a [Notecard](#classnotecard_1_1notecard_1_1_notecard).
+
+#### `public def `[`GetUserAgent`](#namespacenotecard_1_1notecard_1a5f8e8f2b6a9f7c5e4e6b2f9f8a9d6e7c)`()` 
+
+Returns the User Agent String for the host.
+
+#### Returns
+string The User Agent string.
+
+#### `public def `[`SetAppUserAgent`](#namespacenotecard_1_1notecard_1a4b3c2d1f6e8f7a9c0e5d6b8f7c5e4e6b)`(app_user_agent)` 
+
+Sets the User Agent info for the app.
+
+#### Parameters
+* `app_user_agent` The User Agent string for the app.
+
+#### `public def `[`UserAgentSent`](#namespacenotecard_1_1notecard_1a7c5e4e6b2f9f8a9d6e7c5f8e8f7a9c0)`()` 
+
+Returns true if the User Agent has been sent to the Notecard.
+
+#### Returns
+boolean True if the User Agent has been sent.
+
+#### `public def `[`SetTransactionPins`](#namespacenotecard_1_1notecard_1a9c0e5d6b8f7c5e4e6b2f9f8a9d6e7c5)`(rtx_pin,ctx_pin)` 
+
+Sets the pins used for RTX and CTX.
+
+#### Parameters
+* `rtx_pin` The Ready to Transact pin.
+* `ctx_pin` The Clear to Transact pin.
 
 # class `notecard::notecard::Notecard` 
 
@@ -658,5 +719,196 @@ Initialize the [Notecard](#classnotecard_1_1notecard_1_1_notecard) before a rese
 #### `public def `[`validate_card_object`](#namespacenotecard_1_1validators_1a67c61d583c23a6be17354d84575bdc93)`(func)` 
 
 Ensure that the passed-in card is a Notecard.
+
+# namespace `notecard::binary_helpers` 
+
+## Summary
+
+ Members                        | Descriptions                                
+--------------------------------|---------------------------------------------
+`public def `[`get_binary_length`](#namespacenotecard_1_1binary__helpers_1a1e625660366b3766ec9efa8270a7f5bb)`(card)`            | Get the length of the decoded binary data store.
+`public def `[`reset_binary`](#namespacenotecard_1_1binary__helpers_1a660dda3f8fa6f9afff52e0a3be6bef84)`(card)`            | Reset the binary data store.
+`public def `[`binary_get`](#namespacenotecard_1_1binary__helpers_1ad7a4c296382c14a8efb54278c127d73b)`(card,offset,length)`            | Get binary data from the Notecard.
+`public def `[`binary_put`](#namespacenotecard_1_1binary__helpers_1a591ece0048b58f38acf22d97a533577f)`(card,data,offset,length)`            | Put binary data to the Notecard.
+
+## Members
+
+#### `public def `[`get_binary_length`](#namespacenotecard_1_1binary__helpers_1a1e625660366b3766ec9efa8270a7f5bb)`(card)` 
+
+Get the length of the decoded binary data store.
+
+#### Parameters
+* `card` The current Notecard object.
+
+#### Returns
+int The length of the binary data store.
+
+#### `public def `[`reset_binary`](#namespacenotecard_1_1binary__helpers_1a660dda3f8fa6f9afff52e0a3be6bef84)`(card)` 
+
+Reset the binary data store.
+
+#### Parameters
+* `card` The current Notecard object.
+
+#### Returns
+string The result of the Notecard request.
+
+#### `public def `[`binary_get`](#namespacenotecard_1_1binary__helpers_1ad7a4c296382c14a8efb54278c127d73b)`(card,offset,length)` 
+
+Get binary data from the Notecard.
+
+#### Parameters
+* `card` The current Notecard object.
+* `offset` The offset to start reading from.
+* `length` The number of bytes to read.
+
+#### Returns
+bytearray The binary data.
+
+#### `public def `[`binary_put`](#namespacenotecard_1_1binary__helpers_1a591ece0048b58f38acf22d97a533577f)`(card,data,offset,length)` 
+
+Put binary data to the Notecard.
+
+#### Parameters
+* `card` The current Notecard object.
+* `data` The binary data to write.
+* `offset` The offset to start writing at.
+* `length` The number of bytes to write.
+
+#### Returns
+string The result of the Notecard request.
+
+# namespace `notecard::cobs` 
+
+## Summary
+
+ Members                        | Descriptions                                
+--------------------------------|---------------------------------------------
+`public def `[`cobs_encode`](#namespacenotecard_1_1cobs_1a1e625660366b3766ec9efa8270a7f5bb)`(data,eop)`            | Encode a bytearray using COBS.
+`public def `[`cobs_decode`](#namespacenotecard_1_1cobs_1a660dda3f8fa6f9afff52e0a3be6bef84)`(data,eop)`            | Decode a COBS-encoded bytearray.
+
+## Members
+
+#### `public def `[`cobs_encode`](#namespacenotecard_1_1cobs_1a1e625660366b3766ec9efa8270a7f5bb)`(data,eop)` 
+
+Encode a bytearray using COBS.
+
+#### Parameters
+* `data` The data to encode.
+* `eop` The end-of-packet marker.
+
+#### Returns
+bytearray The encoded data.
+
+#### `public def `[`cobs_decode`](#namespacenotecard_1_1cobs_1a660dda3f8fa6f9afff52e0a3be6bef84)`(data,eop)` 
+
+Decode a COBS-encoded bytearray.
+
+#### Parameters
+* `data` The data to decode.
+* `eop` The end-of-packet marker.
+
+#### Returns
+bytearray The decoded data.
+
+# namespace `notecard::crc32` 
+
+## Summary
+
+ Members                        | Descriptions                                
+--------------------------------|---------------------------------------------
+`public def `[`crc32`](#namespacenotecard_1_1crc32_1a1e625660366b3766ec9efa8270a7f5bb)`(data)`            | Compute the CRC32 checksum of data.
+
+## Members
+
+#### `public def `[`crc32`](#namespacenotecard_1_1crc32_1a1e625660366b3766ec9efa8270a7f5bb)`(data)` 
+
+Compute the CRC32 checksum of data.
+
+#### Parameters
+* `data` The data to compute the checksum for.
+
+#### Returns
+int The CRC32 checksum.
+
+# namespace `notecard::gpio` 
+
+## Summary
+
+ Members                        | Descriptions                                
+--------------------------------|---------------------------------------------
+`class `[`notecard::gpio::GPIO`](#classnotecard_1_1gpio_1_1_g_p_i_o) | Base GPIO class.
+`class `[`notecard::gpio::CircuitPythonGPIO`](#classnotecard_1_1gpio_1_1_circuit_python_g_p_i_o) | CircuitPython GPIO implementation.
+`class `[`notecard::gpio::MicroPythonGPIO`](#classnotecard_1_1gpio_1_1_micro_python_g_p_i_o) | MicroPython GPIO implementation.
+`class `[`notecard::gpio::RaspberryPiGPIO`](#classnotecard_1_1gpio_1_1_raspberry_pi_g_p_i_o) | Raspberry Pi GPIO implementation.
+
+# namespace `notecard::md5` 
+
+## Summary
+
+ Members                        | Descriptions                                
+--------------------------------|---------------------------------------------
+`public def `[`md5`](#namespacenotecard_1_1md5_1a1e625660366b3766ec9efa8270a7f5bb)`(data)`            | Compute the MD5 hash of data.
+`public def `[`hexdigest`](#namespacenotecard_1_1md5_1a660dda3f8fa6f9afff52e0a3be6bef84)`(digest)`            | Convert a binary digest to hexadecimal.
+
+## Members
+
+#### `public def `[`md5`](#namespacenotecard_1_1md5_1a1e625660366b3766ec9efa8270a7f5bb)`(data)` 
+
+Compute the MD5 hash of data.
+
+#### Parameters
+* `data` The data to hash.
+
+#### Returns
+bytearray The MD5 hash.
+
+#### `public def `[`hexdigest`](#namespacenotecard_1_1md5_1a660dda3f8fa6f9afff52e0a3be6bef84)`(digest)` 
+
+Convert a binary digest to hexadecimal.
+
+#### Parameters
+* `digest` The binary digest.
+
+#### Returns
+string The hexadecimal representation.
+
+# namespace `notecard::timeout` 
+
+## Summary
+
+ Members                        | Descriptions                                
+--------------------------------|---------------------------------------------
+`public def `[`start_timeout`](#namespacenotecard_1_1timeout_1a1e625660366b3766ec9efa8270a7f5bb)`()`            | Start a timeout interval.
+`public def `[`has_timed_out`](#namespacenotecard_1_1timeout_1a660dda3f8fa6f9afff52e0a3be6bef84)`(start,timeout_secs)`            | Check if a timeout has occurred.
+
+## Members
+
+#### `public def `[`start_timeout`](#namespacenotecard_1_1timeout_1a1e625660366b3766ec9efa8270a7f5bb)`()` 
+
+Start a timeout interval.
+
+#### Returns
+float The start time.
+
+#### `public def `[`has_timed_out`](#namespacenotecard_1_1timeout_1a660dda3f8fa6f9afff52e0a3be6bef84)`(start,timeout_secs)` 
+
+Check if a timeout has occurred.
+
+#### Parameters
+* `start` The start time.
+* `timeout_secs` The timeout in seconds.
+
+#### Returns
+boolean True if the timeout has occurred.
+
+# namespace `notecard::transaction_manager` 
+
+## Summary
+
+ Members                        | Descriptions                                
+--------------------------------|---------------------------------------------
+`class `[`notecard::transaction_manager::TransactionManager`](#classnotecard_1_1transaction__manager_1_1_transaction_manager) | Manages transactions with the Notecard.
+`class `[`notecard::transaction_manager::NoOpTransactionManager`](#classnotecard_1_1transaction__manager_1_1_no_op_transaction_manager) | No-op transaction manager.
 
 Generated by [Moxygen](https://sourcey.com/moxygen)
