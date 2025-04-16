@@ -28,4 +28,19 @@ run_build:
 deploy:
 	pipenv run python -m twine upload -r "pypi" --config-file .pypirc 'dist/*'
 
-.PHONY: precommit test coverage run_build deploy
+generate-api-docs:
+	# Install required dependencies if not present
+	pip install doxypypy
+	# Create virtual environment directory if it doesn't exist
+	mkdir -p env/bin
+	# Create activation script if it doesn't exist
+	if [ ! -f env/bin/activate ]; then \
+		echo '#!/bin/bash' > env/bin/activate; \
+		echo 'export PATH=$$PATH:/home/ubuntu/.local/bin' >> env/bin/activate; \
+		chmod +x env/bin/activate; \
+	fi
+	# Generate documentation
+	doxygen Doxyfile
+	moxygen --output docs/api.md docs/xml
+
+.PHONY: precommit test coverage run_build deploy generate-api-docs
