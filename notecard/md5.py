@@ -1,4 +1,9 @@
-"""Module for computing MD5 hash for MicroPython and CircuitPython."""
+"""Functions for computing MD5 hashes.
+
+This module provides a lightweight implementation of the MD5 algorithm
+for MicroPython and CircuitPython platforms, used for data verification
+in Notecard binary transfers.
+"""
 
 """
 Copyright [2018] [Mauro Riva <lemariva@mail.com> <lemariva.com>]

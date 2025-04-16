@@ -1,4 +1,9 @@
-"""TransactionManager-related code for note-python."""
+"""Classes for managing Notecard transactions.
+
+This module provides transaction management for Notecard communications,
+implementing the RTX/CTX protocol for reliable data exchange between
+the host and Notecard.
+"""
 
 import sys
 import time

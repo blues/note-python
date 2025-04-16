@@ -1,4 +1,8 @@
-"""Module for computing the CRC32 of arbitrary data."""
+"""Functions for computing CRC32 checksums.
+
+This module provides a lightweight implementation of the CRC32 algorithm
+for verifying data integrity in Notecard communications.
+"""
 
 crc32_lookup_table = [
     0x00000000, 0x1DB71064, 0x3B6E20C8, 0x26D930AC, 0x76DC4190, 0x6B6B51F4,

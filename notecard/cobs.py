@@ -1,4 +1,9 @@
-"""Methods for COBS encoding and decoding arbitrary bytearrays."""
+"""Functions for COBS encoding and decoding of bytearrays.
+
+This module implements Consistent Overhead Byte Stuffing (COBS), an encoding
+that eliminates zero bytes from arbitrary binary data. The Notecard uses this
+for binary data transfers to ensure reliable transmission.
+"""
 
 
 def cobs_encode(data: bytearray, eop: int) -> bytearray:

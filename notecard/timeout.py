@@ -1,4 +1,8 @@
-"""Module for managing timeouts in note-python."""
+"""Functions for managing timeouts.
+
+This module provides cross-platform timeout management for Notecard communications,
+supporting different timing mechanisms for CPython, MicroPython, and CircuitPython.
+"""
 
 import sys
 import time

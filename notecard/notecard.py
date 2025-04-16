@@ -402,21 +402,40 @@ class Notecard:
         self.Transaction(req)
 
     def GetUserAgent(self):
-        """Return the User Agent String for the host for debug purposes."""
+        """Return the User Agent String for the host for debug purposes.
+        
+        Returns:
+            dict: A dictionary containing user agent information including OS details
+                 and any application-specific user agent information.
+        """
         ua_copy = self._user_agent.copy()
         ua_copy.update(self._user_agent_app or {})
         return ua_copy
 
     def SetAppUserAgent(self, app_user_agent):
-        """Set the User Agent info for the app."""
+        """Set the User Agent info for the app.
+        
+        Args:
+            app_user_agent (dict): Dictionary containing application-specific 
+                                  user agent information.
+        """
         self._user_agent_app = app_user_agent
 
     def UserAgentSent(self):
-        """Return true if the User Agent has been sent to the Notecard."""
+        """Return true if the User Agent has been sent to the Notecard.
+        
+        Returns:
+            bool: True if the User Agent has been sent to the Notecard, False otherwise.
+        """
         return self._user_agent_sent
 
     def SetTransactionPins(self, rtx_pin, ctx_pin):
-        """Set the pins used for RTX and CTX."""
+        """Set the pins used for RTX and CTX.
+        
+        Args:
+            rtx_pin: The pin to use for Ready To Transact (RTX) signaling.
+            ctx_pin: The pin to use for Clear To Transact (CTX) signaling.
+        """
         self._transaction_manager = TransactionManager(rtx_pin, ctx_pin)
 
 

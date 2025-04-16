@@ -1,4 +1,8 @@
-"""Helper methods for doing binary transfers to/from a Notecard."""
+"""Helper methods for performing binary transfers to and from a Notecard.
+
+This module provides functions for working with the Notecard's binary data store,
+including reading, writing, and managing binary data with CRC verification.
+"""
 
 import sys
 from notecard.cobs import cobs_encode, cobs_decode
