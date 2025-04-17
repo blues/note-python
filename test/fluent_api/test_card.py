@@ -61,6 +61,14 @@ from notecard import card
                 'method': 'wifi-cell-ntn',
                 'allow': True
             }
+        ),
+        (
+            card.power,
+            'card.power',
+            {
+                'minutes': 10,
+                'reset': True
+            }
         )
     ]
 )
