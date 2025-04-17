@@ -29,9 +29,6 @@ deploy:
 	pipenv run python -m twine upload -r "pypi" --config-file .pypirc 'dist/*'
 
 generate-api-docs:
-	# Install required dependencies if not present
-	pipenv install doxypypy
-	# Generate documentation
 	doxygen Doxyfile
 	moxygen --output docs/api.md docs/xml
 
