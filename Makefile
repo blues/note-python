@@ -28,4 +28,8 @@ run_build:
 deploy:
 	pipenv run python -m twine upload -r "pypi" --config-file .pypirc 'dist/*'
 
-.PHONY: precommit test coverage run_build deploy
+generate-api-docs:
+	doxygen Doxyfile
+	moxygen --output docs/api.md docs/xml
+
+.PHONY: precommit test coverage run_build deploy generate-api-docs
