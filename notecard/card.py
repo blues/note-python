@@ -184,3 +184,26 @@ def transport(card, method=None, allow=None):
     if allow is not None:
         req["allow"] = allow
     return card.Transaction(req)
+
+
+@validate_card_object
+def power(card, minutes=None, reset=None):
+    """Configure a connected Mojo device or request power consumption readings in firmware.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        minutes (int): The number of minutes to log power consumption. Default is 720 minutes (12 hours).
+        reset (bool): When True, resets the power consumption counter back to 0.
+
+    Returns:
+        dict: The result of the Notecard request. The response will contain the following fields:
+            "voltage": The current voltage.
+            "milliamp_hours": The cumulative energy consumption in milliamp hours.
+            "temperature": The Notecard's internal temperature in degrees centigrade, including offset.
+    """
+    req = {"req": "card.power"}
+    if minutes:
+        req["minutes"] = minutes
+    if reset:
+        req["reset"] = reset
+    return card.Transaction(req)
