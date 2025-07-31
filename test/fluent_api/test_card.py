@@ -140,6 +140,40 @@ from notecard import card
                 'role': 'Head of Security',
                 'email': 'tom@blues.com'
             }
+        ),
+        (
+            card.aux,
+            'card.aux',
+            {
+                'mode': 'gpio',
+                'usage': ['input', 'output', 'count'],
+                'seconds': 60,
+                'max': 10,
+                'start': True,
+                'gps': False,
+                'rate': 115200,
+                'sync': True,
+                'file': 'aux.qo',
+                'connected': False,
+                'limit': True,
+                'sensitivity': 50,
+                'ms': 100,
+                'count': 5,
+                'offset': 1
+            }
+        ),
+        (
+            card.aux_serial,
+            'card.aux.serial',
+            {
+                'mode': 'notify,accel',
+                'duration': 30,
+                'rate': 9600,
+                'limit': True,
+                'max': 1024,
+                'ms': 500,
+                'minutes': 5
+            }
         )
     ]
 )

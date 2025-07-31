@@ -422,3 +422,122 @@ def contact(card, name=None, org=None, role=None, email=None):
     if email:
         req["email"] = email
     return card.Transaction(req)
+
+
+@validate_card_object
+def aux(card, mode=None, usage=None, seconds=None, max=None, start=None, gps=None,
+        rate=None, sync=None, file=None, connected=None, limit=None, sensitivity=None,
+        ms=None, count=None, offset=None):
+    """Configure various uses of the general-purpose I/O (GPIO) pins AUX1-AUX4 for tracking and sensing tasks.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        mode (string): The AUX mode. Options include: "dfu", "gpio", "led", "monitor", "motion",
+                      "neo", "neo-monitor", "off", "track", "track-monitor", "track-neo-monitor".
+        usage (array): An ordered list of pin modes for each AUX pin when in GPIO mode.
+        seconds (int): When in gpio mode, if an AUX pin is configured as a count type,
+                      the count of rising edges can be broken into samples of this duration.
+        max (int): When in gpio mode, if an AUX pin is configured as a count type,
+                  the maximum number of samples of duration seconds.
+        start (bool): When in gpio mode, if an AUX pin is configured as a count type,
+                     set to True to reset counters and start incrementing.
+        gps (bool): Deprecated. If True, along with mode:track the Notecard supports
+                   the use of an external GPS module.
+        rate (int): The AUX UART baud rate for debug communication over the AUXRX and AUXTX pins.
+        sync (bool): If True, for pins set as input by usage, the Notecard will autonomously
+                    report any state changes as new notes in file.
+        file (string): The name of the Notefile used to report state changes when used
+                      in conjunction with sync:True.
+        connected (bool): If True, defers the sync of the state change Notefile to the next
+                         sync as configured by the hub.set request.
+        limit (bool): If True, along with mode:track and gps:True the Notecard will disable
+                     concurrent modem use during GPS tracking.
+        sensitivity (int): When used with mode:neo-monitor or mode:track-neo-monitor,
+                          this controls the brightness of NeoPixel lights.
+        ms (int): When in gpio mode, this argument configures a debouncing interval.
+        count (int): When used with mode:neo-monitor or mode:track-neo-monitor,
+                    this controls the number of NeoPixels to use in a strip.
+        offset (int): When used with mode:neo-monitor or mode:track-neo-monitor,
+                     this is the 1-based index in a strip of NeoPixels.
+
+    Returns:
+        dict: The result of the Notecard request containing:
+            "mode": The current mode of the AUX interface
+            "text": Text received over the AUX interface
+            "binary": Binary data received over the AUX interface
+            "count": Number of bytes received
+    """
+    req = {"req": "card.aux"}
+    if mode:
+        req["mode"] = mode
+    if usage:
+        req["usage"] = usage
+    if seconds:
+        req["seconds"] = seconds
+    if max:
+        req["max"] = max
+    if start is not None:
+        req["start"] = start
+    if gps is not None:
+        req["gps"] = gps
+    if rate:
+        req["rate"] = rate
+    if sync is not None:
+        req["sync"] = sync
+    if file:
+        req["file"] = file
+    if connected is not None:
+        req["connected"] = connected
+    if limit is not None:
+        req["limit"] = limit
+    if sensitivity:
+        req["sensitivity"] = sensitivity
+    if ms:
+        req["ms"] = ms
+    if count:
+        req["count"] = count
+    if offset:
+        req["offset"] = offset
+    return card.Transaction(req)
+
+
+@validate_card_object
+def aux_serial(card, mode=None, duration=None, rate=None, limit=None, max=None, ms=None, minutes=None):
+    """Configure various uses of the AUXTX and AUXRX pins on the Notecard's edge connector.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        mode (string): The AUX mode. Must be one of the following:
+                      "req" - Request/response monitoring (default)
+                      "gps" - Use external GPS/GNSS module
+                      "notify" - Stream data or notifications
+                      "notify,accel" - Stream accelerometer readings
+                      "notify,signals" - Notify of Inbound Signals
+                      "notify,env" - Notify of Environment Variable changes
+                      "notify,dfu" - Notify of DFU events
+        duration (int): For mode "accel", specify sampling duration for accelerometer.
+        rate (int): Baud rate for transmission (default 115200, 9600 for GPS).
+        limit (bool): Disable concurrent modem use during GPS tracking.
+        max (int): Maximum data to send per session in bytes.
+        ms (int): Delay in milliseconds before sending buffer.
+        minutes (int): Interval for notifying host when using mode "dfu".
+
+    Returns:
+        dict: The result of the Notecard request.
+    """
+    req = {"req": "card.aux.serial"}
+    if mode:
+        req["mode"] = mode
+    if duration:
+        req["duration"] = duration
+    if rate:
+        req["rate"] = rate
+    if limit is not None:
+        req["limit"] = limit
+    if max:
+        req["max"] = max
+    if ms:
+        req["ms"] = ms
+    if minutes:
+        req["minutes"] = minutes
+    return card.Transaction(req)

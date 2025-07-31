@@ -7,8 +7,8 @@
 | Notecard API            | Python Library API  |
 | ----------------------- | ------------------- |
 | `card.attn`             | card.attn           |
-| `card.aux`              | NOT IMPLEMENTED     |
-| `card.aux.serial`       | NOT IMPLEMENTED     |
+| `card.aux`              | card.aux            |
+| `card.aux.serial`       | card.aux_serial     |
 | `card.binary`           | card.binary         |
 | `card.binary.get`       | card.binary_get     |
 | `card.binary.put`       | card.binary_put     |
