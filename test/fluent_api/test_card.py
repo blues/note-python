@@ -174,6 +174,41 @@ from notecard import card
                 'ms': 500,
                 'minutes': 5
             }
+        ),
+        (
+            card.dfu,
+            'card.dfu',
+            {
+                'name': 'esp32',
+                'on': True,
+                'off': False,
+                'seconds': 300,
+                'stop': True,
+                'start': False,
+                'mode': 'secure'
+            }
+        ),
+        (
+            card.illumination,
+            'card.illumination',
+            {}
+        ),
+        (
+            card.io,
+            'card.io',
+            {
+                'i2c': 24,
+                'mode': '+busy'
+            }
+        ),
+        (
+            card.led,
+            'card.led',
+            {
+                'mode': 'red',
+                'on': True,
+                'off': False
+            }
         )
     ]
 )

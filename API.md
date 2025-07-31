@@ -14,10 +14,10 @@
 | `card.binary.put`       | card.binaryPut      |
 | `card.carrier`          | card.carrier        |
 | `card.contact`          | card.contact        |
-| `card.dfu`              | NOT IMPLEMENTED     |
-| `card.illumination`     | NOT IMPLEMENTED     |
-| `card.io`               | NOT IMPLEMENTED     |
-| `card.led`              | NOT IMPLEMENTED     |
+| `card.dfu`              | card.dfu            |
+| `card.illumination`     | card.illumination   |
+| `card.io`               | card.io             |
+| `card.led`              | card.led            |
 | `card.location`         | card.location       |
 | `card.location.mode`    | card.locationMode   |
 | `card.location.track`   | card.locationTrack  |

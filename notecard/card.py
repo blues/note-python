@@ -541,3 +541,114 @@ def auxSerial(card, mode=None, duration=None, rate=None, limit=None, max=None, m
     if minutes:
         req["minutes"] = minutes
     return card.Transaction(req)
+
+
+@validate_card_object
+def dfu(card, name=None, on=None, off=None, seconds=None, stop=None, start=None, mode=None):
+    """Configure a Notecard for Notecard Outboard Firmware Update.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        name (string): One of the supported classes of host MCU. Supported MCU classes are
+                      'esp32', 'stm32', 'stm32-bi', 'mcuboot', '-'.
+        on (bool): Set to True to enable Notecard Outboard Firmware Update.
+        off (bool): Set to True to disable Notecard Outboard Firmware Update from occurring.
+        seconds (int): When used with 'off':True, disable Notecard Outboard Firmware Update
+                      operations for the specified number of seconds.
+        stop (bool): Set to True to disable the host RESET that is normally performed on the
+                    host MCU when the Notecard starts up.
+        start (bool): Set to True to enable the host RESET.
+        mode (string): Optional mode for alternative DFU configuration.
+
+    Returns:
+        dict: The result of the Notecard request containing:
+            "name": Current MCU class configured for DFU
+    """
+    req = {"req": "card.dfu"}
+    if name:
+        req["name"] = name
+    if on is not None:
+        req["on"] = on
+    if off is not None:
+        req["off"] = off
+    if seconds:
+        req["seconds"] = seconds
+    if stop is not None:
+        req["stop"] = stop
+    if start is not None:
+        req["start"] = start
+    if mode:
+        req["mode"] = mode
+    return card.Transaction(req)
+
+
+@validate_card_object
+def illumination(card):
+    """Retrieve an illumination reading from an OPT3001 ambient light sensor connected to Notecard's I2C bus.
+
+    Args:
+        card (Notecard): The current Notecard object.
+
+    Returns:
+        dict: The result of the Notecard request containing:
+            "value": An illumination reading (in lux) from the attached OPT3001 sensor.
+
+    Note:
+        If no OPT3001 sensor is detected, this request returns an "illumination sensor is not available" error.
+    """
+    req = {"req": "card.illumination"}
+    return card.Transaction(req)
+
+
+@validate_card_object
+def io(card, i2c=None, mode=None):
+    """Override the Notecard's I2C address and change behaviors of the onboard LED and USB port.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        i2c (int): The alternate address to use for I2C communication. Pass -1 to reset to the default address.
+        mode (string): Mode to change LED or USB behavior. Options include:
+                      "-usb" - Disable the Notecard's USB port. Re-enable with "usb" or "+usb"
+                      "+busy" - LED will be on when Notecard is awake, off when asleep
+                      "-busy" - Reset "+busy" to default (LED blinks only during flash operations)
+                      "i2c-master-disable" - Disable Notecard acting as an I2C master
+                      "i2c-master-enable" - Re-enable I2C master functionality
+
+    Returns:
+        dict: The result of the Notecard request.
+    """
+    req = {"req": "card.io"}
+    if i2c is not None:
+        req["i2c"] = i2c
+    if mode:
+        req["mode"] = mode
+    return card.Transaction(req)
+
+
+@validate_card_object
+def led(card, mode=None, on=None, off=None):
+    """Control connected LEDs or manage a single connected NeoPixel.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        mode (string): Used to specify the color of the LED or NeoPixel to control.
+                      For LEDs: 'red', 'green', 'yellow'
+                      For NeoPixels: 'red', 'green', 'blue', 'yellow', 'cyan', 'magenta', 'orange', 'white', 'gray'
+        on (bool): Set to True to turn the specified LED or NeoPixel on.
+        off (bool): Set to True to turn the specified LED or NeoPixel off.
+
+    Returns:
+        dict: The result of the Notecard request.
+
+    Note:
+        Requires the card.aux API to be configured in 'led' or 'neo' mode first.
+        Not supported by Notecard LoRa for regular LEDs.
+    """
+    req = {"req": "card.led"}
+    if mode:
+        req["mode"] = mode
+    if on is not None:
+        req["on"] = on
+    if off is not None:
+        req["off"] = off
+    return card.Transaction(req)
