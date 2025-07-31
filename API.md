@@ -8,10 +8,10 @@
 | ----------------------- | ------------------- |
 | `card.attn`             | card.attn           |
 | `card.aux`              | card.aux            |
-| `card.aux.serial`       | card.aux_serial     |
+| `card.aux.serial`       | card.auxSerial      |
 | `card.binary`           | card.binary         |
-| `card.binary.get`       | card.binary_get     |
-| `card.binary.put`       | card.binary_put     |
+| `card.binary.get`       | card.binaryGet      |
+| `card.binary.put`       | card.binaryPut      |
 | `card.carrier`          | card.carrier        |
 | `card.contact`          | card.contact        |
 | `card.dfu`              | NOT IMPLEMENTED     |
@@ -19,8 +19,8 @@
 | `card.io`               | NOT IMPLEMENTED     |
 | `card.led`              | NOT IMPLEMENTED     |
 | `card.location`         | card.location       |
-| `card.location.mode`    | card.location_mode  |
-| `card.location.track`   | card.location_track |
+| `card.location.mode`    | card.locationMode   |
+| `card.location.track`   | card.locationTrack  |
 | `card.monitor`          | NOT IMPLEMENTED     |
 | `card.motion`           | NOT IMPLEMENTED     |
 | `card.motion.mode`      | NOT IMPLEMENTED     |

@@ -76,7 +76,7 @@ from notecard import card
             {}
         ),
         (
-            card.location_mode,
+            card.locationMode,
             'card.location.mode',
             {
                 'mode': 'periodic',
@@ -88,7 +88,7 @@ from notecard import card
             }
         ),
         (
-            card.location_track,
+            card.locationTrack,
             'card.location.track',
             {
                 'start': True,
@@ -107,7 +107,7 @@ from notecard import card
             }
         ),
         (
-            card.binary_get,
+            card.binaryGet,
             'card.binary.get',
             {
                 'cobs': 1024,
@@ -116,7 +116,7 @@ from notecard import card
             }
         ),
         (
-            card.binary_put,
+            card.binaryPut,
             'card.binary.put',
             {
                 'offset': 0,
@@ -163,7 +163,7 @@ from notecard import card
             }
         ),
         (
-            card.aux_serial,
+            card.auxSerial,
             'card.aux.serial',
             {
                 'mode': 'notify,accel',

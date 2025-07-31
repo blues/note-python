@@ -232,7 +232,7 @@ def location(card):
 
 
 @validate_card_object
-def location_mode(card, mode=None, seconds=None, vseconds=None, lat=None, lon=None, max=None):
+def locationMode(card, mode=None, seconds=None, vseconds=None, lat=None, lon=None, max=None):
     """Set location-related configuration settings.
 
     Args:
@@ -269,7 +269,7 @@ def location_mode(card, mode=None, seconds=None, vseconds=None, lat=None, lon=No
 
 
 @validate_card_object
-def location_track(card, start=None, heartbeat=None, hours=None, sync=None, stop=None, file=None):
+def locationTrack(card, start=None, heartbeat=None, hours=None, sync=None, stop=None, file=None):
     """Store location data in a Notefile at the periodic interval, or using a specified heartbeat.
 
     Args:
@@ -325,7 +325,7 @@ def binary(card, delete=None):
 
 
 @validate_card_object
-def binary_get(card, cobs=None, offset=None, length=None):
+def binaryGet(card, cobs=None, offset=None, length=None):
     """Retrieve binary data stored in the binary storage area of the Notecard.
 
     Args:
@@ -350,7 +350,7 @@ def binary_get(card, cobs=None, offset=None, length=None):
 
 
 @validate_card_object
-def binary_put(card, offset=None, cobs=None, status=None):
+def binaryPut(card, offset=None, cobs=None, status=None):
     """Add binary data to the binary storage area of the Notecard.
 
     Args:
@@ -502,7 +502,7 @@ def aux(card, mode=None, usage=None, seconds=None, max=None, start=None, gps=Non
 
 
 @validate_card_object
-def aux_serial(card, mode=None, duration=None, rate=None, limit=None, max=None, ms=None, minutes=None):
+def auxSerial(card, mode=None, duration=None, rate=None, limit=None, max=None, ms=None, minutes=None):
     """Configure various uses of the AUXTX and AUXRX pins on the Notecard's edge connector.
 
     Args:
