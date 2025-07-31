@@ -69,6 +69,146 @@ from notecard import card
                 'minutes': 10,
                 'reset': True
             }
+        ),
+        (
+            card.location,
+            'card.location',
+            {}
+        ),
+        (
+            card.locationMode,
+            'card.location.mode',
+            {
+                'mode': 'periodic',
+                'seconds': 300,
+                'vseconds': 'high',
+                'lat': 42.5776,
+                'lon': -70.87134,
+                'max': 60
+            }
+        ),
+        (
+            card.locationTrack,
+            'card.location.track',
+            {
+                'start': True,
+                'heartbeat': True,
+                'hours': 2,
+                'sync': True,
+                'stop': False,
+                'file': 'location.qo'
+            }
+        ),
+        (
+            card.binary,
+            'card.binary',
+            {
+                'delete': True
+            }
+        ),
+        (
+            card.binaryGet,
+            'card.binary.get',
+            {
+                'cobs': 1024,
+                'offset': 0,
+                'length': 512
+            }
+        ),
+        (
+            card.binaryPut,
+            'card.binary.put',
+            {
+                'offset': 0,
+                'cobs': 1024,
+                'status': 'd41d8cd98f00b204e9800998ecf8427e'
+            }
+        ),
+        (
+            card.carrier,
+            'card.carrier',
+            {
+                'mode': 'charging'
+            }
+        ),
+        (
+            card.contact,
+            'card.contact',
+            {
+                'name': 'Tom Turkey',
+                'org': 'Blues',
+                'role': 'Head of Security',
+                'email': 'tom@blues.com'
+            }
+        ),
+        (
+            card.aux,
+            'card.aux',
+            {
+                'mode': 'gpio',
+                'usage': ['input', 'output', 'count'],
+                'seconds': 60,
+                'max': 10,
+                'start': True,
+                'gps': False,
+                'rate': 115200,
+                'sync': True,
+                'file': 'aux.qo',
+                'connected': False,
+                'limit': True,
+                'sensitivity': 50,
+                'ms': 100,
+                'count': 5,
+                'offset': 1
+            }
+        ),
+        (
+            card.auxSerial,
+            'card.aux.serial',
+            {
+                'mode': 'notify,accel',
+                'duration': 30,
+                'rate': 9600,
+                'limit': True,
+                'max': 1024,
+                'ms': 500,
+                'minutes': 5
+            }
+        ),
+        (
+            card.dfu,
+            'card.dfu',
+            {
+                'name': 'esp32',
+                'on': True,
+                'off': False,
+                'seconds': 300,
+                'stop': True,
+                'start': False,
+                'mode': 'secure'
+            }
+        ),
+        (
+            card.illumination,
+            'card.illumination',
+            {}
+        ),
+        (
+            card.io,
+            'card.io',
+            {
+                'i2c': 24,
+                'mode': '+busy'
+            }
+        ),
+        (
+            card.led,
+            'card.led',
+            {
+                'mode': 'red',
+                'on': True,
+                'off': False
+            }
         )
     ]
 )
