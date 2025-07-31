@@ -371,3 +371,54 @@ def binary_put(card, offset=None, cobs=None, status=None):
     if status:
         req["status"] = status
     return card.Transaction(req)
+
+
+@validate_card_object
+def carrier(card, mode=None):
+    """Configure the AUX_CHARGING pin to notify the Notecard about charging support on a Notecarrier.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        mode (string): The AUX_CHARGING mode. Set to "charging" to tell the Notecard that AUX_CHARGING
+                      is connected to a Notecarrier that supports charging. Set to "-" or "off" to turn off
+                      the AUX_CHARGING detection.
+
+    Returns:
+        dict: The result of the Notecard request containing:
+            "mode": The current AUX_CHARGING mode, or "off" if not set
+            "charging": Will display True when in AUX_CHARGING "charging" mode
+    """
+    req = {"req": "card.carrier"}
+    if mode:
+        req["mode"] = mode
+    return card.Transaction(req)
+
+
+@validate_card_object
+def contact(card, name=None, org=None, role=None, email=None):
+    """Set or retrieve information about the Notecard maintainer.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        name (string): Set the name of the Notecard maintainer.
+        org (string): Set the organization name of the Notecard maintainer.
+        role (string): Set the role of the Notecard maintainer.
+        email (string): Set the email address of the Notecard maintainer.
+
+    Returns:
+        dict: The result of the Notecard request containing:
+            "name": Name of the Notecard maintainer
+            "org": Organization name of the Notecard maintainer
+            "role": Role of the Notecard maintainer
+            "email": Email address of the Notecard maintainer
+    """
+    req = {"req": "card.contact"}
+    if name:
+        req["name"] = name
+    if org:
+        req["org"] = org
+    if role:
+        req["role"] = role
+    if email:
+        req["email"] = email
+    return card.Transaction(req)

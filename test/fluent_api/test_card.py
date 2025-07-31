@@ -123,6 +123,23 @@ from notecard import card
                 'cobs': 1024,
                 'status': 'd41d8cd98f00b204e9800998ecf8427e'
             }
+        ),
+        (
+            card.carrier,
+            'card.carrier',
+            {
+                'mode': 'charging'
+            }
+        ),
+        (
+            card.contact,
+            'card.contact',
+            {
+                'name': 'Tom Turkey',
+                'org': 'Blues',
+                'role': 'Head of Security',
+                'email': 'tom@blues.com'
+            }
         )
     ]
 )

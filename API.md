@@ -12,8 +12,8 @@
 | `card.binary`           | card.binary         |
 | `card.binary.get`       | card.binary_get     |
 | `card.binary.put`       | card.binary_put     |
-| `card.carrier`          | NOT IMPLEMENTED     |
-| `card.contact`          | NOT IMPLEMENTED     |
+| `card.carrier`          | card.carrier        |
+| `card.contact`          | card.contact        |
 | `card.dfu`              | NOT IMPLEMENTED     |
 | `card.illumination`     | NOT IMPLEMENTED     |
 | `card.io`               | NOT IMPLEMENTED     |
