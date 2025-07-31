@@ -9,16 +9,19 @@
 | `card.attn`            | card.attn          |
 | `card.aux`             | NOT IMPLEMENTED    |
 | `card.contact`         | NOT IMPLEMENTED    |
-| `card.location.mode`   | NOT IMPLEMENTED    |
-| `card.location.track`  | NOT IMPLEMENTED    |
+| `card.location`        | card.location      |
+| `card.location.mode`   | card.location_mode |
+| `card.location.track`  | card.location_track|
 | `card.motion.mode`     | NOT IMPLEMENTED    |
 | `card.motion.sync`     | NOT IMPLEMENTED    |
 | `card.motion.track`    | NOT IMPLEMENTED    |
+| `card.power`           | card.power         |
 | `card.restart`         | NOT IMPLEMENTED    |
 | `card.restore`         | NOT IMPLEMENTED    |
 | `card.status`          | card.status        |
 | `card.temp`            | card.temp          |
 | `card.time`            | card.time          |
+| `card.transport`       | card.transport     |
 | `card.usage.get`       | NOT IMPLEMENTED    |
 | `card.usage.test`      | NOT IMPLEMENTED    |
 | `card.version`         | card.version       |

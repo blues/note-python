@@ -69,6 +69,35 @@ from notecard import card
                 'minutes': 10,
                 'reset': True
             }
+        ),
+        (
+            card.location,
+            'card.location',
+            {}
+        ),
+        (
+            card.location_mode,
+            'card.location.mode',
+            {
+                'mode': 'periodic',
+                'seconds': 300,
+                'vseconds': 'high',
+                'lat': 42.5776,
+                'lon': -70.87134,
+                'max': 60
+            }
+        ),
+        (
+            card.location_track,
+            'card.location.track',
+            {
+                'start': True,
+                'heartbeat': True,
+                'hours': 2,
+                'sync': True,
+                'stop': False,
+                'file': 'location.qo'
+            }
         )
     ]
 )

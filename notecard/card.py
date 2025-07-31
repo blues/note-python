@@ -207,3 +207,95 @@ def power(card, minutes=None, reset=None):
     if reset:
         req["reset"] = reset
     return card.Transaction(req)
+
+
+@validate_card_object
+def location(card):
+    """Retrieve the last known location of the Notecard.
+
+    Args:
+        card (Notecard): The current Notecard object.
+
+    Returns:
+        dict: The result of the Notecard request containing location information including:
+            "status": The current status of the Notecard GPS/GNSS connection
+            "mode": The GPS/GNSS connection mode (continuous, periodic, or off)
+            "lat": The latitude in degrees of the last known location
+            "lon": The longitude in degrees of the last known location
+            "time": UNIX Epoch time of location capture
+            "max": If a geofence is enabled by card.location.mode, meters from the geofence center
+            "count": The number of consecutive recorded GPS/GNSS failures
+            "dop": The "Dilution of Precision" value from the latest GPS/GNSS reading
+    """
+    req = {"req": "card.location"}
+    return card.Transaction(req)
+
+
+@validate_card_object
+def location_mode(card, mode=None, seconds=None, vseconds=None, lat=None, lon=None, max=None):
+    """Set location-related configuration settings.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        mode (string): The location mode to set. Must be one of:
+            - "" (empty string) to retrieve the current mode
+            - "off" to turn location mode off
+            - "periodic" to sample location at a specified interval
+            - "continuous" to enable the Notecard's GPS/GNSS module for continuous sampling
+            - "fixed" to report the location as a fixed location
+        seconds (int): When in periodic mode, location will be sampled at this interval, if the Notecard detects motion.
+        vseconds (string): In periodic mode, overrides seconds with a voltage-variable value.
+        lat (float): Used with fixed mode to specify the latitude coordinate.
+        lon (float): Used with fixed mode to specify the longitude coordinate.
+        max (int): Maximum number of seconds to wait for a GPS fix.
+
+    Returns:
+        dict: The result of the Notecard request.
+    """
+    req = {"req": "card.location.mode"}
+    if mode is not None:
+        req["mode"] = mode
+    if seconds:
+        req["seconds"] = seconds
+    if vseconds:
+        req["vseconds"] = vseconds
+    if lat is not None:
+        req["lat"] = lat
+    if lon is not None:
+        req["lon"] = lon
+    if max:
+        req["max"] = max
+    return card.Transaction(req)
+
+
+@validate_card_object
+def location_track(card, start=None, heartbeat=None, hours=None, sync=None, stop=None, file=None):
+    """Store location data in a Notefile at the periodic interval, or using a specified heartbeat.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        start (bool): Set to True to start Notefile tracking.
+        heartbeat (bool): When start is True, set to True to enable tracking even when motion is not detected.
+        hours (int): If heartbeat is True, add a heartbeat entry at this hourly interval.
+                    Use a negative integer to specify a heartbeat in minutes instead of hours.
+        sync (bool): Set to True to perform an immediate sync to the Notehub each time a new Note is added.
+        stop (bool): Set to True to stop Notefile tracking.
+        file (string): The name of the Notefile to store location data in. Defaults to "track.qo".
+
+    Returns:
+        dict: The result of the Notecard request.
+    """
+    req = {"req": "card.location.track"}
+    if start is not None:
+        req["start"] = start
+    if heartbeat is not None:
+        req["heartbeat"] = heartbeat
+    if hours:
+        req["hours"] = hours
+    if sync is not None:
+        req["sync"] = sync
+    if stop is not None:
+        req["stop"] = stop
+    if file:
+        req["file"] = file
+    return card.Transaction(req)
