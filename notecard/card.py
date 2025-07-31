@@ -299,3 +299,75 @@ def location_track(card, start=None, heartbeat=None, hours=None, sync=None, stop
     if file:
         req["file"] = file
     return card.Transaction(req)
+
+
+@validate_card_object
+def binary(card, delete=None):
+    """View the status of the binary storage area of the Notecard and optionally clear data.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        delete (bool): Set to True to clear the COBS area on the Notecard and reset all related arguments.
+
+    Returns:
+        dict: The result of the Notecard request containing binary storage information including:
+            "cobs": The size of COBS-encoded data stored in the reserved area
+            "connected": Returns True if the Notecard is connected to the network
+            "err": If present, a string describing the error that occurred during transmission
+            "length": The length of the binary data
+            "max": Available storage space
+            "status": MD5 checksum of unencoded buffer
+    """
+    req = {"req": "card.binary"}
+    if delete is not None:
+        req["delete"] = delete
+    return card.Transaction(req)
+
+
+@validate_card_object
+def binary_get(card, cobs=None, offset=None, length=None):
+    """Retrieve binary data stored in the binary storage area of the Notecard.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        cobs (int): The size of the COBS-encoded data you are expecting to be returned (in bytes).
+        offset (int): Used along with length, the number of bytes to offset the binary payload from 0 when retrieving binary data.
+        length (int): Used along with offset, the number of bytes to retrieve from the binary storage area.
+
+    Returns:
+        dict: The result of the Notecard request. The response returns the JSON-formatted response object, then the binary data.
+            "status": The MD5 checksum of the data returned, after it has been decoded
+            "err": If present, a string describing the error that occurred during transmission
+    """
+    req = {"req": "card.binary.get"}
+    if cobs:
+        req["cobs"] = cobs
+    if offset is not None:
+        req["offset"] = offset
+    if length:
+        req["length"] = length
+    return card.Transaction(req)
+
+
+@validate_card_object
+def binary_put(card, offset=None, cobs=None, status=None):
+    """Add binary data to the binary storage area of the Notecard.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        offset (int): The number of bytes to offset the binary payload from 0 when appending the binary data to the binary storage area.
+        cobs (int): The size of the COBS-encoded data (in bytes).
+        status (string): The MD5 checksum of the data, before it has been encoded.
+
+    Returns:
+        dict: The result of the Notecard request. The Notecard expects to receive binary data immediately following the usage of this API command.
+            "err": If present, a string describing the error that occurred during transmission
+    """
+    req = {"req": "card.binary.put"}
+    if offset is not None:
+        req["offset"] = offset
+    if cobs:
+        req["cobs"] = cobs
+    if status:
+        req["status"] = status
+    return card.Transaction(req)

@@ -98,6 +98,31 @@ from notecard import card
                 'stop': False,
                 'file': 'location.qo'
             }
+        ),
+        (
+            card.binary,
+            'card.binary',
+            {
+                'delete': True
+            }
+        ),
+        (
+            card.binary_get,
+            'card.binary.get',
+            {
+                'cobs': 1024,
+                'offset': 0,
+                'length': 512
+            }
+        ),
+        (
+            card.binary_put,
+            'card.binary.put',
+            {
+                'offset': 0,
+                'cobs': 1024,
+                'status': 'd41d8cd98f00b204e9800998ecf8427e'
+            }
         )
     ]
 )

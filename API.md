@@ -9,9 +9,9 @@
 | `card.attn`             | card.attn           |
 | `card.aux`              | NOT IMPLEMENTED     |
 | `card.aux.serial`       | NOT IMPLEMENTED     |
-| `card.binary`           | NOT IMPLEMENTED     |
-| `card.binary.get`       | NOT IMPLEMENTED     |
-| `card.binary.set`       | NOT IMPLEMENTED     |
+| `card.binary`           | card.binary         |
+| `card.binary.get`       | card.binary_get     |
+| `card.binary.put`       | card.binary_put     |
 | `card.carrier`          | NOT IMPLEMENTED     |
 | `card.contact`          | NOT IMPLEMENTED     |
 | `card.dfu`              | NOT IMPLEMENTED     |
