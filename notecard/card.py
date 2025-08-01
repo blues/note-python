@@ -891,3 +891,216 @@ def trace(card, mode=None):
     if mode:
         req["mode"] = mode
     return card.Transaction(req)
+
+
+@validate_card_object
+def triangulate(card, mode=None, on=None, usb=None, set=None, minutes=None, text=None, time=None):
+    """Enable or disable triangulation behavior for gathering cell tower and Wi-Fi access point information.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        mode (string): The triangulation approach to use. Keywords can be used separately or together
+                      in a comma-delimited list: "cell", "wifi", or "-" to clear the mode.
+        on (bool): Set to True to triangulate even if the module has not moved.
+                  Only takes effect when set is True. Default: False.
+        usb (bool): Set to True to perform triangulation only when connected to USB power.
+                   Only takes effect when set is True. Default: False.
+        set (bool): Set to True to instruct the module to use the state of the on and usb arguments.
+                   Default: False.
+        minutes (int): Minimum delay, in minutes, between triangulation attempts.
+                      Use 0 for no time-based suppression. Default: 0.
+        text (string): When using Wi-Fi triangulation, a newline-terminated list of Wi-Fi access points.
+                      Format should follow ESP32's AT+CWLAP command output.
+        time (int): UNIX Epoch time when the Wi-Fi access point scan was performed.
+                   If not provided, Notecard time is used.
+
+    Returns:
+        dict: The result of the Notecard request containing:
+            "motion": UNIX Epoch time of last detected Notecard movement
+            "time": UNIX Epoch time of last triangulation scan
+            "mode": Comma-separated list indicating active triangulation modes
+            "on": Boolean if triangulation scans will be performed even if device has not moved
+            "usb": Boolean if triangulation scans will be performed only when USB-powered
+            "length": Length of the text buffer provided in current or previous request
+
+    Note:
+        See: https://dev.blues.io/notecard/notecard-walkthrough/time-and-location-requests/#using-cell-tower-and-wi-fi-triangulation
+    """
+    req = {"req": "card.triangulate"}
+    if mode:
+        req["mode"] = mode
+    if on is not None:
+        req["on"] = on
+    if usb is not None:
+        req["usb"] = usb
+    if set is not None:
+        req["set"] = set
+    if minutes is not None:
+        req["minutes"] = minutes
+    if text:
+        req["text"] = text
+    if time is not None:
+        req["time"] = time
+    return card.Transaction(req)
+
+
+@validate_card_object
+def usageGet(card, mode=None, offset=None):
+    """Return the card's network usage statistics.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        mode (string): The time period to use for statistics. Must be one of:
+                      "total" for all stats since activation (default),
+                      "1hour", "1day", "30day".
+        offset (int): The number of time periods to look backwards, based on the specified mode.
+
+    Returns:
+        dict: The result of the Notecard request containing:
+            "seconds": Number of seconds in the analyzed period
+            "time": UNIX Epoch time of start of analyzed period (or activation time if mode="total")
+            "bytes_sent": Number of bytes sent by the Notecard to Notehub
+            "bytes_received": Number of bytes received by the Notecard from Notehub
+            "notes_sent": Approximate number of notes sent by the Notecard to Notehub
+            "notes_received": Approximate number of notes received by the Notecard from Notehub
+            "sessions_standard": Number of standard Notehub sessions
+            "sessions_secure": Number of secure Notehub sessions
+
+    Note:
+        Usage data is updated at the end of each network connection. If connected in continuous mode,
+        usage data will not be updated until the current session ends.
+        See: https://dev.blues.io/notecard/notecard-walkthrough/low-bandwidth-design#measuring-data-usage
+    """
+    req = {"req": "card.usage.get"}
+    if mode:
+        req["mode"] = mode
+    if offset is not None:
+        req["offset"] = offset
+    return card.Transaction(req)
+
+
+@validate_card_object
+def usageTest(card, days=None, hours=None, megabytes=None):
+    """Test and project data usage based on historical usage patterns.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        days (int): Number of days to use for the test.
+        hours (int): If analyzing a period shorter than one day, the number of hours to use for the test.
+        megabytes (int): The Notecard lifetime data quota (in megabytes) to use for the test. Default: 1024.
+
+    Returns:
+        dict: The result of the Notecard request containing:
+            "max": Days of projected data available based on test
+            "days": Number of days used for the test
+            "bytes_per_day": Average bytes per day used during the test period
+            "seconds": Number of seconds in the analyzed period
+            "time": UNIX Epoch time of device activation
+            "bytes_sent": Number of bytes sent by the Notecard to Notehub
+            "bytes_received": Number of bytes received by the Notecard from Notehub
+            "notes_sent": Number of notes sent by the Notecard to Notehub
+            "notes_received": Number of notes received by the Notecard from Notehub
+            "sessions_standard": Number of standard Notehub sessions
+            "sessions_secure": Number of secure Notehub sessions
+
+    Note:
+        See: https://dev.blues.io/notecard/notecard-walkthrough/low-bandwidth-design#projecting-the-lifetime-of-available-data
+    """
+    req = {"req": "card.usage.test"}
+    if days is not None:
+        req["days"] = days
+    if hours is not None:
+        req["hours"] = hours
+    if megabytes is not None:
+        req["megabytes"] = megabytes
+    return card.Transaction(req)
+
+
+@validate_card_object
+def wifi(card, ssid=None, password=None, name=None, org=None, start=None, text=None):
+    """Set up a Notecard WiFi to connect to a Wi-Fi access point.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        ssid (string): The SSID of the Wi-Fi access point. Use "-" to clear an already set SSID.
+        password (string): The network password of the Wi-Fi access point.
+                          Use "-" to clear an already set password or to connect to an open access point.
+        name (string): Custom name for the SoftAP (software enabled access point).
+                      Default is "Notecard". Use "-" suffix to append MAC address digits.
+        org (string): If specified, replaces the Blues logo on the SoftAP page with the provided name.
+        start (bool): Set to True to activate SoftAP mode on the Notecard programmatically.
+        text (string): String containing an array of access points in format:
+                      '["FIRST-SSID","FIRST-PASSWORD"],["SECOND-SSID","SECOND-PASSWORD"]'
+
+    Returns:
+        dict: The result of the Notecard request containing:
+            "secure": Boolean indicating if Wi-Fi access point uses Management Frame Protection
+            "version": Silicon Labs WF200 Wi-Fi Transceiver binary version
+            "ssid": SSID of the Wi-Fi access point
+            "security": Security protocol the Wi-Fi access point uses
+
+    Note:
+        Updates to WiFi credentials cannot occur while Notecard is in continuous mode.
+        Change to periodic or off mode first using hub.set.
+        See: https://dev.blues.io/guides-and-tutorials/notecard-guides/connecting-to-a-wi-fi-access-point/
+    """
+    req = {"req": "card.wifi"}
+    if ssid:
+        req["ssid"] = ssid
+    if password:
+        req["password"] = password
+    if name:
+        req["name"] = name
+    if org:
+        req["org"] = org
+    if start is not None:
+        req["start"] = start
+    if text:
+        req["text"] = text
+    return card.Transaction(req)
+
+
+@validate_card_object
+def wirelessPenalty(card, reset=None, set=None, rate=None, add=None, max=None, min=None):
+    """View the current state of a Notecard Penalty Box, manually remove from penalty box, or override defaults.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        reset (bool): Set to True to remove the Notecard from certain types of penalty boxes.
+        set (bool): Set to True to override the default settings of the Network Registration Failure Penalty Box.
+        rate (float): The rate at which the penalty box time multiplier is increased over successive retries.
+                     Default: 1.25. Used with set argument.
+        add (int): The number of minutes to add to successive retries. Default: 15. Used with set argument.
+        max (int): The maximum number of minutes that a device can be in a Network Registration Failure
+                  Penalty Box. Default: 4320. Used with set argument.
+        min (int): The number of minutes of the first retry interval of a Network Registration Failure
+                  Penalty Box. Default: 15. Used with set argument.
+
+    Returns:
+        dict: The result of the Notecard request containing:
+            "minutes": Time since the first network registration failure
+            "count": Number of consecutive network registration failures
+            "status": If in a Penalty Box, provides associated Error and Status Codes
+            "seconds": If in a Penalty Box, number of seconds until the penalty condition ends
+
+    Warning:
+        Misuse of this feature may result in the cellular carrier preventing future connections
+        or blacklisting devices for attempting to connect too frequently.
+
+    Note:
+        See: https://dev.blues.io/guides-and-tutorials/notecard-guides/understanding-notecard-penalty-boxes
+    """
+    req = {"req": "card.wireless.penalty"}
+    if reset is not None:
+        req["reset"] = reset
+    if set is not None:
+        req["set"] = set
+    if rate is not None:
+        req["rate"] = rate
+    if add is not None:
+        req["add"] = add
+    if max is not None:
+        req["max"] = max
+    if min is not None:
+        req["min"] = min
+    return card.Transaction(req)

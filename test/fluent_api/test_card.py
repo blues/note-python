@@ -290,6 +290,60 @@ from notecard import card
             {
                 'mode': 'on'
             }
+        ),
+        (
+            card.triangulate,
+            'card.triangulate',
+            {
+                'mode': 'wifi,cell',
+                'on': True,
+                'usb': True,
+                'set': True,
+                'minutes': 30,
+                'text': '+CWLAP:(4,"Blues",-51,"74:ac:b9:12:12:f8",1)\n',
+                'time': 1606755042
+            }
+        ),
+        (
+            card.usageGet,
+            'card.usage.get',
+            {
+                'mode': '1day',
+                'offset': 5
+            }
+        ),
+        (
+            card.usageTest,
+            'card.usage.test',
+            {
+                'days': 7,
+                'hours': 12,
+                'megabytes': 500
+            }
+        ),
+        (
+            card.wifi,
+            'card.wifi',
+            {
+                'ssid': 'MyNetwork',
+                'password': 'MyPassword',
+                'name': 'ACME Inc',
+                'org': 'ACME Inc',
+                'start': True,
+                'text': '["SSID1","PASS1"],["SSID2","PASS2"]'
+            }
+        ),
+        (
+            card.wirelessPenalty,
+            'card.wireless.penalty',
+            {
+                'reset': True,
+                'set': False,
+                'rate': 2.0,
+                'add': 10,
+                'max': 720,
+                'min': 5
+            }
         )
     ]
 )

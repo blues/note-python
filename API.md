@@ -35,14 +35,14 @@
 | `card.time`             | card.time           |
 | `card.trace`            | card.trace          |
 | `card.transport`        | card.transport      |
-| `card.triangulate`      | NOT IMPLEMENTED     |
-| `card.usage.get`        | NOT IMPLEMENTED     |
-| `card.usage.test`       | NOT IMPLEMENTED     |
+| `card.triangulate`      | card.triangulate    |
+| `card.usage.get`        | card.usageGet       |
+| `card.usage.test`       | card.usageTest      |
 | `card.version`          | card.version        |
 | `card.voltage`          | card.voltage        |
-| `card.wifi`             | NOT IMPLEMENTED     |
+| `card.wifi`             | card.wifi           |
 | `card.wireless`         | card.wireless       |
-| `card.wireless.penalty` | NOT IMPLEMENTED     |
+| `card.wireless.penalty` | card.wirelessPenalty|
 
 ## DFU Commands
 
