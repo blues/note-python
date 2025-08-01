@@ -21,28 +21,28 @@
 | `card.location`         | card.location       |
 | `card.location.mode`    | card.locationMode   |
 | `card.location.track`   | card.locationTrack  |
-| `card.monitor`          | NOT IMPLEMENTED     |
-| `card.motion`           | NOT IMPLEMENTED     |
-| `card.motion.mode`      | NOT IMPLEMENTED     |
-| `card.motion.sync`      | NOT IMPLEMENTED     |
-| `card.motion.track`     | NOT IMPLEMENTED     |
+| `card.monitor`          | card.monitor        |
+| `card.motion`           | card.motion         |
+| `card.motion.mode`      | card.motionMode     |
+| `card.motion.sync`      | card.motionSync     |
+| `card.motion.track`     | card.motionTrack    |
 | `card.power`            | card.power          |
-| `card.restart`          | NOT IMPLEMENTED     |
-| `card.restore`          | NOT IMPLEMENTED     |
-| `card.sleep`            | NOT IMPLEMENTED     |
+| `card.restart`          | card.restart        |
+| `card.restore`          | card.restore        |
+| `card.sleep`            | card.sleep          |
 | `card.status`           | card.status         |
 | `card.temp`             | card.temp           |
 | `card.time`             | card.time           |
-| `card.trace`            | NOT IMPLEMENTED     |
+| `card.trace`            | card.trace          |
 | `card.transport`        | card.transport      |
-| `card.triangulate`      | NOT IMPLEMENTED     |
-| `card.usage.get`        | NOT IMPLEMENTED     |
-| `card.usage.test`       | NOT IMPLEMENTED     |
+| `card.triangulate`      | card.triangulate    |
+| `card.usage.get`        | card.usageGet       |
+| `card.usage.test`       | card.usageTest      |
 | `card.version`          | card.version        |
 | `card.voltage`          | card.voltage        |
-| `card.wifi`             | NOT IMPLEMENTED     |
+| `card.wifi`             | card.wifi           |
 | `card.wireless`         | card.wireless       |
-| `card.wireless.penalty` | NOT IMPLEMENTED     |
+| `card.wireless.penalty` | card.wirelessPenalty|
 
 ## DFU Commands
 

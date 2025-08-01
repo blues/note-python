@@ -209,6 +209,141 @@ from notecard import card
                 'on': True,
                 'off': False
             }
+        ),
+        (
+            card.monitor,
+            'card.monitor',
+            {
+                'mode': 'green',
+                'count': 5,
+                'usb': True
+            }
+        ),
+        (
+            card.motion,
+            'card.motion',
+            {
+                'minutes': 10
+            }
+        ),
+        (
+            card.motionMode,
+            'card.motion.mode',
+            {
+                'start': True,
+                'stop': False,
+                'seconds': 30,
+                'sensitivity': 0,
+                'motion': 5
+            }
+        ),
+        (
+            card.motionSync,
+            'card.motion.sync',
+            {
+                'start': True,
+                'stop': False,
+                'minutes': 60,
+                'count': 10,
+                'threshold': 0
+            }
+        ),
+        (
+            card.motionTrack,
+            'card.motion.track',
+            {
+                'start': True,
+                'stop': False,
+                'minutes': 120,
+                'count': 15,
+                'threshold': 0,
+                'file': '_motion.qo',
+                'now': True
+            }
+        ),
+        (
+            card.restart,
+            'card.restart',
+            {}
+        ),
+        (
+            card.restore,
+            'card.restore',
+            {
+                'delete': True,
+                'connected': False
+            }
+        ),
+        (
+            card.sleep,
+            'card.sleep',
+            {
+                'on': True,
+                'off': False,
+                'seconds': 60,
+                'mode': 'accel'
+            }
+        ),
+        (
+            card.trace,
+            'card.trace',
+            {
+                'mode': 'on'
+            }
+        ),
+        (
+            card.triangulate,
+            'card.triangulate',
+            {
+                'mode': 'wifi,cell',
+                'on': True,
+                'usb': True,
+                'set': True,
+                'minutes': 30,
+                'text': '+CWLAP:(4,"Blues",-51,"74:ac:b9:12:12:f8",1)\n',
+                'time': 1606755042
+            }
+        ),
+        (
+            card.usageGet,
+            'card.usage.get',
+            {
+                'mode': '1day',
+                'offset': 5
+            }
+        ),
+        (
+            card.usageTest,
+            'card.usage.test',
+            {
+                'days': 7,
+                'hours': 12,
+                'megabytes': 500
+            }
+        ),
+        (
+            card.wifi,
+            'card.wifi',
+            {
+                'ssid': 'MyNetwork',
+                'password': 'MyPassword',
+                'name': 'ACME Inc',
+                'org': 'ACME Inc',
+                'start': True,
+                'text': '["SSID1","PASS1"],["SSID2","PASS2"]'
+            }
+        ),
+        (
+            card.wirelessPenalty,
+            'card.wireless.penalty',
+            {
+                'reset': True,
+                'set': False,
+                'rate': 2.0,
+                'add': 10,
+                'max': 720,
+                'min': 5
+            }
         )
     ]
 )
