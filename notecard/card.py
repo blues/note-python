@@ -670,7 +670,7 @@ def monitor(card, mode=None, count=None, usb=None):
     req = {"req": "card.monitor"}
     if mode:
         req["mode"] = mode
-    if count:
+    if count is not None:
         req["count"] = count
     if usb is not None:
         req["usb"] = usb
@@ -696,7 +696,7 @@ def motion(card, minutes=None):
             "mode": Current motion status of the Notecard (e.g., "stopped" or "moving")
     """
     req = {"req": "card.motion"}
-    if minutes:
+    if minutes is not None:
         req["minutes"] = minutes
     return card.Transaction(req)
 
@@ -721,11 +721,11 @@ def motionMode(card, start=None, stop=None, seconds=None, sensitivity=None, moti
         req["start"] = start
     if stop is not None:
         req["stop"] = stop
-    if seconds:
+    if seconds is not None:
         req["seconds"] = seconds
     if sensitivity is not None:
         req["sensitivity"] = sensitivity
-    if motion:
+    if motion is not None:
         req["motion"] = motion
     return card.Transaction(req)
 
@@ -751,9 +751,9 @@ def motionSync(card, start=None, stop=None, minutes=None, count=None, threshold=
         req["start"] = start
     if stop is not None:
         req["stop"] = stop
-    if minutes:
+    if minutes is not None:
         req["minutes"] = minutes
-    if count:
+    if count is not None:
         req["count"] = count
     if threshold is not None:
         req["threshold"] = threshold
@@ -782,13 +782,13 @@ def motionTrack(card, start=None, stop=None, minutes=None, count=None, threshold
         req["start"] = start
     if stop is not None:
         req["stop"] = stop
-    if minutes:
+    if minutes is not None:
         req["minutes"] = minutes
-    if count:
+    if count is not None:
         req["count"] = count
     if threshold is not None:
         req["threshold"] = threshold
-    if file:
+    if file is not None:
         req["file"] = file
     if now is not None:
         req["now"] = now
@@ -866,7 +866,7 @@ def sleep(card, on=None, off=None, seconds=None, mode=None):
         req["on"] = on
     if off is not None:
         req["off"] = off
-    if seconds:
+    if seconds is not None:
         req["seconds"] = seconds
     if mode:
         req["mode"] = mode
@@ -1047,11 +1047,11 @@ def wifi(card, ssid=None, password=None, name=None, org=None, start=None, text=N
     req = {"req": "card.wifi"}
     if ssid:
         req["ssid"] = ssid
-    if password:
+    if password is not None:
         req["password"] = password
     if name:
         req["name"] = name
-    if org:
+    if org is not None:
         req["org"] = org
     if start is not None:
         req["start"] = start
