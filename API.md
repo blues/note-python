@@ -33,7 +33,7 @@
 | `card.status`           | card.status         |
 | `card.temp`             | card.temp           |
 | `card.time`             | card.time           |
-| `card.trace`            | NOT IMPLEMENTED     |
+| `card.trace`            | card.trace          |
 | `card.transport`        | card.transport      |
 | `card.triangulate`      | NOT IMPLEMENTED     |
 | `card.usage.get`        | NOT IMPLEMENTED     |

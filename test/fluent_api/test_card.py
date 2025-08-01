@@ -283,6 +283,13 @@ from notecard import card
                 'seconds': 60,
                 'mode': 'accel'
             }
+        ),
+        (
+            card.trace,
+            'card.trace',
+            {
+                'mode': 'on'
+            }
         )
     ]
 )

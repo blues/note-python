@@ -871,3 +871,23 @@ def sleep(card, on=None, off=None, seconds=None, mode=None):
     if mode:
         req["mode"] = mode
     return card.Transaction(req)
+
+
+@validate_card_object
+def trace(card, mode=None):
+    """Enable and disable trace mode on a Notecard for debugging.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        mode (string): Set to "on" to enable trace mode on a Notecard, or "off" to disable it.
+
+    Returns:
+        dict: The result of the Notecard request.
+
+    Note:
+        See: https://dev.blues.io/guides-and-tutorials/notecard-guides/using-notecard-trace-mode
+    """
+    req = {"req": "card.trace"}
+    if mode:
+        req["mode"] = mode
+    return card.Transaction(req)
