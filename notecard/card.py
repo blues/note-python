@@ -652,3 +652,144 @@ def led(card, mode=None, on=None, off=None):
     if off is not None:
         req["off"] = off
     return card.Transaction(req)
+
+
+@validate_card_object
+def monitor(card, mode=None, count=None, usb=None):
+    """Configure AUX pins when in monitor mode.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        mode (string): Set LED color. Options: 'green', 'red', 'yellow'.
+        count (int): Number of pulses to send to AUX pin LED. Set this to 0 to return to default LED behavior.
+        usb (bool): Set to true to configure LED behavior so that it is only active when the Notecard is connected to USB power.
+
+    Returns:
+        dict: The result of the Notecard request.
+    """
+    req = {"req": "card.monitor"}
+    if mode:
+        req["mode"] = mode
+    if count:
+        req["count"] = count
+    if usb is not None:
+        req["usb"] = usb
+    return card.Transaction(req)
+
+
+@validate_card_object
+def motion(card, minutes=None):
+    """Retrieve information about the Notecard's accelerometer motion and orientation.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        minutes (int): Amount of time to sample for buckets of accelerometer-measured movement.
+
+    Returns:
+        dict: The result of the Notecard request containing:
+            "count": Number of accelerometer motion events since the last card.motion request
+            "alert": Boolean indicating free-fall detection since the last request
+            "motion": UNIX Epoch time of the last accelerometer motion event
+            "status": Comma-separated list of orientation events (e.g., "face-up", "portrait-down")
+            "seconds": Duration of each bucket of sample accelerometer movements (when minutes is provided)
+            "movements": Base-36 characters representing motion counts in each bucket
+            "mode": Current motion status of the Notecard (e.g., "stopped" or "moving")
+    """
+    req = {"req": "card.motion"}
+    if minutes:
+        req["minutes"] = minutes
+    return card.Transaction(req)
+
+
+@validate_card_object
+def motionMode(card, start=None, stop=None, seconds=None, sensitivity=None, motion=None):
+    """Configure accelerometer motion monitoring parameters.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        start (bool): Set to True to enable the Notecard accelerometer and start motion tracking.
+        stop (bool): Set to True to disable the Notecard accelerometer and stop motion tracking.
+        seconds (int): Period for each bucket of movements to be accumulated when minutes is used with card.motion.
+        sensitivity (int): Sets accelerometer sample rate with different sensitivity levels (default -1).
+        motion (int): Threshold for motion events to trigger motion status change between "moving" and "stopped".
+
+    Returns:
+        dict: The result of the Notecard request.
+    """
+    req = {"req": "card.motion.mode"}
+    if start is not None:
+        req["start"] = start
+    if stop is not None:
+        req["stop"] = stop
+    if seconds:
+        req["seconds"] = seconds
+    if sensitivity is not None:
+        req["sensitivity"] = sensitivity
+    if motion:
+        req["motion"] = motion
+    return card.Transaction(req)
+
+
+@validate_card_object
+def motionSync(card, start=None, stop=None, minutes=None, count=None, threshold=None):
+    """Configure automatic sync triggered by Notecard movement.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        start (bool): Set to True to start motion-triggered syncing.
+        stop (bool): Set to True to stop motion-triggered syncing.
+        minutes (int): Maximum frequency at which sync will be triggered.
+        count (int): Number of most recent motion buckets to examine.
+        threshold (int): Number of buckets that must indicate motion to trigger a sync.
+                        If set to 0, sync occurs only on orientation changes.
+
+    Returns:
+        dict: The result of the Notecard request.
+    """
+    req = {"req": "card.motion.sync"}
+    if start is not None:
+        req["start"] = start
+    if stop is not None:
+        req["stop"] = stop
+    if minutes:
+        req["minutes"] = minutes
+    if count:
+        req["count"] = count
+    if threshold is not None:
+        req["threshold"] = threshold
+    return card.Transaction(req)
+
+
+@validate_card_object
+def motionTrack(card, start=None, stop=None, minutes=None, count=None, threshold=None, file=None, now=None):
+    """Configure automatic capture of accelerometer motion in a Notefile.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        start (bool): Set to True to start motion capture.
+        stop (bool): Set to True to stop motion capture.
+        minutes (int): Maximum period to capture Notes in the Notefile.
+        count (int): Number of most recent motion buckets to examine.
+        threshold (int): Number of buckets that must indicate motion to capture.
+        file (string): Notefile to use for motion capture Notes (default '_motion.qo').
+        now (bool): Set to True to trigger immediate _motion.qo event on orientation change.
+
+    Returns:
+        dict: The result of the Notecard request.
+    """
+    req = {"req": "card.motion.track"}
+    if start is not None:
+        req["start"] = start
+    if stop is not None:
+        req["stop"] = stop
+    if minutes:
+        req["minutes"] = minutes
+    if count:
+        req["count"] = count
+    if threshold is not None:
+        req["threshold"] = threshold
+    if file:
+        req["file"] = file
+    if now is not None:
+        req["now"] = now
+    return card.Transaction(req)

@@ -209,6 +209,57 @@ from notecard import card
                 'on': True,
                 'off': False
             }
+        ),
+        (
+            card.monitor,
+            'card.monitor',
+            {
+                'mode': 'green',
+                'count': 5,
+                'usb': True
+            }
+        ),
+        (
+            card.motion,
+            'card.motion',
+            {
+                'minutes': 10
+            }
+        ),
+        (
+            card.motionMode,
+            'card.motion.mode',
+            {
+                'start': True,
+                'stop': False,
+                'seconds': 30,
+                'sensitivity': 0,
+                'motion': 5
+            }
+        ),
+        (
+            card.motionSync,
+            'card.motion.sync',
+            {
+                'start': True,
+                'stop': False,
+                'minutes': 60,
+                'count': 10,
+                'threshold': 0
+            }
+        ),
+        (
+            card.motionTrack,
+            'card.motion.track',
+            {
+                'start': True,
+                'stop': False,
+                'minutes': 120,
+                'count': 15,
+                'threshold': 0,
+                'file': '_motion.qo',
+                'now': True
+            }
         )
     ]
 )

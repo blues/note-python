@@ -21,11 +21,11 @@
 | `card.location`         | card.location       |
 | `card.location.mode`    | card.locationMode   |
 | `card.location.track`   | card.locationTrack  |
-| `card.monitor`          | NOT IMPLEMENTED     |
-| `card.motion`           | NOT IMPLEMENTED     |
-| `card.motion.mode`      | NOT IMPLEMENTED     |
-| `card.motion.sync`      | NOT IMPLEMENTED     |
-| `card.motion.track`     | NOT IMPLEMENTED     |
+| `card.monitor`          | card.monitor        |
+| `card.motion`           | card.motion         |
+| `card.motion.mode`      | card.motionMode     |
+| `card.motion.sync`      | card.motionSync     |
+| `card.motion.track`     | card.motionTrack    |
 | `card.power`            | card.power          |
 | `card.restart`          | NOT IMPLEMENTED     |
 | `card.restore`          | NOT IMPLEMENTED     |
