@@ -260,6 +260,29 @@ from notecard import card
                 'file': '_motion.qo',
                 'now': True
             }
+        ),
+        (
+            card.restart,
+            'card.restart',
+            {}
+        ),
+        (
+            card.restore,
+            'card.restore',
+            {
+                'delete': True,
+                'connected': False
+            }
+        ),
+        (
+            card.sleep,
+            'card.sleep',
+            {
+                'on': True,
+                'off': False,
+                'seconds': 60,
+                'mode': 'accel'
+            }
         )
     ]
 )

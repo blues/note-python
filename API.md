@@ -27,9 +27,9 @@
 | `card.motion.sync`      | card.motionSync     |
 | `card.motion.track`     | card.motionTrack    |
 | `card.power`            | card.power          |
-| `card.restart`          | NOT IMPLEMENTED     |
-| `card.restore`          | NOT IMPLEMENTED     |
-| `card.sleep`            | NOT IMPLEMENTED     |
+| `card.restart`          | card.restart        |
+| `card.restore`          | card.restore        |
+| `card.sleep`            | card.sleep          |
 | `card.status`           | card.status         |
 | `card.temp`             | card.temp           |
 | `card.time`             | card.time           |

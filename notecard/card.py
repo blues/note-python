@@ -793,3 +793,81 @@ def motionTrack(card, start=None, stop=None, minutes=None, count=None, threshold
     if now is not None:
         req["now"] = now
     return card.Transaction(req)
+
+
+@validate_card_object
+def restart(card):
+    """Perform a firmware restart of the Notecard.
+
+    Args:
+        card (Notecard): The current Notecard object.
+
+    Returns:
+        dict: The result of the Notecard request.
+
+    Warning:
+        Not recommended for production applications due to potential increased
+        cellular data and consumption credit usage.
+    """
+    req = {"req": "card.restart"}
+    return card.Transaction(req)
+
+
+@validate_card_object
+def restore(card, delete=None, connected=None):
+    """Reset Notecard configuration settings and/or deprovision from Notehub.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        delete (bool): Set to True to reset most Notecard configuration settings.
+                      Does not reset Wi-Fi credentials or alternate I2C address.
+                      Notecard will be unable to sync with Notehub until ProductUID is set again.
+                      On Notecard LoRa, this parameter is required, though LoRaWAN configuration is retained.
+        connected (bool): Set to True to reset the Notecard on Notehub.
+                         Will delete and deprovision the Notecard from Notehub on next connection.
+                         Removes any Notefile templates used by the device.
+
+    Returns:
+        dict: The result of the Notecard request.
+    """
+    req = {"req": "card.restore"}
+    if delete is not None:
+        req["delete"] = delete
+    if connected is not None:
+        req["connected"] = connected
+    return card.Transaction(req)
+
+
+@validate_card_object
+def sleep(card, on=None, off=None, seconds=None, mode=None):
+    """Configure sleep mode for Notecard WiFi v2.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        on (bool): Set to True to enable sleep mode after 30 seconds of idleness.
+        off (bool): Set to True to disable sleep mode.
+        seconds (int): Number of seconds before entering sleep mode (minimum 30).
+        mode (string): Accelerometer wake configuration.
+                      Use "accel" to wake from deep sleep on accelerometer movement,
+                      or "-accel" to reset to default setting.
+
+    Returns:
+        dict: The result of the Notecard request containing:
+            "on": Boolean indicating if sleep mode is enabled
+            "off": Boolean indicating if sleep mode is disabled
+            "seconds": Configured sleep delay
+            "mode": Accelerometer wake configuration
+
+    Note:
+        Only valid for Notecard WiFi v2.
+    """
+    req = {"req": "card.sleep"}
+    if on is not None:
+        req["on"] = on
+    if off is not None:
+        req["off"] = off
+    if seconds:
+        req["seconds"] = seconds
+    if mode:
+        req["mode"] = mode
+    return card.Transaction(req)
