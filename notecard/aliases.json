@@ -1,0 +1,32 @@
+{
+  "note.changes": {
+    "aliases": {
+      "maximum": "max"
+    }
+  },
+  "note.delete": {
+    "aliases": {
+      "note_id": "note"
+    }
+  },
+  "note.get": {
+    "aliases": {
+      "note_id": "note"
+    }
+  },
+  "note.template": {
+    "aliases": {
+      "compact": {
+        "field": "format",
+        "value_transform": {
+          "true": "compact"
+        }
+      }
+    }
+  },
+  "note.update": {
+    "aliases": {
+      "note_id": "note"
+    }
+  }
+}
