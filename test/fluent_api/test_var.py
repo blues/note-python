@@ -1,48 +1,48 @@
 import pytest
-from notecard import env
+from notecard import var
 
 
 @pytest.mark.parametrize(
     'fluent_api,notecard_api,req_params',
     [
         (
-            env.default,
-            'env.default',
-            {'name': 'my_var', 'text': 'my_text'}
-        ),
-        (
-            env.get,
-            'env.get',
+            var.delete,
+            'var.delete',
             {'name': 'my_var'}
         ),
         (
-            env.modified,
-            'env.modified',
-            {}
+            var.delete,
+            'var.delete',
+            {'name': 'my_var', 'file': 'config.db'}
         ),
         (
-            env.set,
-            'env.set',
-            {'name': 'my_var', 'text': 'my_text'}
+            var.get,
+            'var.get',
+            {'name': 'my_var'}
         ),
         (
-            env.template,
-            'env.template',
-            {'body': {'temperature': 25.5, 'enabled': True, 'counter': 42, 'name': 'sensor'}}
+            var.get,
+            'var.get',
+            {'name': 'my_var', 'file': 'config.db'}
         ),
         (
-            env.get,
-            'env.get',
-            {'names': ['var1', 'var2'], 'time': 1640995200}
+            var.set,
+            'var.set',
+            {'name': 'my_var', 'text': 'my_value'}
         ),
         (
-            env.modified,
-            'env.modified',
-            {'time': 1640995200}
+            var.set,
+            'var.set',
+            {'name': 'my_var', 'value': 42, 'file': 'config.db'}
+        ),
+        (
+            var.set,
+            'var.set',
+            {'name': 'my_var', 'flag': True, 'sync': True}
         )
     ]
 )
-class TestEnv:
+class TestVar:
     def test_fluent_api_maps_notecard_api_correctly(
             self, fluent_api, notecard_api, req_params,
             run_fluent_api_notecard_api_mapping_test):

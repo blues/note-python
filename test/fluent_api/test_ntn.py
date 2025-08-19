@@ -1,48 +1,33 @@
 import pytest
-from notecard import file
+from notecard import ntn
 
 
 @pytest.mark.parametrize(
     'fluent_api,notecard_api,req_params',
     [
         (
-            file.changes,
-            'file.changes',
-            {
-                'tracker': 'tracker',
-                'files': ['file_1', 'file_2', 'file_3']
-            }
+            ntn.gps,
+            'ntn.gps',
+            {'on': True}
         ),
         (
-            file.delete,
-            'file.delete',
-            {
-                'files': ['file_1', 'file_2', 'file_3']
-            }
+            ntn.gps,
+            'ntn.gps',
+            {'off': True}
         ),
         (
-            file.stats,
-            'file.stats',
+            ntn.reset,
+            'ntn.reset',
             {}
         ),
         (
-            file.stats,
-            'file.stats',
-            {'file': 'data.qo'}
-        ),
-        (
-            file.changesPending,
-            'file.changes.pending',
+            ntn.status,
+            'ntn.status',
             {}
-        ),
-        (
-            file.clear,
-            'file.clear',
-            {'file': 'data.qo'}
         )
     ]
 )
-class TestFile:
+class TestNtn:
     def test_fluent_api_maps_notecard_api_correctly(
             self, fluent_api, notecard_api, req_params,
             run_fluent_api_notecard_api_mapping_test):

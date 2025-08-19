@@ -9,139 +9,183 @@
 # This module contains helper methods for calling hub.* Notecard API commands.
 # This module is optional and not required for use with the Notecard.
 
-import notecard
 from notecard.validators import validate_card_object
 
 
 @validate_card_object
-def set(card, product=None, sn=None, mode=None, outbound=None,
-        inbound=None, duration=None, sync=False, align=None, voutbound=None,
-        vinbound=None, host=None):
-    """Configure Notehub behavior on the Notecard.
+def get(card):
+    """Retrieve the current Notehub configuration for the Notecard.
 
     Args:
         card (Notecard): The current Notecard object.
-        product (string): The ProductUID of the project.
-        sn (string): The Serial Number of the device.
-        mode (string): The sync mode to use.
-        outbound (int): Max time to wait to sync outgoing data.
-        inbound (int): Max time to wait to sync incoming data.
-        duration (int): If in continuous mode, the amount of time, in minutes,
-            of each session.
-        sync (bool): If in continuous mode, whether to automatically
-            sync each time a change is detected on the device or Notehub.
-        align (bool): To align syncs to a regular time-interval, as opposed
-            to using max time values.
-        voutbound (string): Overrides "outbound" with a voltage-variable value.
-        vinbound (string): Overrides "inbound" with a voltage-variable value.
-        host (string): URL of an alternative or private Notehub instance.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request.
+    """
+    req = {"req": "hub.get"}
+    return card.Transaction(req)
+
+
+@validate_card_object
+def log(card, alert=None, sync=None, text=None):
+    """Add a "device health" log message to send to Notehub on the next sync via the healthhost.qo Notefile.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        alert (bool): `true` if the message is urgent. This doesn't change any functionality, but rather `alert` is provided as a convenient flag to use in your program logic.
+        sync (bool): `true` if a sync should be initiated immediately. Setting `true` will also remove the Notecard from certain types of penalty boxes.
+        text (str): Text to log.
+
+    Returns:
+        dict: The result of the Notecard request.
+    """
+    req = {"req": "hub.log"}
+    if alert is not None:
+        req["alert"] = alert
+    if sync is not None:
+        req["sync"] = sync
+    if text:
+        req["text"] = text
+    return card.Transaction(req)
+
+
+@validate_card_object
+def set(card, align=None, details=None, duration=None, host=None, inbound=None, mode=None, off=None, on=None, outbound=None, product=None, seconds=None, sn=None, sync=None, umin=None, uoff=None, uperiodic=None, version=None, vinbound=None, voutbound=None):
+    """Use hub.set request is the primary method for controlling the Notecard's Notehub connection and sync behavior.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        align (bool): Use `true` to align syncs on a regular time-periodic cycle.
+        details (str): When using Notecard LoRa you can use this argument to provide information about an alternative LoRaWAN server or service you would like the Notecard to use. Use `"-"` to reset a Notecard's LoRaWAN details to its default values.
+        duration (int): When in `continuous` mode, the amount of time, in minutes, of each session (the minimum allowed value is `15`).
+        host (str): The URL of the Notehub service. Use `"-"` to reset to the default value.
+        inbound (int): The max wait time, in minutes, to sync inbound data from Notehub. Use `-1` to reset the value back to its default of `0`. A value of `0` means that the Notecard will never sync inbound data unless explicitly told to do so.
+        mode (str): The Notecard's synchronization mode.
+        off (bool): Set to `true` to manually instruct the Notecard to resume periodic mode after a web transaction has completed.
+        on (bool): If in `periodic` mode, used to temporarily switch the Notecard to `continuous` mode to perform a web transaction.
+        outbound (int): The max wait time, in minutes, to sync outbound data from the Notecard. Use `-1` to reset the value back to its default of `0`. A value of `0` means that the Notecard will never sync outbound data unless explicitly told to do so.
+        product (str): A Notehub-managed unique identifier that is used to match Devices with Projects.
+        seconds (int): If in `periodic` mode and using `on` above, the number of seconds to run in continuous mode before switching back to periodic mode. If not set, a default of 300 seconds is used.
+        sn (str): The end product's serial number.
+        sync (bool): If in `continuous` mode, automatically and immediately sync each time an inbound Notefile change is detected on Notehub. NOTE: The `sync` argument is not supported when a Notecard is in NTN mode.
+        umin (bool): Set to `true` to use USB/line power variable sync behavior, enabling the Notecard to stay in `continuous` mode when connected to USB/line power and fallback to `minimum` mode when disconnected.
+        uoff (bool): Set to `true` to use USB/line power variable sync behavior, enabling the Notecard to stay in `continuous` mode when connected to USB/line power and fallback to `off` mode when disconnected.
+        uperiodic (bool): Set to `true` to use USB/line power variable sync behavior, enabling the Notecard to stay in `continuous` mode when connected to USB/line power and fallback to `periodic` mode when disconnected.
+        version (str): The version of your host firmware. You may pass a simple version number string, or an object with detailed information about the firmware image.
+        vinbound (str): Overrides `inbound` with a voltage-variable value. Use `"-"` to clear this value. NOTE: Setting voltage-variable values is not supported on Notecard XP.
+        voutbound (str): Overrides `outbound` with a voltage-variable value. Use `"-"` to clear this value. NOTE: Setting voltage-variable values is not supported on Notecard XP.
+
+    Returns:
+        dict: The result of the Notecard request.
     """
     req = {"req": "hub.set"}
-    if product:
-        req["product"] = product
-    if sn:
-        req["sn"] = sn
-    if mode:
-        req["mode"] = mode
-    if outbound:
-        req["outbound"] = outbound
-    if inbound:
-        req["inbound"] = inbound
-    if duration:
-        req["duration"] = duration
-    if sync is not None:
-        req["sync"] = sync
     if align is not None:
         req["align"] = align
-    if voutbound:
-        req["voutbound"] = voutbound
-    if vinbound:
-        req["vinbound"] = vinbound
+    if details:
+        req["details"] = details
+    if duration is not None:
+        req["duration"] = duration
     if host:
         req["host"] = host
-
-    return card.Transaction(req)
-
-
-@validate_card_object
-def sync(card):
-    """Initiate a sync of the Notecard to Notehub.
-
-    Args:
-        card (Notecard): The current Notecard object.
-
-    Returns:
-        string: The result of the Notecard request.
-    """
-    req = {"req": "hub.sync"}
-    return card.Transaction(req)
-
-
-@validate_card_object
-def syncStatus(card, sync=None):
-    """Retrieve the status of a sync request.
-
-    Args:
-        card (Notecard): The current Notecard object.
-        sync (bool): True if sync should be auto-initiated pending
-            outbound data.
-
-    Returns:
-        string: The result of the Notecard request.
-    """
-    req = {"req": "hub.sync.status"}
+    if inbound is not None:
+        req["inbound"] = inbound
+    if mode:
+        req["mode"] = mode
+    if off is not None:
+        req["off"] = off
+    if on is not None:
+        req["on"] = on
+    if outbound is not None:
+        req["outbound"] = outbound
+    if product:
+        req["product"] = product
+    if seconds is not None:
+        req["seconds"] = seconds
+    if sn:
+        req["sn"] = sn
     if sync is not None:
         req["sync"] = sync
+    if umin is not None:
+        req["umin"] = umin
+    if uoff is not None:
+        req["uoff"] = uoff
+    if uperiodic is not None:
+        req["uperiodic"] = uperiodic
+    if version:
+        req["version"] = version
+    if vinbound:
+        req["vinbound"] = vinbound
+    if voutbound:
+        req["voutbound"] = voutbound
+    return card.Transaction(req)
 
+
+@validate_card_object
+def signal(card, seconds=None):
+    """Receive a Signal (a near-real-time note) from Notehub.
+
+    Args:
+        card (Notecard): The current Notecard object.
+        seconds (int): The number of seconds to wait before timing out the request.
+
+    Returns:
+        dict: The result of the Notecard request.
+    """
+    req = {"req": "hub.signal"}
+    if seconds is not None:
+        req["seconds"] = seconds
     return card.Transaction(req)
 
 
 @validate_card_object
 def status(card):
-    """Retrieve the status of the Notecard's connection.
+    """Display the current status of the Notecard's connection to Notehub.
 
     Args:
         card (Notecard): The current Notecard object.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request.
     """
     req = {"req": "hub.status"}
     return card.Transaction(req)
 
 
 @validate_card_object
-def log(card, text, alert=False, sync=False):
-    """Send a log request to the Notecard.
+def sync(card, allow=None, in_=None, out_=None):
+    """Manually initiates a sync with Notehub.
 
     Args:
         card (Notecard): The current Notecard object.
-        text (string): The ProductUID of the project.
-        alert (bool): True if the message is urgent.
-        sync (bool): Whether to sync right away.
+        allow (bool): Set to `true` to remove the Notecard from certain types of penalty boxes (the default is `false`).
+        in_ (bool): Set to `true` to only sync pending inbound Notefiles. Required when using NTN mode with Starnote to check for inbound Notefiles.
+        out_ (bool): Set to `true` to only sync pending outbound Notefiles.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request.
     """
-    req = {"req": "hub.log"}
-    req["text"] = text
-    req["alert"] = alert
-    req["sync"] = sync
+    req = {"req": "hub.sync"}
+    if allow is not None:
+        req["allow"] = allow
+    if in_ is not None:
+        req["in"] = in_
+    if out_ is not None:
+        req["out"] = out_
     return card.Transaction(req)
 
 
 @validate_card_object
-def get(card):
-    """Retrieve the current Notehub configuration parameters.
+def syncStatus(card, sync=None):
+    """Check on the status of a recently triggered or previous sync.
 
     Args:
         card (Notecard): The current Notecard object.
+        sync (bool): `true` if this request should auto-initiate a sync pending outbound data.
 
     Returns:
-        string: The result of the Notecard request.
+        dict: The result of the Notecard request.
     """
-    req = {"req": "hub.get"}
+    req = {"req": "hub.sync.status"}
+    if sync is not None:
+        req["sync"] = sync
     return card.Transaction(req)

@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Generate Notecard API functions from JSON schema."""
+"""Generate Notecard API functions from notecard-schema."""
 
-import json
 import requests
-import re
+import time
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 import argparse
@@ -12,22 +11,30 @@ import argparse
 class NotecardAPIGenerator:
     """Generate Python API functions from Notecard JSON schema."""
 
+    reserved_keywords = {"in", "out", "from", "import", "class", "def", "if", "else", "for", "while", "try", "except", "with", "as", "is", "not", "and", "or", "async", "await"}
+
     def __init__(self, schema_url: str = "https://raw.githubusercontent.com/blues/notecard-schema/refs/heads/master/notecard.api.json", notecard_dir: str = "notecard"):
         self.schema_url = schema_url
         self.base_url = "/".join(schema_url.split("/")[:-1]) + "/"
         self.apis = {}
         self.notecard_dir = Path(notecard_dir)
-        self.meta_configs = self.load_meta_configs()
 
-    def fetch_schema(self, url: str) -> Dict[str, Any]:
-        """Fetch JSON schema from URL."""
-        try:
-            response = requests.get(url)
-            response.raise_for_status()
-            return response.json()
-        except Exception as e:
-            print(f"Error fetching {url}: {e}")
-            return {}
+    def fetch_schema(self, url: str, max_retries: int = 3, delay: float = 1.0) -> Dict[str, Any]:
+        """Fetch JSON schema from URL with retry logic."""
+        for attempt in range(max_retries):
+            try:
+                response = requests.get(url, timeout=30)
+                response.raise_for_status()
+                return response.json()
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    print(f"Error fetching {url} (attempt {attempt + 1}/{max_retries}): {e}")
+                    print(f"Retrying in {delay} seconds...")
+                    time.sleep(delay)
+                    delay *= 2  # Exponential backoff
+                else:
+                    print(f"Failed to fetch {url} after {max_retries} attempts: {e}")
+                    return {}
 
     def parse_main_schema(self) -> List[str]:
         """Parse main schema and extract API references."""
@@ -119,28 +126,61 @@ class NotecardAPIGenerator:
         import re
         text = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', text)
 
+        # Remove markdown emphasis formatting (* and _)
+        # Handle both single and double emphasis markers
+        text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)  # **bold** -> bold
+        text = re.sub(r'\*([^*]+)\*', r'\1', text)      # *italic* -> italic
+        text = re.sub(r'__([^_]+)__', r'\1', text)      # __bold__ -> bold
+        text = re.sub(r'_([^_]+)_', r'\1', text)        # _italic_ -> italic
+
         # Collapse multiple spaces into single spaces
         text = re.sub(r'\s+', ' ', text)
 
         # Strip leading/trailing whitespace
         return text.strip()
 
-    def load_meta_configs(self) -> Dict[str, Dict[str, Any]]:
-        """Load alias configuration files for backward compatibility."""
-        aliases_file = self.notecard_dir / "aliases.json"
-        if not aliases_file.exists():
-            return {}
+    def convert_to_imperative_mood(self, text: str) -> str:
+        """Convert docstring text to imperative mood using built-in replacements (Pydocstyle D402)."""
+        if not text:
+            return text
 
-        try:
-            with open(aliases_file, 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            print(f"Warning: Could not load aliases config {aliases_file}: {e}")
-            return {}
+        # Built-in replacements for converting docstrings to imperative mood
+        replacements = {
+            "Returns": "Return",
+            "Configures": "Configure",
+            "Performs": "Perform",
+            "Used": "Use",
+            "Uses": "Use",
+            "Sets": "Set",
+            "Gets": "Get",
+            "Retrieves": "Retrieve",
+            "Displays": "Display",
+            "Adds": "Add",
+            "Enables": "Enable",
+            "Provides": "Provide",
+            "Deletes": "Delete",
+            "Updates": "Update",
+            "Calculates": "Calculate",
+            "Specifies": "Specify",
+            "Determines": "Determine",
+            "The": "Use",
+            "This": "Use"
+        }
 
-    def get_meta_config(self, api_name: str) -> Dict[str, Any]:
-        """Get meta configuration for an API, or empty dict if none exists."""
-        return self.meta_configs.get(api_name, {})
+        # Apply replacements - only replace at the start of sentences
+        for non_imperative, imperative in replacements.items():
+            # Replace at the beginning of the text
+            if text.startswith(non_imperative + " "):
+                text = imperative + text[len(non_imperative):]
+                break
+            # Also handle cases where the non-imperative word starts the text
+            elif text.startswith(non_imperative):
+                # Make sure we're not replacing part of a larger word
+                if len(text) == len(non_imperative) or not text[len(non_imperative)].isalpha():
+                    text = imperative + text[len(non_imperative):]
+                    break
+
+        return text
 
     def generate_function_signature(self, api: Dict[str, Any]) -> str:
         """Generate Python function signature."""
@@ -155,74 +195,34 @@ class NotecardAPIGenerator:
 
         params = ["card"]
 
-        # Get meta configuration for this API
-        meta_config = self.get_meta_config(api_name)
-        aliases = meta_config.get("aliases", {})
-
         # Add parameters based on properties
         properties = api["properties"]
         required = api["required"]
-
-        # Python reserved keywords that need to be handled specially
-        reserved_keywords = {"in", "out", "from", "import", "class", "def", "if", "else", "for", "while", "try", "except", "with", "as", "is", "not", "and", "or", "async", "await"}
 
         # Add parameters for schema properties
         for prop_name, _ in properties.items():
             if prop_name in ["req", "cmd"]:  # Skip these as they're auto-generated
                 continue
 
-            # Check if this property has an alias - if so, make it optional
-            has_alias = False
-            for alias_config in aliases.values():
-                if isinstance(alias_config, str):
-                    if alias_config == prop_name:
-                        has_alias = True
-                        break
-                else:
-                    if alias_config.get("field") == prop_name:
-                        has_alias = True
-                        break
-
             # Handle reserved keywords by appending underscore
             param_name = prop_name
-            if param_name in reserved_keywords:
+            if param_name in self.reserved_keywords:
                 param_name = f"{param_name}_"
 
-            # If the field is required but has an alias, make it optional since user can use alias
-            if prop_name in required and prop_name not in ["req", "cmd"] and not has_alias:
+            # Required parameters come first without default values
+            if prop_name in required and prop_name not in ["req", "cmd"]:
                 params.append(f"{param_name}")
             else:
                 params.append(f"{param_name}=None")
 
-        # Add alias parameters from meta config
-        for alias_name, alias_config in aliases.items():
-            # Handle reserved keywords by appending underscore
-            param_name = alias_name
-            if param_name in reserved_keywords:
-                param_name = f"{param_name}_"
-
-            # Always optional since aliases are for backward compatibility
-            params.append(f"{param_name}=None")
-
 
         return f"def {func_name}({', '.join(params)}):"
 
-    def generate_docstring(self, api: Dict[str, Any]) -> str:
-        """Generate function docstring."""
-        # Clean the description text
-        clean_description = self.clean_docstring_text(api["description"])
-        lines = [f'    """{clean_description}']
-        lines.append("")
-        lines.append("    Args:")
-        lines.append("        card (Notecard): The current Notecard object.")
-
-        # Get meta configuration for this API
-        api_name = api["name"]
-        meta_config = self.get_meta_config(api_name)
-        aliases = meta_config.get("aliases", {})
+    def _build_docstring_content(self, api: Dict[str, Any], imperative_description: str) -> str:
+        """Build complete docstring content to check for backslashes."""
+        lines = [imperative_description, ""]
 
         properties = api["properties"]
-        reserved_keywords = {"in", "out", "from", "import", "class", "def", "if", "else", "for", "while", "try", "except", "with", "as", "is", "not", "and", "or", "async", "await"}
 
         # Process schema properties
         for prop_name, prop_def in properties.items():
@@ -231,38 +231,47 @@ class NotecardAPIGenerator:
 
             # Handle reserved keywords by appending underscore for parameter name
             param_name = prop_name
-            if param_name in reserved_keywords:
+            if param_name in self.reserved_keywords:
+                param_name = f"{param_name}_"
+
+            prop_desc = self.clean_docstring_text(prop_def.get("description", f"The {prop_name} parameter."))
+            lines.append(f"        {param_name} (type): {prop_desc}")
+
+        return "\n".join(lines)
+
+    def generate_docstring(self, api: Dict[str, Any]) -> str:
+        """Generate function docstring."""
+        # Clean the description text
+        clean_description = self.clean_docstring_text(api["description"])
+        # Convert to imperative mood (Pydocstyle D402)
+        imperative_description = self.convert_to_imperative_mood(clean_description)
+
+        # Check if docstring contains backslashes and use raw string if needed
+        docstring_content = self._build_docstring_content(api, imperative_description)
+        has_backslashes = '\\' in docstring_content
+
+        if has_backslashes:
+            lines = [f'    r"""{imperative_description}']
+        else:
+            lines = [f'    """{imperative_description}']
+        lines.append("")
+        lines.append("    Args:")
+        lines.append("        card (Notecard): The current Notecard object.")
+
+        properties = api["properties"]
+
+        # Process schema properties
+        for prop_name, prop_def in properties.items():
+            if prop_name in ["req", "cmd"]:
+                continue
+
+            # Handle reserved keywords by appending underscore for parameter name
+            param_name = prop_name
+            if param_name in self.reserved_keywords:
                 param_name = f"{param_name}_"
 
             prop_type = self.get_python_type_hint(prop_def)
             prop_desc = self.clean_docstring_text(prop_def.get("description", f"The {prop_name} parameter."))
-            lines.append(f"        {param_name} ({prop_type}): {prop_desc}")
-
-        # Add alias parameters from meta config
-        for alias_name, alias_config in aliases.items():
-            # Handle reserved keywords by appending underscore
-            param_name = alias_name
-            if param_name in reserved_keywords:
-                param_name = f"{param_name}_"
-
-            # Handle both simple and complex aliases
-            if isinstance(alias_config, str):
-                schema_field = alias_config
-                # Find the corresponding schema property for type information
-                schema_prop_def = properties.get(schema_field, {})
-                prop_type = self.get_python_type_hint(schema_prop_def) if schema_prop_def else "str"
-                original_desc = schema_prop_def.get('description', '')
-                clean_desc = self.clean_docstring_text(original_desc) if original_desc else ''
-                prop_desc = f"Alias for {schema_field}. {clean_desc}"
-            else:
-                # Complex alias with potential value transformation
-                schema_field = alias_config.get("field")
-                schema_prop_def = properties.get(schema_field, {})
-                prop_type = self.get_python_type_hint(schema_prop_def) if schema_prop_def else "str"
-                original_desc = schema_prop_def.get('description', '')
-                clean_desc = self.clean_docstring_text(original_desc) if original_desc else ''
-                prop_desc = f"Alias for {schema_field}. {clean_desc}"
-
             lines.append(f"        {param_name} ({prop_type}): {prop_desc}")
 
 
@@ -278,12 +287,7 @@ class NotecardAPIGenerator:
         api_name = api["name"]
         lines = [f'    req = {{"req": "{api_name}"}}']
 
-        # Get meta configuration for this API
-        meta_config = self.get_meta_config(api_name)
-        aliases = meta_config.get("aliases", {})
-
         properties = api["properties"]
-        reserved_keywords = {"in", "out", "from", "import", "class", "def", "if", "else", "for", "while", "try", "except", "with", "as", "is", "not", "and", "or", "async", "await"}
 
         # Process schema properties
         for prop_name, prop_def in properties.items():
@@ -292,7 +296,7 @@ class NotecardAPIGenerator:
 
             # Handle reserved keywords by appending underscore for parameter name
             param_name = prop_name
-            if param_name in reserved_keywords:
+            if param_name in self.reserved_keywords:
                 param_name = f"{param_name}_"
 
             json_type = prop_def.get("type", "string")
@@ -315,52 +319,6 @@ class NotecardAPIGenerator:
                 lines.append(f"    if {param_name}:")
                 lines.append(f'        req["{prop_name}"] = {param_name}')
 
-        # Handle alias parameters from meta config
-        for alias_name, alias_config in aliases.items():
-            # Handle reserved keywords by appending underscore
-            param_name = alias_name
-            if param_name in reserved_keywords:
-                param_name = f"{param_name}_"
-
-            # Check if this is a simple alias (string) or complex alias (dict)
-            if isinstance(alias_config, str):
-                # Simple alias: alias_name -> schema_field
-                schema_field = alias_config
-                # Get type info from the corresponding schema field
-                schema_prop_def = properties.get(schema_field, {})
-                json_type = schema_prop_def.get("type", "string")
-
-                # Handle case where type is a list of types
-                if isinstance(json_type, list):
-                    # Use the first non-null type
-                    for t in json_type:
-                        if t != "null":
-                            json_type = t
-                            break
-                    else:
-                        json_type = "string"
-
-                # Use 'is not None' for types that can have falsy but valid values (0, False, "", etc.)
-                lines.append(f"    # Supported Alias")
-                if json_type in ["boolean", "integer", "number"]:
-                    lines.append(f"    if {param_name} is not None:")
-                    lines.append(f'        req["{schema_field}"] = {param_name}')
-                else:
-                    lines.append(f"    if {param_name}:")
-                    lines.append(f'        req["{schema_field}"] = {param_name}')
-            else:
-                # Complex alias with value transformation
-                schema_field = alias_config.get("field")
-                value_transform = alias_config.get("value_transform", {})
-
-                lines.append(f"    # Supported Alias")
-                lines.append(f"    if {param_name}:")
-                if value_transform and "true" in value_transform:
-                    # Handle boolean transformation (e.g., compact=True -> format="compact")
-                    lines.append(f'        req["{schema_field}"] = "{value_transform["true"]}"')
-                else:
-                    lines.append(f'        req["{schema_field}"] = {param_name}')
-
 
         lines.append("    return card.Transaction(req)")
 
@@ -369,6 +327,7 @@ class NotecardAPIGenerator:
     def generate_api_function(self, api: Dict[str, Any]) -> str:
         """Generate complete API function."""
         lines = []
+        lines.append("")
         lines.append("")
         lines.append("@validate_card_object")
         lines.append(self.generate_function_signature(api))
@@ -403,12 +362,12 @@ class NotecardAPIGenerator:
         lines.append("# This module is optional and not required for use with the Notecard.")
         lines.append("")
         lines.append("from notecard.validators import validate_card_object")
-        lines.append("")
 
         for api in apis:
             lines.append(self.generate_api_function(api))
 
-        return "\n".join(lines)
+        # Ensure the file ends with a newline
+        return "\n".join(lines) + "\n"
 
     def generate_all_apis(self, output_dir: str = "notecard"):
         """Generate all API modules."""
@@ -434,17 +393,14 @@ class NotecardAPIGenerator:
         # Group by module
         modules = self.group_apis_by_module(apis)
 
-        # Create output directory
         output_path = Path(output_dir)
         output_path.mkdir(exist_ok=True)
 
-        # Generate each module file
         for module_name, module_apis in modules.items():
             print(f"Generating {module_name}.py with {len(module_apis)} APIs...")
 
             file_content = self.generate_module_file(module_name, module_apis)
 
-            # Write to file
             file_path = output_path / f"{module_name}.py"
             with open(file_path, "w") as f:
                 f.write(file_content)
