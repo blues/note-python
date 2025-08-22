@@ -17,6 +17,13 @@ from notecard import card
             }
         ),
         (
+            card.attn,
+            'card.attn',
+            {
+                'verify': True
+            }
+        ),
+        (
             card.status,
             'card.status',
             {}
@@ -32,9 +39,23 @@ from notecard import card
             {'minutes': 5}
         ),
         (
+            card.temp,
+            'card.temp',
+            {
+                'status': 'usb:15;high:30;normal:60;720',
+                'stop': True,
+                'sync': True
+            }
+        ),
+        (
             card.version,
             'card.version',
             {}
+        ),
+        (
+            card.version,
+            'card.version',
+            {'api': True}
         ),
         (
             card.voltage,
@@ -47,6 +68,15 @@ from notecard import card
             }
         ),
         (
+            card.voltage,
+            'card.voltage',
+            {
+                'mode': 'charging',
+                'name': 'voltage_sensor',
+                'calibration': 1.1
+            }
+        ),
+        (
             card.wireless,
             'card.wireless',
             {
@@ -55,11 +85,26 @@ from notecard import card
             }
         ),
         (
+            card.wireless,
+            'card.wireless',
+            {
+                'method': 'dual-primary-secondary'
+            }
+        ),
+        (
             card.transport,
             'card.transport',
             {
                 'method': 'wifi-cell-ntn',
                 'allow': True
+            }
+        ),
+        (
+            card.transport,
+            'card.transport',
+            {
+                'seconds': 300,
+                'umin': True
             }
         ),
         (
@@ -88,6 +133,14 @@ from notecard import card
             }
         ),
         (
+            card.locationMode,
+            'card.location.mode',
+            {
+                'minutes': 10,
+                'threshold': 100
+            }
+        ),
+        (
             card.locationTrack,
             'card.location.track',
             {
@@ -97,6 +150,13 @@ from notecard import card
                 'sync': True,
                 'stop': False,
                 'file': 'location.qo'
+            }
+        ),
+        (
+            card.locationTrack,
+            'card.location.track',
+            {
+                'payload': 'ewogICJkYXRhIjogImV4YW1wbGUiCn0='
             }
         ),
         (
@@ -267,6 +327,11 @@ from notecard import card
             {}
         ),
         (
+            card.random,
+            'card.random',
+            {'mode': 'entropy', 'count': 16}
+        ),
+        (
             card.restore,
             'card.restore',
             {
@@ -343,6 +408,54 @@ from notecard import card
                 'add': 10,
                 'max': 720,
                 'min': 5
+            }
+        ),
+        (
+            card.attn,
+            'card.attn',
+            {
+                'off': True,
+                'on': False
+            }
+        ),
+        (
+            card.dfu,
+            'card.dfu',
+            {
+                'off': True,
+                'on': False
+            }
+        ),
+        (
+            card.locationMode,
+            'card.location.mode',
+            {
+                'delete': True
+            }
+        ),
+        (
+            card.temp,
+            'card.temp',
+            {
+                'stop': True,
+                'sync': False
+            }
+        ),
+        (
+            card.voltage,
+            'card.voltage',
+            {
+                'usb': True,
+                'alert': False,
+                'sync': True,
+                'set': False
+            }
+        ),
+        (
+            card.wireless,
+            'card.wireless',
+            {
+                'hours': 24
             }
         )
     ]
