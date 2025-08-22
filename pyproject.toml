@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "note-python"
-version = "1.6.1"
+version = "2.1.1"
 description = "Cross-platform Python Library for the Blues Wireless Notecard"
 authors = [
     {name = "Blues Inc.", email = "support@blues.com"},
