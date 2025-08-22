@@ -321,7 +321,7 @@ def io(card, i2c=None, mode=None):
 
 @validate_card_object
 def led(card, mode=None, on=None, off=None):
-    """Use along with the card.aux API to turn connected LEDs on/off or to manage a single connected NeoPixel.
+    """Use along with the card.aux API to turn connected LEDs on/off or to manage a single connected NeoPixel. If using monochromatic LEDs, they must be wired according to the instructions provided in the guide on Using Monitor Mode. Please note that the use of monochromatic LEDs is not supported by Notecard for LoRa. If using NeoPixels, the NeoPixel (or strip of NeoPixels) must be wired according to the instructions provided in the guide on Using Neo-Monitor Mode.
 
     Args:
         card (Notecard): The current Notecard object.
@@ -399,7 +399,7 @@ def location(card):
 
 @validate_card_object
 def locationTrack(card, start=None, heartbeat=None, hours=None, sync=None, stop=None, file=None, payload=None):
-    """Store location data in a Notefile at the `periodic` interval, or using a specified `heartbeat`. This request is only available when the `card.location.mode` request has been set to `periodic`—e.g. `{"req":"card.location.mode","mode":"periodic","seconds":300}`. If you want to track and transmit data simultaneously consider using an external GPS/GNSS module with the Notecard. If you connect a BME280 sensor on the I2C bus, Notecard will include a temperature, humidity, and pressure reading with each captured Note. If you connect an ENS210 sensor on the I2C bus, Notecard will include a temperature and pressure reading with each captured Note.
+    """Store location data in a Notefile at the `periodic` interval, or using a specified `heartbeat`. This request is only available when the `card.location.mode` request has been set to `periodic`—e.g. `{"req":"card.location.mode","mode":"periodic","seconds":300}`. If you want to track and transmit data simultaneously consider using an external GPS/GNSS module with the Notecard. If you connect a BME280 sensor on the I2C bus, Notecard will include a temperature, humidity, and pressure reading with each captured Note. If you connect an ENS210 sensor on the I2C bus, Notecard will include a temperature and pressure reading with each captured Note. Learn more in _track.qo.
 
     Args:
         card (Notecard): The current Notecard object.
@@ -768,7 +768,7 @@ def triangulate(card, mode=None, on=None, usb=None, set=None, minutes=None, text
 
     Args:
         card (Notecard): The current Notecard object.
-        mode (str): The triangulation approach to use for determining the Notecard location. The following keywords can be used separately or together in a comma-delimited list, in any order. `cell` enables cell tower scanning to determine the position of the Device. `wifi` enables the use of nearby Wi-Fi access points to determine the position of the Device. To leverage this feature, the host will need to provide access point information to the Notecard via the `text` argument in subsequent requests. `-` to clear the currently-set triangulation mode.
+        mode (str): The triangulation approach to use for determining the Notecard location. The following keywords can be used separately or together in a comma-delimited list, in any order. See Using Cell Tower & Wi-Fi Triangulation for more information.
         on (bool): `true` to instruct the Notecard to triangulate even if the module has not moved. Only takes effect when `set` is `true`.
         usb (bool): `true` to use perform triangulation only when the Notecard is connected to USB power. Only takes effect when `set` is `true`.
         set (bool): `true` to instruct the module to use the state of the `on` and `usb` arguments.
@@ -803,7 +803,7 @@ def usageGet(card, mode=None, offset=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        mode (str): The time period to use for statistics. Must be one of: `"total"` for all stats since the Notecard was activated. `"1hour"` `"1day"` `"30day"`
+        mode (str): The time period to use for statistics. Must be one of:
         offset (int): The number of time periods to look backwards, based on the specified `mode`. To accurately determine the start of the calculated time period when using `offset`, use the `time` value of the response. Likewise, to calculate the end of the time period, add the `seconds` value to the `time` value.
 
     Returns:
@@ -846,7 +846,7 @@ def version(card, api=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        api (int): Host expected major version of the Notecard API
+        api (int): Specify a major version of the Notecard firmware that a host expects to use.
 
     Returns:
         dict: The result of the Notecard request.
@@ -942,7 +942,7 @@ def wireless(card, mode=None, apn=None, method=None, hours=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        mode (str): Network scan mode. Must be one of: `"-"` to reset to the default mode, `"auto"` to perform automatic band scan mode (this is the default mode). The following values apply exclusively to Narrowband (NB) Notecard Cellular devices: `"m"` to restrict the modem to Cat-M1, `"nb"` to restrict the modem to Cat-NB1, `"gprs"` to restrict the modem to EGPRS.
+        mode (str): Network scan mode. Must be one of:
         apn (str): Access Point Name (APN) when using an external SIM. Use `"-"` to reset to the Notecard default APN.
         method (str): Used when configuring a Notecard to failover to a different SIM.
         hours (int): When using the `method` argument with `"dual-primary-secondary"` or `"dual-secondary-primary"`, this is the number of hours after which the Notecard will attempt to switch back to the preferred SIM.

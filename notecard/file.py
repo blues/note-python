@@ -28,12 +28,12 @@ def changesPending(card):
 
 @validate_card_object
 def changes(card, files=None, tracker=None):
-    """Use file.changes request performs queries on a single or multiple files to determine if new Notes are available to read, or if there are unsynced Notes in local Notefiles. Note: This request is a Notefile API request, only. `.qo` Notes in Notehub are automatically ingested and stored, or sent to applicable Routes.
+    """Use to perform queries on a single or multiple files to determine if new Notes are available to read, or if there are unsynced Notes in local Notefiles. Note: This request is a Notefile API request, only. `.qo` Notes in Notehub are automatically ingested and stored, or sent to applicable Routes.
 
     Args:
         card (Notecard): The current Notecard object.
-        files (list): An array of Notefile names to obtain change information from. If not specified, queries all Notefiles.
-        tracker (str): An ID string for a change tracker to use to determine changes to Notefiles. Each tracker maintains its own state for monitoring file changes.
+        files (list): One or more files to obtain change information from. Omit to return changes for all Notefiles.
+        tracker (str): ID of a change tracker to use to determine changes to Notefiles.
 
     Returns:
         dict: The result of the Notecard request.
@@ -48,7 +48,7 @@ def changes(card, files=None, tracker=None):
 
 @validate_card_object
 def clear(card, file=None):
-    """Use to clear the contents of a specified outbound (.qo/.qos) Notefile, deleting all pending Notes.
+    """Use to clear the contents of a specified outbound (`.qo`/`.qos`) Notefile, deleting all pending Notes.
 
     Args:
         card (Notecard): The current Notecard object.

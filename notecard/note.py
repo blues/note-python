@@ -18,14 +18,14 @@ def add(card, file=None, note=None, body=None, payload=None, sync=None, key=None
 
     Args:
         card (Notecard): The current Notecard object.
-        file (str): The name of the Notefile. On Notecard LoRa this argument is required. On all other Notecards this field is optional and defaults to `data.qo` if not provided. When using this request on the Notecard the Notefile name must end in one of: `.qo` for a queue outgoing (Notecard to Notehub) with plaintext transport, `.qos` for a queue outgoing with encrypted transport, `.db` for a bidirectionally synchronized database with plaintext transport, `.dbs` for a bidirectionally synchronized database with encrypted transport, `.dbx` for a local-only database.
+        file (str): The name of the Notefile. On Notecard LoRa this argument is required. On all other Notecards this field is optional and defaults to `data.qo` if not provided. When using this request on the Notecard the Notefile name must end in one of: `.qo` for a queue outgoing (Notecard to Notehub) with plaintext transport `.qos` for a queue outgoing with encrypted transport `.db` for a bidirectionally synchronized database with plaintext transport `.dbs` for a bidirectionally synchronized database with encrypted transport `.dbx` for a local-only database
         note (str): If the Notefile has a `.db/.dbs/.dbx` extension, specifies a unique Note ID. If `note` string is "?", then a random unique Note ID is generated and returned as `{"note":"xxx"}`. If this argument is provided for a `.qo` Notefile, an error is returned.
         body (dict): A JSON object to be enqueued. A note must have either a `body` or a `payload`, and can have both.
         payload (str): A base64-encoded binary payload. A note must have either a `body` or a `payload`, and can have both. If a Note template is not in use, payloads are limited to 250 bytes.
         sync (bool): Set to `true` to sync immediately. Only applies to outgoing Notecard requests, and only guarantees syncing the specified Notefile. Auto-syncing incoming Notes from Notehub is set on the Notecard with `{"req": "hub.set", "mode":"continuous", "sync": true}`.
         key (str): The name of an environment variable in your Notehub.io project that contains the contents of a public key. Used when encrypting the Note body for transport.
         verify (bool): If set to `true` and using a templated Notefile, the Notefile will be written to flash immediately, rather than being cached in RAM and written to flash later.
-        binary (bool): If `true`, the Notecard will send all the data in the binary buffer to Notehub.
+        binary (bool): If `true`, the Notecard will send all the data in the binary buffer to Notehub. Learn more in this guide on Sending and Receiving Large Binary Objects.
         live (bool): If `true`, bypasses saving the Note to flash on the Notecard. Required to be set to `true` if also using `"binary":true`.
         full (bool): If set to `true`, and the Note is using a Notefile Template, the Note will bypass usage of omitempty and retain `null`, `0`, `false`, and empty string `""` values.
         limit (bool): If set to `true`, the Note will not be created if Notecard is in a penalty box.
@@ -125,7 +125,7 @@ def delete(card, file, note, verify=None):
 
 @validate_card_object
 def get(card, file=None, note=None, delete=None, deleted=None, decrypt=None):
-    """Retrieve a Note from a Notefile. The file must either be a DB Notefile or inbound queue file (see `file` argument below).
+    """Retrieve a Note from a Notefile. The file must either be a DB Notefile or inbound queue file (see `file` argument below). `.qo`/`.qos` Notes must be read from the Notehub event table using the Notehub Event API.
 
     Args:
         card (Notecard): The current Notecard object.
@@ -154,7 +154,7 @@ def get(card, file=None, note=None, delete=None, deleted=None, decrypt=None):
 
 @validate_card_object
 def template(card, file, body=None, length=None, verify=None, format=None, port=None, delete=None):
-    """By using the `note.template` request with any `.qo`/`.qos` Notefile, developers can provide the Notecard with a schema of sorts to apply to future Notes added to the Notefile. This template acts as a hint to the Notecard that allows it to internally store data as fixed-length binary records rather than as flexible JSON objects which require much more memory. Using templated Notes in place of regular Notes increases the storage and sync capability of the Notecard by an order of magnitude.
+    """By using the `note.template` request with any `.qo`/`.qos` Notefile, developers can provide the Notecard with a schema of sorts to apply to future Notes added to the Notefile. This template acts as a hint to the Notecard that allows it to internally store data as fixed-length binary records rather than as flexible JSON objects which require much more memory. Using templated Notes in place of regular Notes increases the storage and sync capability of the Notecard by an order of magnitude. Read about Working with Note Templates for additional information.
 
     Args:
         card (Notecard): The current Notecard object.

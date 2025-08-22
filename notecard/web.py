@@ -59,7 +59,7 @@ def get(card, route=None, name=None, body=None, content=None, seconds=None, asyn
         content (str): The MIME type of the body or payload of the response. Default is `application/json`.
         seconds (int): If specified, overrides the default 90 second timeout.
         async_ (bool): If `true`, the Notecard performs the web request asynchronously, and returns control to the host without waiting for a response from Notehub.
-        binary (bool): If `true`, the Notecard will return the response stored in its binary buffer.
+        binary (bool): If `true`, the Notecard will return the response stored in its binary buffer. Learn more in this guide on Sending and Receiving Large Binary Objects.
         offset (int): Used along with `binary:true` and `max`, sent as a URL parameter to the remote endpoint. Represents the number of bytes to offset the binary payload from 0 when retrieving binary data from the remote endpoint.
         max (int): Used along with `binary:true` and `offset`, sent as a URL parameter to the remote endpoint. Represents the number of bytes to retrieve from the binary payload segment.
         file (str): The name of the local-only Database Notefile (`.dbx`) to be used if the web request is issued asynchronously and you wish to store the response.

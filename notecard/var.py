@@ -14,7 +14,7 @@ from notecard.validators import validate_card_object
 
 @validate_card_object
 def delete(card, name=None, file=None):
-    """Delete a Note from a DB Notefile by its name. Provides a simpler interface to the note.delete API.
+    """Delete a Note from a DB Notefile by its `name`. Provides a simpler interface to the note.delete API.
 
     Args:
         card (Notecard): The current Notecard object.

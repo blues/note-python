@@ -94,7 +94,7 @@ def set(card, name=None, text=None):
 
 @validate_card_object
 def template(card, body=None):
-    """Use env.template request allows developers to provide a schema for the environment variables the Notecard uses. The provided template allows the Notecard to store environment variables as fixed-length binary records rather than as flexible JSON objects that require much more memory.
+    """Use `env.template` request allows developers to provide a schema for the environment variables the Notecard uses. The provided template allows the Notecard to store environment variables as fixed-length binary records rather than as flexible JSON objects that require much more memory. Using templated environment variables also allows the Notecard to optimize the network traffic related to sending and receiving environment variable updates.
 
     Args:
         card (Notecard): The current Notecard object.
