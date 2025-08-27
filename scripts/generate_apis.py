@@ -164,7 +164,8 @@ class NotecardAPIGenerator:
             "Specifies": "Specify",
             "Determines": "Determine",
             "The": "Use",
-            "This": "Use"
+            "This": "Use",
+            "Allows": "Allow"
         }
 
         # Apply replacements - only replace at the start of sentences

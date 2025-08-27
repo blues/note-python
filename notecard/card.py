@@ -621,7 +621,7 @@ def restart(card):
 
 @validate_card_object
 def sleep(card, mode=None, off=None, on=None, seconds=None):
-    """Allows the ESP32-based Notecard WiFi v2 to fall back to a low current draw when idle (this behavior differs from the STM32-based Notecards that have a `STOP` mode where UART and I2C may still operate). Note that the Notecard WiFi v2 will not enable a "sleep" mode while plugged in via USB. Read more in the guide on using Deep Sleep Mode on Notecard WiFi v2.
+    """Allow the ESP32-based Notecard WiFi v2 to fall back to a low current draw when idle (this behavior differs from the STM32-based Notecards that have a `STOP` mode where UART and I2C may still operate). Note that this power state is not available if the Notecard is plugged in via USB. Read more in the guide on using Deep Sleep Mode on Notecard WiFi v2.
 
     Args:
         card (Notecard): The current Notecard object.
