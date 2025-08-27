@@ -13,22 +13,22 @@ from notecard.validators import validate_card_object
 
 
 @validate_card_object
-def gps(card, on=None, off=None):
+def gps(card, off=None, on=None):
     """Determine whether a Notecard should override a paired Starnote's GPS/GNSS location with its own GPS/GNSS location. The paired Starnote uses its own GPS/GNSS location by default.
 
     Args:
         card (Notecard): The current Notecard object.
-        on (bool): When `true`, a Starnote will use the GPS/GNSS location from its paired Notecard, instead of its own GPS/GNSS location.
         off (bool): When `true`, a paired Starnote will use its own GPS/GNSS location. This is the default configuration.
+        on (bool): When `true`, a Starnote will use the GPS/GNSS location from its paired Notecard, instead of its own GPS/GNSS location.
 
     Returns:
         dict: The result of the Notecard request.
     """
     req = {"req": "ntn.gps"}
-    if on is not None:
-        req["on"] = on
     if off is not None:
         req["off"] = off
+    if on is not None:
+        req["on"] = on
     return card.Transaction(req)
 
 

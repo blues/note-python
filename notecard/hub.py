@@ -122,7 +122,7 @@ def set(card, align=None, details=None, duration=None, host=None, inbound=None, 
 
 @validate_card_object
 def signal(card, seconds=None):
-    """Receive a Signal (a near-real-time note) from Notehub. This request checks for an inbound signal from Notehub. If it finds a signal, this request returns the signal's body and deletes the signal. If there are multiple signals to receive, this request reads and deletes signals in FIFO (first in first out) order.
+    """Receive a Signal (a near-real-time Note) from Notehub. This request checks for an inbound signal from Notehub. If it finds a signal, this request returns the signal's body and deletes the signal. If there are multiple signals to receive, this request reads and deletes signals in FIFO (first in first out) order.
 
     Args:
         card (Notecard): The current Notecard object.
