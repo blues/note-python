@@ -63,7 +63,7 @@ def add(card, binary=None, body=None, file=None, full=None, key=None, limit=None
 
 
 @validate_card_object
-def changes(card, delete=None, deleted=None, file, max=None, reset=None, start=None, stop=None, tracker=None):
+def changes(card, file, delete=None, deleted=None, max=None, reset=None, start=None, stop=None, tracker=None):
     """Use to incrementally retrieve changes within a specific Notefile.
 
     Args:
@@ -153,7 +153,7 @@ def get(card, decrypt=None, delete=None, deleted=None, file=None, note=None):
 
 
 @validate_card_object
-def template(card, body=None, delete=None, file, format=None, length=None, port=None, verify=None):
+def template(card, file, body=None, delete=None, format=None, length=None, port=None, verify=None):
     """By using the `note.template` request with any `.qo`/`.qos` Notefile, developers can provide the Notecard with a schema of sorts to apply to future Notes added to the Notefile. This template acts as a hint to the Notecard that allows it to internally store data as fixed-length binary records rather than as flexible JSON objects which require much more memory. Using templated Notes in place of regular Notes increases the storage and sync capability of the Notecard by an order of magnitude. Read about Working with Note Templates for additional information.
 
     Args:
@@ -188,7 +188,7 @@ def template(card, body=None, delete=None, file, format=None, length=None, port=
 
 
 @validate_card_object
-def update(card, body=None, file, note, payload=None, verify=None):
+def update(card, file, note, body=None, payload=None, verify=None):
     """Update a Note in a DB Notefile by its ID, replacing the existing `body` and/or `payload`.
 
     Args:

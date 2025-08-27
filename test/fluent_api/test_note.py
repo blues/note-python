@@ -10,7 +10,7 @@ from notecard import note
             'note.add',
             {
                 'file': 'data.qo',
-                'body': {'key_a:', 'val_a', 'key_b', 42},
+                'body': {'key_a': 'val_a', 'key_b': 42},
                 'payload': 'ewogICJpbnRlcnZhbHMiOiI2MCwxMiwxNCIKfQ==',
                 'sync': True
             },
@@ -90,7 +90,7 @@ from notecard import note
             'note.template',
             {
                 'file': 'my-settings.db',
-                'body': {'key_a:', 'val_a', 'key_b', 42},
+                'body': {'key_a': 'val_a', 'key_b': 42},
                 'length': 42,
                 'format': "compact"
             },
@@ -111,7 +111,7 @@ from notecard import note
             {
                 'file': 'my-settings.db',
                 'note': 'my_note',
-                'body': {'key_a:', 'val_a', 'key_b', 42},
+                'body': {'key_a': 'val_a', 'key_b': 42},
                 'payload': 'ewogICJpbnRlcnZhbHMiOiI2MCwxMiwxNCIKfQ=='
             },
         ),

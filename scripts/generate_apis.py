@@ -199,6 +199,10 @@ class NotecardAPIGenerator:
         properties = api["properties"]
         required = api["required"]
 
+        # Separate required and optional parameters
+        required_params = []
+        optional_params = []
+
         # Add parameters for schema properties
         for prop_name, _ in properties.items():
             if prop_name in ["req", "cmd"]:  # Skip these as they're auto-generated
@@ -209,11 +213,15 @@ class NotecardAPIGenerator:
             if param_name in self.reserved_keywords:
                 param_name = f"{param_name}_"
 
-            # Required parameters come first without default values
+            # Separate required and optional parameters
             if prop_name in required and prop_name not in ["req", "cmd"]:
-                params.append(f"{param_name}")
+                required_params.append(f"{param_name}")
             else:
-                params.append(f"{param_name}=None")
+                optional_params.append(f"{param_name}=None")
+
+        # Add required parameters first, then optional parameters
+        params.extend(required_params)
+        params.extend(optional_params)
 
 
         return f"def {func_name}({', '.join(params)}):"
