@@ -1,0 +1,60 @@
+name: Update Notecard Fluent API from upstream schema
+on:
+  workflow_dispatch:
+    inputs:
+      upstream_commit:
+        description: 'Upstream commit that triggered this update'
+        required: false
+        type: string
+
+jobs:
+  update-notecard-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Install pipenv
+        run: |
+          python -m pip install --upgrade pip
+          pip install pipenv
+
+      - name: Fetch schemas and generate Fluent API
+        run: |
+          echo "Updating from upstream commit: ${{ inputs.upstream_commit }}"
+          pipenv run python scripts/generate_apis.py --output-dir notecard
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request with GitHub CLI
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          BRANCH_NAME="update-notecard-api-${{ github.run_number }}"
+          git checkout -b $BRANCH_NAME
+
+          git add .
+          git commit -m "Update Notecard API from upstream schema changes (${{ inputs.upstream_commit || 'forced' }})"
+
+          git push origin $BRANCH_NAME
+
+          gh pr create \
+            --title "Auto-update: API changes from upstream" \
+            --body "Automated PR to update API based on upstream schema changes (${{ inputs.upstream_commit || 'forced' }})" \
+            --base main \
+            --head $BRANCH_NAME
