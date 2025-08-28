@@ -24,3 +24,4 @@ twine = "*"
 pre-commit = "*"
 exceptiongroup = "*"  # Python 3.9 & 3.10 compatibility with pytest
 doxypypy = "*"  # For generating API documentation
+requests = "*"
