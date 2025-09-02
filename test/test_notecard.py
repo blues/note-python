@@ -442,11 +442,26 @@ class TestNotecard:
         card = notecard.Notecard()
         userAgent = card.GetUserAgent()
 
-        assert userAgent['agent'] == 'note-python'
+        expected_agent = f'note-python {card.__version__}'.strip()
+        assert userAgent['agent'] == expected_agent
         assert userAgent['os_name'] is not None
         assert userAgent['os_platform'] is not None
         assert userAgent['os_version'] is not None
         assert userAgent['os_family'] is not None
+
+    def test_get_user_agent_with_custom_version(self):
+        with patch.object(notecard.Notecard, '_fetch_version', return_value='1.1.1'):
+            card = notecard.Notecard()
+            userAgent = card.GetUserAgent()
+
+            assert userAgent['agent'] == 'note-python 1.1.1'
+
+    def test_get_user_agent_with_missing_version(self):
+        with patch.object(notecard.Notecard, '_fetch_version', return_value=''):
+            card = notecard.Notecard()
+            userAgent = card.GetUserAgent()
+
+            assert userAgent['agent'] == 'note-python'
 
     # SetAppUserAgent tests.
     def set_user_agent_info(self, info=None):
