@@ -177,8 +177,7 @@ class Notecard:
             seq_number_as_int = int(seq_number, 16)
         except ValueError:
             if self._debug:
-                self._debug_fn(f'Received sequence number "{seq_number}" cannot be ' + \
-                      'converted to integer.')
+                self._debug_fn(f'Received sequence number "{seq_number}" cannot be converted to integer.')
             return True
         try:
             crc_as_int = int(crc, 16)
@@ -201,14 +200,11 @@ class Notecard:
 
         if seq_number_as_int != self._last_request_seq_number:
             if self._debug:
-                self._debug_fn('Sequence number mismatch. Expected ' + \
-                      f'{self._last_request_seq_number}, received ' + \
-                      f'{seq_number_as_int}.')
+                self._debug_fn(f'Sequence number mismatch. Expected {self._last_request_seq_number}, received {seq_number_as_int}.')
             return True
         elif crc_as_int != computed_crc:
             if self._debug:
-                self._debug_fn(f'CRC error. Computed {computed_crc}, received ' + \
-                      f'{crc_as_int}.')
+                self._debug_fn(f'CRC error. Computed {computed_crc}, received {crc_as_int}.')
             return True
 
         return False
@@ -347,8 +343,7 @@ class Notecard:
                     if 'err' in rsp_json:
                         if '{io}' in rsp_json['err'] and '{not-supported}' not in rsp_json['err']:
                             if self._debug:
-                                self._debug_fn('Response has error field indicating ' + \
-                                      f'I/O error: {rsp_json}')
+                                self._debug_fn(f'Response has error field indicating I/O error: {rsp_json}')
 
                             error = True
                             retries_left -= 1
@@ -356,8 +351,7 @@ class Notecard:
                             continue
                         elif '{bad-bin}' in rsp_json['err']:
                             if self._debug:
-                                self._debug_fn('Response has error field indicating ' + \
-                                      f'binary I/O error: {rsp_json}')
+                                self._debug_fn(f'Response has error field indicating binary I/O error: {rsp_json}')
                                 self._debug_fn('Not eligible for retry.')
 
                             error = True
@@ -540,13 +534,11 @@ class OpenSerial(Notecard):
 
                 if not something_found:
                     if self._debug:
-                        self._debug_fn('Notecard not responding to newline during ' + \
-                              'reset.')
+                        self._debug_fn('Notecard not responding to newline during reset.')
 
                 elif non_control_char_found:
                     if self._debug:
-                        self._debug_fn('Received non-control characters from the ' + \
-                              'Notecard during reset.')
+                        self._debug_fn('Received non-control characters from the Notecard during reset.')
                 else:
                     # If all we got back is newlines, we're in sync with the
                     # Notecard.
@@ -801,13 +793,11 @@ class OpenI2C(Notecard):
 
                 if not something_found:
                     if self._debug:
-                        self._debug_fn('Notecard not responding to newline during ' + \
-                              'reset.')
+                        self._debug_fn('Notecard not responding to newline during reset.')
                     time.sleep(.005)
                 elif non_control_char_found:
                     if self._debug:
-                        self._debug_fn('Received non-control characters from the ' + \
-                              'Notecard during reset.')
+                        self._debug_fn('Received non-control characters from the Notecard during reset.')
                 else:
                     # If all we got back is newlines, we're in sync with the
                     # Notecard.
