@@ -320,9 +320,9 @@ class TestNotecard:
     @pytest.mark.parametrize('num_heartbeats,debug_enabled', [
         (1, False),
         (4, False),
+        (notecard.CARD_TRANSACTION_RETRIES + 1, False),
         (1, True),
         (4, True),
-        (notecard.CARD_TRANSACTION_RETRIES + 1, False),
         (notecard.CARD_TRANSACTION_RETRIES + 1, True),
     ])
     def test_transaction_continues_after_heartbeat_to_get_valid_response(
