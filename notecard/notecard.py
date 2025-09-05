@@ -365,7 +365,7 @@ class Notecard:
                             if self._debug:
                                 try:
                                     print('Response has heartbeat field indicating ' + \
-                                        f'heartbeat: {rsp_json["status"]}')
+                                          f'heartbeat: {rsp_json["status"]}')
                                 except Exception as e:
                                     print(e)
 
