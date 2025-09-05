@@ -332,11 +332,11 @@ class TestNotecard:
         req = {"req": "note.add"}
 
         # num_heartbeats of heartbeat responses followed by valid response
-        heartbeat_response = b'{"err":"{heartbeat}"}\r\n'
+        heartbeat_response = b'{"err":"{heartbeat}","status":"testing"}\r\n'
+        json_responses = [{'err': '{heartbeat}', 'status': 'testing'}] * num_heartbeats + [{'total': 42}]
+
         valid_response = b'{"total":42}\r\n'
         card._transact.side_effect = [heartbeat_response] * num_heartbeats + [valid_response]
-
-        json_responses = [{'err': '{heartbeat}'}] * num_heartbeats + [{'total': 42}]
 
         with patch('notecard.notecard.json.loads') as mock_loads:
             mock_loads.side_effect = json_responses
@@ -374,11 +374,12 @@ class TestNotecard:
             with patch('builtins.print') as mock_print:
                 result = card.Transaction(req)
 
-                # Verify the status message was printed for first heartbeat
-                mock_print.assert_any_call('Response has heartbeat field indicating heartbeat: testing stsafe')
-                # Verify the exception was printed for second heartbeat (KeyError: 'status')
-                printed_calls = [str(call) for call in mock_print.call_args_list]
-                assert any("KeyError" in call and "'status'" in call for call in printed_calls)
+                # Verify the debug message was printed for first heartbeat (has status)
+                mock_print.assert_any_call('[DEBUG] testing stsafe')
+                # For second heartbeat (no status), exception is silently ignored (pass)
+                # So we should only see one debug print call
+                debug_calls = [call for call in mock_print.call_args_list if '[DEBUG]' in str(call)]
+                assert len(debug_calls) == 1
                 assert result == {'total': 42}
 
     @pytest.mark.parametrize(

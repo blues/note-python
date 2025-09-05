@@ -364,10 +364,9 @@ class Notecard:
                         elif '{heartbeat}' in rsp_json['err']:
                             if self._debug:
                                 try:
-                                    print('Response has heartbeat field indicating ' + \
-                                          f'heartbeat: {rsp_json["status"]}')
-                                except Exception as e:
-                                    print(e)
+                                    print(f'[DEBUG] {rsp_json["status"]}')
+                                except:
+                                    pass
 
                             error = False
                             continue
