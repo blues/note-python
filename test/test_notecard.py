@@ -317,6 +317,71 @@ class TestNotecard:
 
             assert card._transact.call_count == 1
 
+    @pytest.mark.parametrize('num_heartbeats,debug_enabled', [
+        (1, False),
+        (4, False),
+        (notecard.CARD_TRANSACTION_RETRIES + 1, False),
+        (1, True),
+        (4, True),
+        (notecard.CARD_TRANSACTION_RETRIES + 1, True),
+    ])
+    def test_transaction_continues_after_heartbeat_to_get_valid_response(
+            self, arrange_transaction_test, num_heartbeats, debug_enabled):
+        card = arrange_transaction_test()
+        card._debug = debug_enabled
+        req = {"req": "note.add"}
+
+        # num_heartbeats of heartbeat responses followed by valid response
+        heartbeat_response = b'{"err":"{heartbeat}","status":"testing"}\r\n'
+        json_responses = [{'err': '{heartbeat}', 'status': 'testing'}] * num_heartbeats + [{'total': 42}]
+
+        valid_response = b'{"total":42}\r\n'
+        card._transact.side_effect = [heartbeat_response] * num_heartbeats + [valid_response]
+
+        with patch('notecard.notecard.json.loads') as mock_loads:
+            mock_loads.side_effect = json_responses
+            if debug_enabled:
+                with patch('builtins.print') as mock_print:
+                    result = card.Transaction(req)
+                    # Verify debug messages were printed for each heartbeat
+                    assert mock_print.call_count >= num_heartbeats
+            else:
+                result = card.Transaction(req)
+
+            assert card._transact.call_count == num_heartbeats + 1
+            assert result == {'total': 42}
+
+    def test_transaction_debug_heartbeat_with_and_without_status(
+            self, arrange_transaction_test):
+        card = arrange_transaction_test()
+        card._debug = True
+        req = {"req": "note.add"}
+
+        # First heartbeat has a status field, second doesn't, then valid response
+        heartbeat_with_status = b'{"err":"{heartbeat}","status":"testing stsafe"}\r\n'
+        heartbeat_without_status = b'{"err":"{heartbeat}"}\r\n'
+        valid_response = b'{"total":42}\r\n'
+        card._transact.side_effect = [heartbeat_with_status, heartbeat_without_status, valid_response]
+
+        json_responses = [
+            {'err': '{heartbeat}', 'status': 'testing stsafe'},
+            {'err': '{heartbeat}'},
+            {'total': 42}
+        ]
+
+        with patch('notecard.notecard.json.loads') as mock_loads:
+            mock_loads.side_effect = json_responses
+            with patch('builtins.print') as mock_print:
+                result = card.Transaction(req)
+
+                # Verify the debug message was printed for first heartbeat (has status)
+                mock_print.assert_any_call('[DEBUG] testing stsafe')
+                # For second heartbeat (no status), exception is silently ignored (pass)
+                # So we should only see one debug print call
+                debug_calls = [call for call in mock_print.call_args_list if '[DEBUG]' in str(call)]
+                assert len(debug_calls) == 1
+                assert result == {'total': 42}
+
     @pytest.mark.parametrize(
         'rsp_expected,return_type',
         [

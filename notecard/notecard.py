@@ -361,6 +361,15 @@ class Notecard:
 
                             error = True
                             break
+                        elif '{heartbeat}' in rsp_json['err']:
+                            if self._debug:
+                                try:
+                                    print(f'[DEBUG] {rsp_json["status"]}')
+                                except:
+                                    pass
+
+                            error = False
+                            continue
 
                     error = False
                     break
