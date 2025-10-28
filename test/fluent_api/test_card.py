@@ -452,6 +452,20 @@ from notecard import card
             }
         ),
         (
+            card.voltage,
+            'card.voltage',
+            {
+                'on': True
+            }
+        ),
+        (
+            card.voltage,
+            'card.voltage',
+            {
+                'off': True
+            }
+        ),
+        (
             card.wireless,
             'card.wireless',
             {
