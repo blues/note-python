@@ -27,7 +27,7 @@ def add(card, binary=None, body=None, file=None, full=None, key=None, limit=None
         live (bool): If `true`, bypasses saving the Note to flash on the Notecard. Required to be set to `true` if also using `"binary":true`.
         max (int): Defines the maximum number of queued Notes permitted in the specified Notefile (`"file"`). Any Notes added after this value will be rejected. When used with `"sync":true`, a sync will be triggered when the number of pending Notes matches the `max` value.
         note (str): If the Notefile has a `.db/.dbs/.dbx` extension, specifies a unique Note ID. If `note` string is `"?"`, then a random unique Note ID is generated and returned as `{"note":"xxx"}`. If this argument is provided for a `.qo` Notefile, an error is returned.
-        payload (str): A base64-encoded binary payload. A Note must have either a `body` or a `payload`, and can have both. If a Note template is not in use, payloads are limited to 250 bytes.
+        payload (str): A base64-encoded binary payload. A Note must have either a `body` or a `payload`, and can have both. Payloads are limited to 256 bytes.
         sync (bool): Set to `true` to sync immediately. Only applies to outgoing Notecard requests, and only guarantees syncing the specified Notefile. Auto-syncing incoming Notes from Notehub is set on the Notecard with `{"req": "hub.set", "mode":"continuous", "sync": true}`.
         verify (bool): If set to `true` and using a templated Notefile, the Notefile will be written to flash immediately, rather than being cached in RAM and written to flash later.
 
