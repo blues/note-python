@@ -858,7 +858,7 @@ def version(card, api=None):
 
 
 @validate_card_object
-def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None, offset=None, set=None, sync=None, usb=None, vmax=None, vmin=None):
+def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None, off=None, offset=None, on=None, set=None, sync=None, usb=None, vmax=None, vmin=None):
     """Provide the current V+ voltage level on the Notecard, and provides information about historical voltage trends. When used with the mode argument, configures voltage thresholds based on how the device is powered.
 
     Args:
@@ -868,7 +868,9 @@ def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None
         hours (int): The number of hours to analyze, up to 720 (30 days).
         mode (str): Used to set voltage thresholds based on how the Notecard will be powered, and which can be used to configure voltage-variable Notecard behavior. Each value is shorthand that assigns a battery voltage reading to a given device state like `high`, `normal`, `low`, and `dead`. NOTE: Setting voltage thresholds is not supported on the Notecard XP.
         name (str): Specifies an environment variable to override application default timing values.
+        off (bool): Disable historic voltage trend calculations.
         offset (int): Number of hours to move into the past before starting analysis.
+        on (bool): Enable historic voltage trend calculations.
         set (bool): Used along with `calibration`, set to `true` to specify a new calibration value.
         sync (bool): When enabled and the `usb` argument is set to `true`, the Notecard will perform a sync when USB power is connected or disconnected.
         usb (bool): When enabled, the Notecard will monitor for changes to USB power state.
@@ -889,8 +891,12 @@ def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None
         req["mode"] = mode
     if name:
         req["name"] = name
+    if off is not None:
+        req["off"] = off
     if offset is not None:
         req["offset"] = offset
+    if on is not None:
+        req["on"] = on
     if set is not None:
         req["set"] = set
     if sync is not None:
