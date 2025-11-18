@@ -122,6 +122,9 @@ class NotecardAPIGenerator:
         # Remove newline characters and replace with spaces
         text = text.replace('\n', ' ').replace('\r', ' ')
 
+        # Remove escaped newline sequences (literal \n in the string)
+        text = text.replace('\\n', ' ')
+
         # Convert markdown links [text](url) -> text
         import re
         text = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', text)
@@ -244,12 +247,12 @@ class NotecardAPIGenerator:
                 param_name = f"{param_name}_"
 
             prop_desc = self.clean_docstring_text(prop_def.get("description", f"The {prop_name} parameter."))
-            lines.append(f"        {param_name} (type): {prop_desc}")
+            lines.append(f"    @param {param_name} {prop_desc}")
 
         return "\n".join(lines)
 
     def generate_docstring(self, api: Dict[str, Any]) -> str:
-        """Generate function docstring."""
+        """Generate function docstring in Doxygen format."""
         # Clean the description text
         clean_description = self.clean_docstring_text(api["description"])
         # Convert to imperative mood (Pydocstyle D402)
@@ -260,12 +263,11 @@ class NotecardAPIGenerator:
         has_backslashes = '\\' in docstring_content
 
         if has_backslashes:
-            lines = [f'    r"""{imperative_description}']
+            lines = [f'    r"""! {imperative_description}']
         else:
-            lines = [f'    """{imperative_description}']
+            lines = [f'    """! {imperative_description}']
         lines.append("")
-        lines.append("    Args:")
-        lines.append("        card (Notecard): The current Notecard object.")
+        lines.append("    @param card The current Notecard object.")
 
         properties = api["properties"]
 
@@ -279,14 +281,12 @@ class NotecardAPIGenerator:
             if param_name in self.reserved_keywords:
                 param_name = f"{param_name}_"
 
-            prop_type = self.get_python_type_hint(prop_def)
             prop_desc = self.clean_docstring_text(prop_def.get("description", f"The {prop_name} parameter."))
-            lines.append(f"        {param_name} ({prop_type}): {prop_desc}")
+            lines.append(f"    @param {param_name} {prop_desc}")
 
 
         lines.append("")
-        lines.append("    Returns:")
-        lines.append("        dict: The result of the Notecard request.")
+        lines.append("    @return The result of the Notecard request.")
         lines.append('    """')
 
         return "\n".join(lines)
@@ -359,16 +359,13 @@ class NotecardAPIGenerator:
 
     def generate_module_file(self, module_name: str, apis: List[Dict[str, Any]]) -> str:
         """Generate complete module file content."""
-        lines = [f'"""{module_name} Fluent API Helper."""']
+        lines = [f'"""! @file {module_name}.py']
+        lines.append(f"@brief {module_name} Fluent API Helper.")
         lines.append("")
-        lines.append("##")
-        lines.append(f"# @file {module_name}.py")
-        lines.append("#")
-        lines.append(f"# @brief {module_name} Fluent API Helper.")
-        lines.append("#")
-        lines.append("# @section description Description")
-        lines.append(f"# This module contains helper methods for calling {module_name}.* Notecard API commands.")
-        lines.append("# This module is optional and not required for use with the Notecard.")
+        lines.append("@section description Description")
+        lines.append(f"This module contains helper methods for calling {module_name}.* Notecard API commands.")
+        lines.append("This module is optional and not required for use with the Notecard.")
+        lines.append('"""')
         lines.append("")
         lines.append("from notecard.validators import validate_card_object")
 
