@@ -321,7 +321,7 @@ def io(card, i2c=None, mode=None):
 
 @validate_card_object
 def led(card, mode=None, off=None, on=None):
-    """Use along with the card.aux API to turn connected LEDs on/off, to enable a specific color on an RGB LED, or to manage a single connected NeoPixel. If using monochromatic LEDs, they must be wired according to the instructions provided in the guide on Using Monitor Mode. Please note that the use of monochromatic LEDs is not supported by Notecard for LoRa. If using an RGB LED, it must be wired according to the instructions provided in the guide on Using RGB-Monitor Mode. Please note that the use of RGB LEDs is not supported by Notecard for LoRa. If using NeoPixels, the NeoPixel (or strip of NeoPixels) must be wired according to the instructions provided in the guide on Using Neo-Monitor Mode.
+    """Use along with the card.aux API to turn connected LEDs on/off, to enable a specific color on an RGB LED, or to manage a single connected NeoPixel. Monochromatic LEDs must be wired according to the instructions provided in the guide on Using Monitor Mode. Please note that the use of monochromatic LEDs is not supported by Notecard for LoRa. RGB LEDs must be wired according to the instructions provided in the guide on Using RGB-Monitor Mode. Please note that the use of RGB LEDs is not supported by Notecard for LoRa. NeoPixels must be wired according to the instructions provided in the guide on Using Neo-Monitor Mode.
 
     Args:
         card (Notecard): The current Notecard object.
