@@ -841,19 +841,16 @@ def usageTest(card, days=None, hours=None, megabytes=None):
 
 
 @validate_card_object
-def version(card, api=None):
+def version(card):
     """Return firmware version information for the Notecard.
 
     Args:
         card (Notecard): The current Notecard object.
-        api (int): Specify a major version of the Notecard firmware that a host expects to use.
 
     Returns:
         dict: The result of the Notecard request.
     """
     req = {"req": "card.version"}
-    if api is not None:
-        req["api"] = api
     return card.Transaction(req)
 
 
