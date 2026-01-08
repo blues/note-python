@@ -53,11 +53,6 @@ from notecard import card
             {}
         ),
         (
-            card.version,
-            'card.version',
-            {'api': True}
-        ),
-        (
             card.voltage,
             'card.voltage',
             {
