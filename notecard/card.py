@@ -117,7 +117,7 @@ def auxSerial(card, duration=None, limit=None, max=None, minutes=None, mode=None
         card (Notecard): The current Notecard object.
         duration (int): If using `"mode": "accel"`, specify a sampling duration for the Notecard accelerometer.
         limit (bool): If `true`, along with `"mode":"gps"` the Notecard will disable concurrent modem use during GPS tracking.
-        max (int): The maximum amount of data to send per session, in bytes. This is typically set to the size of the receive buffer on the host minus `1`. For example, `note-arduino` uses a buffer size of `(SERIALRXBUFFER_SIZE - 1)`.
+        max (int): The maximum amount of data, in bytes, that can be sent in a single transmission before the Notecard pauses to allow the host to process incoming data. This value should be set to the size of the host's serial receive buffer minus `1`, which represents the number of bytes the host can absorb before the sender must delay due to the absence of flow control. For example, `note-arduino`` uses a buffer size of `(SERIALRXBUFFER_SIZE - 1)`.
         minutes (int): When using `"mode": "notify,dfu"`, specify an interval for notifying the host.
         mode (str): The AUX mode. Must be one of the following:
         ms (int): The delay in milliseconds before sending a buffer of `max` size.

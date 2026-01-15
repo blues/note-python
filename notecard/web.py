@@ -154,12 +154,13 @@ def post(card, async_=None, binary=None, body=None, content=None, file=None, max
 
 
 @validate_card_object
-def put(card, async_=None, body=None, content=None, file=None, max=None, name=None, note=None, offset=None, payload=None, route=None, seconds=None, status=None, total=None, verify=None):
+def put(card, async_=None, binary=None, body=None, content=None, file=None, max=None, name=None, note=None, offset=None, payload=None, route=None, seconds=None, status=None, total=None, verify=None):
     """Perform a simple HTTP or HTTPS `PUT` request against an external endpoint, and returns the response to the Notecard.
 
     Args:
         card (Notecard): The current Notecard object.
         async_ (bool): If `true`, the Notecard performs the web request asynchronously, and returns control to the host without waiting for a response from Notehub.
+        binary (bool): If `true`, the Notecard will send all the data in the binary buffer to the specified proxy route in Notehub. Learn more in this guide on Sending and Receiving Large Binary Objects.
         body (dict): The JSON body to send with the request.
         content (str): The MIME type of the body or payload of the response. Default is `application/json`.
         file (str): The name of the local-only Database Notefile (`.dbx`) to be used if the web request is issued asynchronously and you wish to store the response.
@@ -180,6 +181,8 @@ def put(card, async_=None, body=None, content=None, file=None, max=None, name=No
     req = {"req": "web.put"}
     if async_ is not None:
         req["async"] = async_
+    if binary is not None:
+        req["binary"] = binary
     if body:
         req["body"] = body
     if content:
