@@ -799,7 +799,7 @@ def triangulate(card, minutes=None, mode=None, on=None, set=None, text=None, tim
 
 @validate_card_object
 def usageGet(card, mode=None, offset=None):
-    """Return the card's network usage statistics.
+    """Return the Notecard's network usage statistics for cellular and Wi-Fi transmissions.
 
     Args:
         card (Notecard): The current Notecard object.
@@ -819,13 +819,13 @@ def usageGet(card, mode=None, offset=None):
 
 @validate_card_object
 def usageTest(card, days=None, hours=None, megabytes=None):
-    """Calculate a projection of how long the available data quota will last based on the observed usage patterns.
+    """Calculate a projection of how long the available cellular data quota will last based on the observed usage patterns.
 
     Args:
         card (Notecard): The current Notecard object.
         days (int): Number of days to use for the test.
         hours (int): If you want to analyze a period shorter than one day, the number of hours to use for the test.
-        megabytes (int): The Notecard lifetime data quota (in megabytes) to use for the test.
+        megabytes (int): The Notecard lifetime cellular data quota (in megabytes) to use for the test.
 
     Returns:
         dict: The result of the Notecard request.
