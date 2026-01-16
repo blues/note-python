@@ -345,7 +345,6 @@
                 "sha256:66eda1888b0171c998b35be2bcc0f6d75c388a7ce20c3f3f37aa8e96c2dddf58",
                 "sha256:d38e30481def20772f5baf097c122c3babc4fcdb7e14e57049eb9d88c6dc017d"
             ],
-            "index": "pypi",
             "markers": "python_version >= '3.9'",
             "version": "==3.19.1"
         },
@@ -768,11 +767,12 @@
         },
         "virtualenv": {
             "hashes": [
-                "sha256:341f5afa7eee943e4984a9207c025feedd768baff6753cd660c857ceb3e36026",
-                "sha256:44815b2c9dee7ed86e387b842a84f20b93f7f417f95886ca1996a72a4138eb1a"
+                "sha256:575a8d6b124ef88f6f51d56d656132389f961062a9177016a50e4f507bbcc19f",
+                "sha256:8befb5c81842c641f8ee658481e42641c68b5eab3521d8e092d18320902466ba"
             ],
+            "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==20.34.0"
+            "version": "==20.36.1"
         },
         "wrapt": {
             "hashes": [
