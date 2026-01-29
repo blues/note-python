@@ -13,11 +13,12 @@ from notecard.validators import validate_card_object
 
 
 @validate_card_object
-def get(card, length=None, offset=None):
+def get(card, binary=None, length=None, offset=None):
     """Retrieve downloaded firmware data from the Notecard for use with IAP host MCU firmware updates.
 
     Args:
         card (Notecard): The current Notecard object.
+        binary (bool): If `true`, the Notecard will return firmware data in the binary I/O buffer instead of the response `payload` field. This allows for larger data transfers and more efficient processing. When `true`, the response will include `cobs`, `length`, and `status` (MD5 hash) fields instead of `payload`. Learn more in this guide on Sending and Receiving Large Binary Objects.
         length (int): The number of bytes of firmware data to read and return to the host. Set to `0` to verify that the Notecard is in DFU mode without attempting to retrieve data.
         offset (int): The offset to use before performing a read of firmware data.
 
@@ -25,6 +26,8 @@ def get(card, length=None, offset=None):
         dict: The result of the Notecard request.
     """
     req = {"req": "dfu.get"}
+    if binary is not None:
+        req["binary"] = binary
     if length is not None:
         req["length"] = length
     if offset is not None:
