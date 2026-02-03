@@ -34,7 +34,7 @@ def gps(card, off=None, on=None):
 
 @validate_card_object
 def reset(card):
-    """Once a Notecard is connected to a Starnote device, the presence of a physical Starnote is stored in a permanent configuration that is not affected by a `card.restore` request. This request clears this configuration and allows you to return to testing NTN mode over cellular or Wi-Fi.
+    """Once a Notecard is connected to a Starnote device, the presence of a physical Starnote is stored in a permanent configuration that is not affected by a `card.restore` request. This request clears this configuration and allows you to return to testing NTN mode over cellular or WiFi.
 
     Args:
         card (Notecard): The current Notecard object.

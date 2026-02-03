@@ -652,7 +652,7 @@ def restore(card, connected=None, delete=None):
     Args:
         card (Notecard): The current Notecard object.
         connected (bool): Set to `true` to reset the Notecard on Notehub. This will delete and deprovision the Notecard from Notehub the next time the Notecard connects. This also removes any Notefile templates used by this device. Conversely, if `connected` is `false` (or omitted), the Notecard's settings and data will be restored from Notehub the next time the Notecard connects to the previously used Notehub project.
-        delete (bool): Set to `true` to reset most Notecard configuration settings. Note that this does not reset stored Wi-Fi credentials or the alternate I2C address (if previously set) so the Notecard can still contact the network after a reset. The Notecard will be unable to sync with Notehub until the `ProductUID` is set again.
+        delete (bool): Set to `true` to reset most Notecard configuration settings. Note that this does not reset stored WiFi credentials or the alternate I2C address (if previously set) so the Notecard can still contact the network after a reset. The Notecard will be unable to sync with Notehub until the `ProductUID` is set again.
 
     Returns:
         dict: The result of the Notecard request.
@@ -764,16 +764,16 @@ def transport(card, allow=None, method=None, seconds=None, umin=None):
 
 @validate_card_object
 def triangulate(card, minutes=None, mode=None, on=None, set=None, text=None, time=None, usb=None):
-    """Enable or disables a behavior by which the Notecard gathers information about surrounding cell towers and/or Wi-Fi access points with each new Notehub session.
+    """Enable or disables a behavior by which the Notecard gathers information about surrounding cell towers and/or WiFi access points with each new Notehub session.
 
     Args:
         card (Notecard): The current Notecard object.
         minutes (int): Minimum delay, in minutes, between triangulation attempts. Use `0` for no time-based suppression.
-        mode (str): The triangulation approach to use for determining the Notecard location. The following keywords can be used separately or together in a comma-delimited list, in any order. See Using Cell Tower & Wi-Fi Triangulation for more information.
+        mode (str): The triangulation approach to use for determining the Notecard location. The following keywords can be used separately or together in a comma-delimited list, in any order. See Using Cell Tower & WiFi Triangulation for more information.
         on (bool): `true` to instruct the Notecard to triangulate even if the module has not moved. Only takes effect when `set` is `true`.
         set (bool): `true` to instruct the module to use the state of the `on` and `usb` arguments.
-        text (str): When using Wi-Fi triangulation, a newline-terminated list of Wi-Fi access points obtained by the external module. Format should follow the ESP32's AT+CWLAP command output.
-        time (int): When passed with `text`, records the time that the Wi-Fi access point scan was performed. If not provided, Notecard time is used.
+        text (str): When using WiFi triangulation, a newline-terminated list of WiFi access points obtained by the external module. Format should follow the ESP32's AT+CWLAP command output.
+        time (int): When passed with `text`, records the time that the WiFi access point scan was performed. If not provided, Notecard time is used.
         usb (bool): `true` to use perform triangulation only when the Notecard is connected to USB power. Only takes effect when `set` is `true`.
 
     Returns:
@@ -799,7 +799,7 @@ def triangulate(card, minutes=None, mode=None, on=None, set=None, text=None, tim
 
 @validate_card_object
 def usageGet(card, mode=None, offset=None):
-    """Return the Notecard's network usage statistics for cellular and Wi-Fi transmissions.
+    """Return the Notecard's network usage statistics for cellular and WiFi transmissions.
 
     Args:
         card (Notecard): The current Notecard object.
@@ -967,14 +967,14 @@ def wireless(card, apn=None, hours=None, method=None, mode=None):
 
 @validate_card_object
 def wifi(card, name=None, org=None, password=None, ssid=None, start=None, text=None):
-    r"""Set up a Notecard WiFi to connect to a Wi-Fi access point.
+    r"""Set up a Notecard WiFi to connect to a WiFi access point.
 
     Args:
         card (Notecard): The current Notecard object.
         name (str): By default, the Notecard creates a SoftAP (software enabled access point) under the name "Notecard". You can use the `name` argument to change the name of the SoftAP to a custom name. If you include a `-` at the end of the `name` (for example `"name": "acme-"`), the Notecard will append the last four digits of the network's MAC address (for example `acme-025c`). This allows you to distinguish between multiple Notecards in SoftAP mode.
         org (str): If specified, replaces the Blues logo on the SoftAP page with the provided name.
-        password (str): The network password of the Wi-Fi access point. Alternatively, use `-` to clear an already set password or to connect to an open access point.
-        ssid (str): The SSID of the Wi-Fi access point. Alternatively, use `-` to clear an already set SSID.
+        password (str): The network password of the WiFi access point. Alternatively, use `-` to clear an already set password or to connect to an open access point.
+        ssid (str): The SSID of the WiFi access point. Alternatively, use `-` to clear an already set SSID.
         start (bool): Specify `true` to activate SoftAP mode on the Notecard programmatically.
         text (str): A string containing an array of access points the Notecard should attempt to use. The access points should be provided in the following format: `["FIRST-SSID","FIRST-PASSWORD"],["SECOND-SSID","SECOND-PASSWORD"]`. You may need to escape any quotes used in this argument before passing it to the Notecard. For example, the following is a valid request to pass to a Notecard through the In-Browser Terminal. `{"req":"card.wifi", "text":"[\"FIRST-SSID\",\"FIRST-PASSWORD\"]"}`
 
