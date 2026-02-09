@@ -13,12 +13,13 @@ from notecard.validators import validate_card_object
 
 
 @validate_card_object
-def default(card, name=None, text=None):
+def default(card, name=None, sync=None, text=None):
     """Use by the Notecard host to specify a default value for an environment variable until that variable is overridden by a device, project or fleet-wide setting at Notehub.
 
     Args:
         card (Notecard): The current Notecard object.
         name (str): The name of the environment variable (case-insensitive).
+        sync (bool): Set to `true` to trigger an immediate sync.
         text (str): The value of the variable. Pass `""` or omit from the request to delete it.
 
     Returns:
@@ -27,6 +28,8 @@ def default(card, name=None, text=None):
     req = {"req": "env.default"}
     if name:
         req["name"] = name
+    if sync is not None:
+        req["sync"] = sync
     if text:
         req["text"] = text
     return card.Transaction(req)

@@ -856,7 +856,7 @@ def version(card):
 
 @validate_card_object
 def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None, off=None, offset=None, on=None, set=None, sync=None, usb=None, vmax=None, vmin=None):
-    """Provide the current V+ voltage level on the Notecard, and provides information about historical voltage trends. When used with the mode argument, configures voltage thresholds based on how the device is powered.
+    """Provide the current VMODEM_P voltage level on the Notecard, and provides information about historical voltage trends. When used with the mode argument, configures voltage thresholds based on how the device is powered.
 
     Args:
         card (Notecard): The current Notecard object.
