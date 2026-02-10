@@ -63,7 +63,7 @@ def set(card, file=None, flag=None, name=None, sync=None, text=None, value=None)
         name (str): The unique Note ID.
         sync (bool): Set to `true` to immediately sync any changes.
         text (str): The string-based value to be stored in the DB Notefile.
-        value (int): The numeric value to be stored in the DB Notefile.
+        value (float): The numeric value to be stored in the DB Notefile.
 
     Returns:
         dict: The result of the Notecard request.
