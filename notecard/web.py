@@ -113,7 +113,7 @@ def post(card, async_=None, binary=None, body=None, content=None, file=None, max
         route (str): Alias for a Proxy Route in Notehub.
         seconds (int): If specified, overrides the default 90 second timeout.
         status (str): A 32-character hex-encoded MD5 sum of the payload or payload fragment. Used by Notehub to perform verification upon receipt.
-        total (int): When sending large payloads to Notehub in fragments across several `web.post` requests, the total size, in bytes, of the binary payload across all fragments.
+        total (int): When using the `application/octet-stream` content type, you may send large payloads to Notehub in fragments spanning several `web.post` requests by using `offset` (see above) and `total`. The `total` field indicates the total size, in bytes (10MB max), of the payload across all fragments.
         verify (bool): `true` to request verification from Notehub once the payload or payload fragment is received. Automatically set to `true` when `status` is supplied.
 
     Returns:
@@ -172,7 +172,7 @@ def put(card, async_=None, binary=None, body=None, content=None, file=None, max=
         route (str): Alias for a Proxy Route in Notehub.
         seconds (int): If specified, overrides the default 90 second timeout.
         status (str): A 32-character hex-encoded MD5 sum of the payload or payload fragment. Used by Notehub to perform verification upon receipt.
-        total (int): When sending large payloads to Notehub in fragments across several `web.put` requests, the total size, in bytes, of the binary payload across all fragments.
+        total (int): When using the `application/octet-stream` content type, you may send large payloads to Notehub in fragments spanning several `web.put` requests by using `offset` (see above) and `total`. The `total` field indicates the total size, in bytes (10MB max), of the payload across all fragments.
         verify (bool): `true` to request verification from Notehub once the payload or payload fragment is received. Automatically set to `true` when `status` is supplied.
 
     Returns:
