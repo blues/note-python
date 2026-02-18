@@ -95,7 +95,7 @@ def get(card, async_=None, binary=None, body=None, content=None, file=None, max=
 
 
 @validate_card_object
-def post(card, async_=None, binary=None, body=None, content=None, file=None, max=None, name=None, note=None, offset=None, payload=None, route=None, seconds=None, status=None, total=None, verify=None):
+def post(card, async_=None, binary=None, body=None, content=None, file=None, label=None, max=None, name=None, note=None, offset=None, payload=None, route=None, seconds=None, status=None, total=None, verify=None):
     """Perform a simple HTTP or HTTPS `POST` request against an external endpoint, and returns the response to the Notecard.
 
     Args:
@@ -105,6 +105,7 @@ def post(card, async_=None, binary=None, body=None, content=None, file=None, max
         body (dict): The JSON body to send with the request.
         content (str): The MIME type of the body or payload of the response. Default is `application/json`.
         file (str): The name of the local-only Database Notefile (`.dbx`) to be used if the web request is issued asynchronously and you wish to store the response.
+        label (str): A label for the upload, typically a filename.
         max (int): The maximum size of the response from the remote server, in bytes. Useful if a memory-constrained host wants to limit the response size.
         name (str): A web URL endpoint relative to the host configured in the Proxy Route. URL parameters may be added to this argument as well (e.g. `/addReading?id=1`).
         note (str): The unique Note ID for the local-only Database Notefile (`.dbx`). Only used with asynchronous web requests (see `file` argument above).
@@ -130,6 +131,8 @@ def post(card, async_=None, binary=None, body=None, content=None, file=None, max
         req["content"] = content
     if file:
         req["file"] = file
+    if label:
+        req["label"] = label
     if max is not None:
         req["max"] = max
     if name:
@@ -154,7 +157,7 @@ def post(card, async_=None, binary=None, body=None, content=None, file=None, max
 
 
 @validate_card_object
-def put(card, async_=None, binary=None, body=None, content=None, file=None, max=None, name=None, note=None, offset=None, payload=None, route=None, seconds=None, status=None, total=None, verify=None):
+def put(card, async_=None, binary=None, body=None, content=None, file=None, label=None, max=None, name=None, note=None, offset=None, payload=None, route=None, seconds=None, status=None, total=None, verify=None):
     """Perform a simple HTTP or HTTPS `PUT` request against an external endpoint, and returns the response to the Notecard.
 
     Args:
@@ -164,6 +167,7 @@ def put(card, async_=None, binary=None, body=None, content=None, file=None, max=
         body (dict): The JSON body to send with the request.
         content (str): The MIME type of the body or payload of the response. Default is `application/json`.
         file (str): The name of the local-only Database Notefile (`.dbx`) to be used if the web request is issued asynchronously and you wish to store the response.
+        label (str): A label for the upload, typically a filename.
         max (int): The maximum size of the response from the remote server, in bytes. Useful if a memory-constrained host wants to limit the response size. Default (and maximum value) is 8192.
         name (str): A web URL endpoint relative to the host configured in the Proxy Route. URL parameters may be added to this argument as well (e.g. `/updateReading?id=1`).
         note (str): The unique Note ID for the local-only Database Notefile (`.dbx`). Only used with asynchronous web requests (see `file` argument above).
@@ -189,6 +193,8 @@ def put(card, async_=None, binary=None, body=None, content=None, file=None, max=
         req["content"] = content
     if file:
         req["file"] = file
+    if label:
+        req["label"] = label
     if max is not None:
         req["max"] = max
     if name:
