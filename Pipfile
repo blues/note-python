@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-filelock = ">=3.4.1"
+filelock = ">=3.24.3"
 
 [dev-packages]
 python-periphery = "==2.3.0"
@@ -19,6 +19,6 @@ pytest-cov = "*"
 build = "*"
 twine = "*"
 pre-commit = "*"
-exceptiongroup = "*"  # Python 3.9 & 3.10 compatibility with pytest
+exceptiongroup = "*"  # Python 3.10 compatibility with pytest
 doxypypy = "*"  # For generating API documentation
 requests = "*"
