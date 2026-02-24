@@ -1,13 +1,13 @@
+version: "3.8"
 # .devcontainer/docker-compose.yaml
 
-name: note-arduino
 services:
   devcontainer:
-    # image: ghcr.io/blues/note_arduino_ci:latest
+    # image: ghcr.io/blues/note_python_ci:latest
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: note-arduino_devcontainer
+    container_name: note-python_devcontainer
     command: sleep infinity
     depends_on:
       - tailscale
@@ -22,7 +22,7 @@ services:
     cap_add:
       - NET_ADMIN  # Network admin privileges
       - SYS_MODULE  # Required for TUN device
-    container_name: note-arduino_tailnet-connection
+    container_name: note-python_tailnet-connection
     env_file:
       - .env
       - ts_config.env  # Load Tailscale config from generated file

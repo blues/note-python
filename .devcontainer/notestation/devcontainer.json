@@ -21,7 +21,7 @@
             "extensions": [
                 "ms-python.python",
                 "ms-python.vscode-pylance",
-                "shardulm94.trailing-spaces"
+                "shardulm94.trailing-spaces",\n                "${containerWorkspaceFolder}/.vscode/extensions/notestation-2.0.1.vsix"
             ],
             "settings": {}
         }
