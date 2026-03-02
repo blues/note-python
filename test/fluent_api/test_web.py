@@ -30,16 +30,13 @@ from notecard import web
                 'body': {'key': 'value'},
                 'content': 'application/json',
                 'seconds': 60,
-                'async_': False,
                 'binary': True,
                 'offset': 0,
                 'max': 1024,
                 'file': 'responses.dbx',
                 'note': 'get_response_1'
             },
-            {
-                'async_': 'async'
-            }
+            None
         ),
         (
             web.post,
