@@ -48,19 +48,18 @@ def delete(card, async_=None, content=None, file=None, name=None, note=None, rou
 
 
 @validate_card_object
-def get(card, async_=None, binary=None, body=None, content=None, file=None, max=None, name=None, note=None, offset=None, route=None, seconds=None):
+def get(card, binary=None, body=None, content=None, file=None, max=None, name=None, note=None, offset=None, route=None, seconds=None):
     """Perform a simple HTTP or HTTPS `GET` request against an external endpoint, and returns the response to the Notecard.
 
     Args:
         card (Notecard): The current Notecard object.
-        async_ (bool): If `true`, the Notecard performs the web request asynchronously, and returns control to the host without waiting for a response from Notehub.
         binary (bool): If `true`, the Notecard will return the response stored in its binary buffer. Learn more in this guide on Sending and Receiving Large Binary Objects.
         body (dict): The JSON body to send with the request.
         content (str): The MIME type of the body or payload of the response. Default is `application/json`.
-        file (str): The name of the local-only Database Notefile (`.dbx`) to be used if the web request is issued asynchronously and you wish to store the response.
+        file (str): The name of a local-only Database Notefile (.dbx) where the response will be stored when the web request is executed as a queued web transaction (e.g. if the request is made when Notecard is not in continuous mode and not online). If `file` is not specified, queued web transaction responses are discarded. This argument is not used when the Notecard is in `continuous` mode and online, as responses in that case are returned directly to the host.
         max (int): Used along with `binary:true` and `offset`, sent as a URL parameter to the remote endpoint. Represents the number of bytes to retrieve from the binary payload segment.
         name (str): A web URL endpoint relative to the host configured in the Proxy Route. URL parameters may be added to this argument as well (e.g. `/getLatest?id=1`).
-        note (str): The unique Note ID for the local-only Database Notefile (`.dbx`). Only used with asynchronous web requests (see `file` argument above).
+        note (str): The unique Note ID within the local-only Database Notefile (.dbx) specified by the `file` argument (see above). Used with queued web transactions to identify a specific Note where the response will be stored.
         offset (int): Used along with `binary:true` and `max`, sent as a URL parameter to the remote endpoint. Represents the number of bytes to offset the binary payload from 0 when retrieving binary data from the remote endpoint.
         route (str): Alias for a Proxy Route in Notehub.
         seconds (int): If specified, overrides the default 90 second timeout.
@@ -69,8 +68,6 @@ def get(card, async_=None, binary=None, body=None, content=None, file=None, max=
         dict: The result of the Notecard request.
     """
     req = {"req": "web.get"}
-    if async_ is not None:
-        req["async"] = async_
     if binary is not None:
         req["binary"] = binary
     if body:
@@ -100,14 +97,14 @@ def post(card, async_=None, binary=None, body=None, content=None, file=None, max
 
     Args:
         card (Notecard): The current Notecard object.
-        async_ (bool): If `true`, the Notecard performs the web request asynchronously, and returns control to the host without waiting for a response from Notehub.
+        async_ (bool): If `true`, the Notecard performs the web request asynchronously, and returns control to the host without waiting for a response from Notehub. This argument only applies when the Notecard is in `continuous` mode and currently online.
         binary (bool): If `true`, the Notecard will send all the data in the binary buffer to the specified proxy route in Notehub. Learn more in this guide on Sending and Receiving Large Binary Objects.
         body (dict): The JSON body to send with the request.
         content (str): The MIME type of the body or payload of the response. Default is `application/json`.
-        file (str): The name of the local-only Database Notefile (`.dbx`) to be used if the web request is issued asynchronously and you wish to store the response.
+        file (str): The name of a local-only Database Notefile (.dbx) where the response will be stored when the web request is executed as a queued web transaction (e.g. if the request is made when Notecard is not in continuous mode and not online). If `file` is not specified, queued web transaction responses are discarded. This argument is not used when the Notecard is in `continuous` mode and online, as responses in that case are returned directly to the host.
         max (int): The maximum size of the response from the remote server, in bytes. Useful if a memory-constrained host wants to limit the response size.
         name (str): A web URL endpoint relative to the host configured in the Proxy Route. URL parameters may be added to this argument as well (e.g. `/addReading?id=1`).
-        note (str): The unique Note ID for the local-only Database Notefile (`.dbx`). Only used with asynchronous web requests (see `file` argument above).
+        note (str): The unique Note ID within the local-only Database Notefile (.dbx) specified by the `file` argument (see above). Used with queued web transactions to identify a specific Note where the response will be stored.
         offset (int): When sending payload fragments, the number of bytes of the binary payload to offset from 0 when reassembling on the Notehub once all fragments have been received.
         payload (str): A base64-encoded binary payload. A `web.post` may have either a `body` or a `payload`, but may NOT have both. Be aware that Notehub will decode the payload as it is delivered to the endpoint. Learn more about sending large binary objects with the Notecard.
         route (str): Alias for a Proxy Route in Notehub.
@@ -159,14 +156,14 @@ def put(card, async_=None, binary=None, body=None, content=None, file=None, max=
 
     Args:
         card (Notecard): The current Notecard object.
-        async_ (bool): If `true`, the Notecard performs the web request asynchronously, and returns control to the host without waiting for a response from Notehub.
+        async_ (bool): If `true`, the Notecard performs the web request asynchronously, and returns control to the host without waiting for a response from Notehub. This argument only applies when the Notecard is in `continuous` mode and currently online.
         binary (bool): If `true`, the Notecard will send all the data in the binary buffer to the specified proxy route in Notehub. Learn more in this guide on Sending and Receiving Large Binary Objects.
         body (dict): The JSON body to send with the request.
         content (str): The MIME type of the body or payload of the response. Default is `application/json`.
-        file (str): The name of the local-only Database Notefile (`.dbx`) to be used if the web request is issued asynchronously and you wish to store the response.
+        file (str): The name of a local-only Database Notefile (.dbx) where the response will be stored when the web request is executed as a queued web transaction (e.g. if the request is made when Notecard is not in continuous mode and not online). If `file` is not specified, queued web transaction responses are discarded. This argument is not used when the Notecard is in `continuous` mode and online, as responses in that case are returned directly to the host.
         max (int): The maximum size of the response from the remote server, in bytes. Useful if a memory-constrained host wants to limit the response size. Default (and maximum value) is 8192.
         name (str): A web URL endpoint relative to the host configured in the Proxy Route. URL parameters may be added to this argument as well (e.g. `/updateReading?id=1`).
-        note (str): The unique Note ID for the local-only Database Notefile (`.dbx`). Only used with asynchronous web requests (see `file` argument above).
+        note (str): The unique Note ID within the local-only Database Notefile (.dbx) specified by the `file` argument (see above). Used with queued web transactions to identify a specific Note where the response will be stored.
         offset (int): When sending payload fragments, the number of bytes of the binary payload to offset from 0 when reassembling on the Notehub once all fragments have been received.
         payload (str): A base64-encoded binary payload. A `web.put` may have either a `body` or a `payload`, but may NOT have both. Be aware that Notehub will decode the payload as it is delivered to the endpoint. Learn more about sending large binary objects with the Notecard.
         route (str): Alias for a Proxy Route in Notehub.
