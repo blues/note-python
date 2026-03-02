@@ -213,7 +213,7 @@ def carrier(card, mode=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        mode (str): The `AUXCHARGING` mode. Set to `"charging"` to tell the Notecard that `AUXCHARGING` is connected to a Notecarrier that supports charging on `AUXCHARGING`. Set to `"-"` or `"off"` to turn off the `AUXCHARGING` detection.
+        mode (str): The `AUX_CHARGING` mode.
 
     Returns:
         dict: The result of the Notecard request.
@@ -305,7 +305,7 @@ def io(card, i2c=None, mode=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        i2c (int): The alternate address to use for I2C communication. Pass `-1` to reset to the default address
+        i2c (int): The alternate address to use for I2C communication.
         mode (str): Used to control the Notecard's IO behavior, including USB port, LED, I2C master, NTN fallback.
 
     Returns:
@@ -725,7 +725,7 @@ def trace(card, mode=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        mode (str): Set to `"on"` to enable trace mode on a Notecard, or `"off"` to disable it.
+        mode (str): The mode parameter.
 
     Returns:
         dict: The result of the Notecard request.
