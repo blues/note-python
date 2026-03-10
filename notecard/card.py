@@ -707,7 +707,7 @@ def temp(card, minutes=None, status=None, stop=None, sync=None):
 
 @validate_card_object
 def time(card):
-    """Retrieve current date and time information in UTC. Upon power-up, the Notecard must complete a sync to Notehub in order to obtain time and location data. Before the time is obtained, this request will return `{"zone":"UTC,Unknown"}`.
+    """Retrieve current date and time information in UTC. Upon power-up, the Notecard must complete a sync to Notehub in order to obtain time and location data. Before the time is obtained, this request will return `{"zone":"UTC,Unknown"}`. The Notecard's stored timezone is only updated when a new Notehub session begins.
 
     Args:
         card (Notecard): The current Notecard object.
