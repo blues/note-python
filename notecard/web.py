@@ -18,11 +18,11 @@ def delete(card, async_=None, content=None, file=None, name=None, note=None, rou
 
     Args:
         card (Notecard): The current Notecard object.
-        async_ (bool): If `true`, the Notecard performs the web request asynchronously, and returns control to the host without waiting for a response from Notehub.
+        async_ (bool): If `true`, the Notecard performs the web request asynchronously, and returns control to the host without waiting for a response from Notehub. This argument only applies when the Notecard is in `continuous` mode and currently online.
         content (str): The MIME type of the body or payload of the response. Default is `application/json`.
-        file (str): The name of the local-only Database Notefile (`.dbx`) to be used if the web request is issued asynchronously and you wish to store the response.
+        file (str): The name of a local-only Database Notefile (.dbx) where the response will be stored when the web request is executed as a queued web transaction (e.g. if the request is made when Notecard is not in continuous mode and not online). If `file` is not specified, queued web transaction responses are discarded. This argument is not used when the Notecard is in `continuous` mode and online, as responses in that case are returned directly to the host.
         name (str): A web URL endpoint relative to the host configured in the Proxy Route. URL parameters may be added to this argument as well (e.g. `/deleteReading?id=1`).
-        note (str): The unique Note ID for the local-only Database Notefile (`.dbx`). Only used with asynchronous web requests (see `file` argument above).
+        note (str): The unique Note ID within the local-only Database Notefile (.dbx) specified by the `file` argument (see above). Used with queued web transactions to identify a specific Note where the response will be stored.
         route (str): Alias for a Proxy Route in Notehub.
         seconds (int): If specified, overrides the default 90 second timeout.
 
