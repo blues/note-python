@@ -13,7 +13,7 @@ from notecard.validators import validate_card_object
 
 
 @validate_card_object
-def default(card, name=None, sync=None, text=None):
+def default(card, name, sync=None, text=None):
     """Use by the Notecard host to specify a default value for an environment variable until that variable is overridden by a device, project or fleet-wide setting at Notehub.
 
     Args:
@@ -76,7 +76,7 @@ def modified(card, time=None):
 
 
 @validate_card_object
-def set(card, name=None, text=None):
+def set(card, name, text=None):
     """Set a local environment variable on the Notecard. Local environment variables cannot be overridden by a Notehub variable of any scope.
 
     Args:
