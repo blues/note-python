@@ -1,6 +1,6 @@
 # note-python
 
-Python library for communicating with the Blues Wireless Notecard over serial
+Python library for communicating with the Blues Notecard over serial
 or I²C.
 
 ![Build](https://github.com/blues/note-python/workflows/Python%20package/badge.svg)
@@ -23,7 +23,6 @@ pip install note-python
 
 or
 
-
 ```bash
 pip3 install note-python
 ```
@@ -37,14 +36,14 @@ directory into the `lib/notecard` directory of your device.
 import notecard
 ```
 
-The `note-python` library requires a pointer to a serial or i2c object that you
+The `note-python` library requires a reference to a serial or i2c object that you
 initialize and pass into the library. This object differs based on platform, so
 consult the [examples](examples/) directory for platform-specific guidance.
 
 ### Serial Configuration
 
-
 #### Linux and Raspberry Pi
+
 ```python
 # Use PySerial on a Linux desktop or Raspberry Pi
 import serial
@@ -67,7 +66,6 @@ port = serial.Serial(port="/dev/tty.usbmodemNOTE1",
 
 card = notecard.OpenSerial(port)
 ```
-
 
 ### I2C Configuration
 
@@ -126,6 +124,26 @@ rsp = hub.set(nCard, productUID, mode="continuous", sync=True)
 print(rsp) # {}
 ```
 
+### Debugging
+
+The `notecard` library allows you to pass in a debug function to be called when debug messages are generated.
+This is useful for debugging the library and for troubleshooting issues with the Notecard.
+
+```python
+import notecard
+
+card = notecard.OpenSerial(port, debug=True, debug_fn=print)
+```
+
+This can be used with the Python `logging` library to log debug messages to a file or to the console.
+
+```python
+import notecard
+import logging
+
+card = notecard.OpenSerial(port, debug=True, debug_fn=logging.debug)
+```
+
 ## Documentation
 
 The documentation for this library can be found
@@ -155,11 +173,13 @@ our [contribution guide](CONTRIBUTING.md).
 If you're planning to contribute to this repo, please be sure to run the tests, linting and style checks before submitting a PR.
 
 1. Install Pipenv if you haven't already:
+
    ```bash
    pip install pipenv
    ```
 
 2. Clone the repository and install dependencies:
+
    ```bash
    git clone https://github.com/blues/note-python.git
    cd note-python
@@ -167,16 +187,19 @@ If you're planning to contribute to this repo, please be sure to run the tests, 
    ```
 
 3. Activate the virtual environment:
+
    ```bash
    pipenv shell
    ```
 
 4. Run the tests:
+
    ```bash
    make test
    ```
 
 5. Run linting and style checks:
+
    ```bash
    make precommit
    ```
