@@ -61,15 +61,15 @@ def aux(card, connected=None, count=None, file=None, gps=None, limit=None, max=N
         file (str): The name of the Notefile used to report state changes when used in conjunction with `"sync": true`. Default Notefile name is `_button.qo`.
         gps (bool): If `true`, along with `"mode":"track"` the Notecard supports the use of an external GPS module. This argument is deprecated. Use the `card.aux.serial` request with a `mode` of `"gps"` instead.
         limit (bool): If `true`, along with `"mode":"track"` and `gps:true` the Notecard will disable concurrent modem use during GPS tracking.
-        max (int): When in `gpio` mode, if an `AUX` pin is configured as a `count` type, the maximum number of samples of duration `seconds`, after which all subsequent counts are added to the final sample. Passing `0` or omitting this value will provide a single incrementing count of rising edges on the pin.
-        mode (str): The AUX mode. Must be one of the following keywords. Some keywords are only supported on certain types of Notecards.
+        max (int): When in `gpio` mode, if an `AUX` pin is configured as a `count` type, the maximum number of `seconds`-long sample buckets to collect. Once `max` buckets have been filled, additional counts roll into the final bucket. Passing `0` or omitting this value will provide a single incrementing count of rising edges on the pin.
+        mode (str): The AUX mode. If specified, must be one of the following keywords. Some keywords are only supported on certain types of Notecards.
         ms (int): When in `gpio` mode, this argument configures a debouncing interval. With a debouncing interval in place, the Notecard excludes all transitions with a shorter duration than the provided debounce time, in milliseconds. This interval only applies to GPIOs configured with a `usage` of `count`, `count-pulldown`, or `count-pullup`.
         offset (int): When used with `"mode":"neo-monitor"` or `"mode":"track-neo-monitor"`, this is the 1-based index in a strip of NeoPixels that determines which single NeoPixel the host can command.
         rate (int): The AUX UART baud rate for debug communication over the AUXRX and AUXTX pins.
         seconds (int): When in `gpio` mode, if an `AUX` pin is configured as a `count` type, the count of rising edges can be broken into samples of this duration. Passing `0` or omitting this field will total into a single sample.
         sensitivity (int): When used with `"mode":"neo-monitor"` or `"mode":"track-neo-monitor"`, this controls the brightness of NeoPixel lights, where `100` is the maximum brightness and `1` is the minimum.
         start (bool): When in `gpio` mode, if an `AUX` pin is configured as a `count` type, set to `true` to reset counters and start incrementing.
-        sync (bool): If `true`, for pins set as `input` by `usage`, the Notecard will autonomously report any state changes as new notes in `file`. For pins used as `counter`, the Notecard will use an interrupt to count pulses and will report the total in a new note in `file` unless it has been noted in the previous second.
+        sync (bool): If `true`, for pins set as `input` by `usage`, the Notecard will autonomously report any state changes as new notes in `file`. For pins used as `count`, the Notecard will use an interrupt to count pulses and will report the total in a new note in `file` unless it has been noted in the previous second.
         usage (list): An ordered list of pin modes for each AUX pin when in GPIO mode.
 
     Returns:
