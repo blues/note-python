@@ -115,9 +115,9 @@ def auxSerial(card, duration=None, limit=None, max=None, minutes=None, mode=None
 
     Args:
         card (Notecard): The current Notecard object.
-        duration (int): If using `"mode": "accel"`, specify a sampling duration for the Notecard accelerometer.
+        duration (int): If using `"mode": "notify,accel"`, specify a sampling duration (in milliseconds) for the Notecard accelerometer.
         limit (bool): If `true`, along with `"mode":"gps"` the Notecard will disable concurrent modem use during GPS tracking.
-        max (int): The maximum amount of data, in bytes, that can be sent in a single transmission before the Notecard pauses to allow the host to process incoming data. This value should be set to the size of the host's serial receive buffer minus `1`, which represents the number of bytes the host can absorb before the sender must delay due to the absence of flow control. For example, `note-arduino`` uses a buffer size of `(SERIALRXBUFFER_SIZE - 1)`.
+        max (int): The maximum amount of data, in bytes, that can be sent in a single transmission before the Notecard pauses to allow the host to process incoming data. This value should be set to the size of the host's serial receive buffer minus `1`, which represents the number of bytes the host can absorb before the sender must delay due to the absence of flow control. For example, `note-arduino` uses a buffer size of `(SERIALRXBUFFER_SIZE - 1)`.
         minutes (int): When using `"mode": "notify,dfu"`, specify an interval for notifying the host.
         mode (str): The AUX mode. Must be one of the following:
         ms (int): The delay in milliseconds before sending a buffer of `max` size.
@@ -404,8 +404,8 @@ def locationTrack(card, file=None, heartbeat=None, hours=None, payload=None, sta
     Args:
         card (Notecard): The current Notecard object.
         file (str): The Notefile in which to store tracked location data. See the `_track.qo` Notefile's documentation for details on the format of the data captured.
-        heartbeat (bool): When `start` is `true`, set to `true` to enable tracking even when motion is not detected. If using `heartbeat`, also set the `hours` below.
-        hours (int): If `heartbeat` is true, add a heartbeat entry at this hourly interval. Use a negative integer to specify a heartbeat in minutes instead of hours.
+        heartbeat (bool): When `start` is `true`, set to `true` to capture a tracking Note on a fixed interval even when no motion has been detected. The interval is configured with the `hours` field below.
+        hours (int): When `heartbeat` is `true`, the interval at which to capture a heartbeat tracking Note. A positive value sets the interval in hours (e.g. `2` captures a Note every two hours). To configure an interval shorter than one hour, pass a negative integer whose absolute value is the number of minutes (e.g. `-30` captures a Note every 30 minutes).
         payload (str): A base64-encoded binary payload to be included in the next `_track.qo` Note. See the guide on Sampling at Predefined Intervals for more details.
         start (bool): Set to `true` to start Notefile tracking.
         stop (bool): Set to `true` to stop Notefile tracking.
@@ -744,7 +744,7 @@ def transport(card, allow=None, method=None, seconds=None, umin=None):
         card (Notecard): The current Notecard object.
         allow (bool): Set to `true` to allow adding Notes to non-compact Notefiles while connected over a non-terrestrial network. See Define NTN vs non-NTN Templates.
         method (str): The connectivity method to enable on the Notecard.
-        seconds (int): The amount of time a Notecard will spend on any fallback transport before retrying the first transport specified in the `method`. The default is `3600` or 60 minutes.
+        seconds (int): The amount of time (in seconds) a Notecard will spend on any fallback transport before retrying the first transport specified in the `method`. The default is `3600` or 60 minutes.
         umin (bool): Set to `true` to force a longer network transport timeout when using Wideband Notecards.
 
     Returns:
@@ -863,7 +863,7 @@ def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None
         alert (bool): When enabled and the `usb` argument is set to `true`, the Notecard will add an entry to the `health.qo` Notefile when USB power is connected or disconnected.
         calibration (float): The offset, in volts, to account for the forward voltage drop of the diode used between the battery and Notecard in either Blues- or customer-designed Notecarriers.
         hours (int): The number of hours to analyze, up to 720 (30 days).
-        mode (str): Used to set voltage thresholds based on how the Notecard will be powered, and which can be used to configure voltage-variable Notecard behavior. Each value is shorthand that assigns a battery voltage reading to a given device state like `high`, `normal`, `low`, and `dead`. NOTE: Setting voltage thresholds is not supported on the Notecard XP.
+        mode (str): Used to set voltage thresholds based on how the Notecard will be powered, and which can be used to configure voltage-variable Notecard behavior. Each value is shorthand that assigns a battery voltage reading to a given device state like `high`, `normal`, `low`, and `dead`. In addition to the named presets below, a custom semicolon-separated shorthand string may be provided using any combination of the `usb`, `high`, `normal`, `low`, and `dead` states (e.g. `"usb:4.6;high:4.2;normal:3.6;low:0"`). NOTE: Setting voltage thresholds is not supported on the Notecard XP.
         name (str): Specifies an environment variable to override application default timing values.
         off (bool): Disable historic voltage trend calculations.
         offset (int): Number of hours to move into the past before starting analysis.
@@ -967,7 +967,7 @@ def wireless(card, apn=None, hours=None, method=None, mode=None):
 
 @validate_card_object
 def wifi(card, name=None, org=None, password=None, ssid=None, start=None, text=None):
-    r"""Set up a Notecard WiFi to connect to a WiFi access point.
+    r"""Set up a Notecard's connection to a WiFi access point.
 
     Args:
         card (Notecard): The current Notecard object.
