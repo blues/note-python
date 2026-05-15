@@ -863,7 +863,7 @@ def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None
         alert (bool): When enabled and the `usb` argument is set to `true`, the Notecard will add an entry to the `health.qo` Notefile when USB power is connected or disconnected.
         calibration (float): The offset, in volts, to account for the forward voltage drop of the diode used between the battery and Notecard in either Blues- or customer-designed Notecarriers.
         hours (int): The number of hours to analyze, up to 720 (30 days).
-        mode (str): Used to set voltage thresholds based on how the Notecard will be powered, and which can be used to configure voltage-variable Notecard behavior. Each value is shorthand that assigns a battery voltage reading to a given device state like `high`, `normal`, `low`, and `dead`. NOTE: Setting voltage thresholds is not supported on the Notecard XP.
+        mode (str): Used to set voltage thresholds based on how the Notecard will be powered, and which can be used to configure voltage-variable Notecard behavior. Each value is shorthand that assigns a battery voltage reading to a given device state like `high`, `normal`, `low`, and `dead`. In addition to the named presets below, a custom semicolon-separated shorthand string may be provided using any combination of the `usb`, `high`, `normal`, `low`, and `dead` states (e.g. `"usb:4.6;high:4.2;normal:3.6;low:0"`). NOTE: Setting voltage thresholds is not supported on the Notecard XP.
         name (str): Specifies an environment variable to override application default timing values.
         off (bool): Disable historic voltage trend calculations.
         offset (int): Number of hours to move into the past before starting analysis.
@@ -967,7 +967,7 @@ def wireless(card, apn=None, hours=None, method=None, mode=None):
 
 @validate_card_object
 def wifi(card, name=None, org=None, password=None, ssid=None, start=None, text=None):
-    r"""Set up a Notecard WiFi to connect to a WiFi access point.
+    r"""Set up a Notecard's connection to a WiFi access point.
 
     Args:
         card (Notecard): The current Notecard object.
