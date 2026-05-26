@@ -126,12 +126,22 @@ class NotecardAPIGenerator:
         import re
         text = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', text)
 
-        # Remove markdown emphasis formatting (* and _)
-        # Handle both single and double emphasis markers
+        # Remove markdown emphasis formatting (* and _), but protect backtick-quoted
+        # spans first so identifiers like SERIAL_RX_BUFFER_SIZE are not corrupted.
+        placeholders = {}
+        def save_backtick(m):
+            key = f"\x00BACKTICK{len(placeholders)}\x00"
+            placeholders[key] = m.group(0)
+            return key
+        text = re.sub(r'`[^`]*`', save_backtick, text)
+
         text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)  # **bold** -> bold
         text = re.sub(r'\*([^*]+)\*', r'\1', text)      # *italic* -> italic
         text = re.sub(r'__([^_]+)__', r'\1', text)      # __bold__ -> bold
         text = re.sub(r'_([^_]+)_', r'\1', text)        # _italic_ -> italic
+
+        for key, val in placeholders.items():
+            text = text.replace(key, val)
 
         # Collapse multiple spaces into single spaces
         text = re.sub(r'\s+', ' ', text)
