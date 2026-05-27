@@ -117,7 +117,7 @@ def auxSerial(card, duration=None, limit=None, max=None, minutes=None, mode=None
         card (Notecard): The current Notecard object.
         duration (int): If using `"mode": "notify,accel"`, specify a sampling duration (in milliseconds) for the Notecard accelerometer.
         limit (bool): If `true`, along with `"mode":"gps"` the Notecard will disable concurrent modem use during GPS tracking.
-        max (int): The maximum amount of data, in bytes, that can be sent in a single transmission before the Notecard pauses to allow the host to process incoming data. This value should be set to the size of the host's serial receive buffer minus `1`, which represents the number of bytes the host can absorb before the sender must delay due to the absence of flow control. For example, `note-arduino` uses a buffer size of `(SERIALRXBUFFER_SIZE - 1)`.
+        max (int): The maximum amount of data, in bytes, that can be sent in a single transmission before the Notecard pauses to allow the host to process incoming data. This value should be set to the size of the host's serial receive buffer minus `1`, which represents the number of bytes the host can absorb before the sender must delay due to the absence of flow control. For example, `note-arduino` uses a buffer size of `(SERIAL_RX_BUFFER_SIZE - 1)`.
         minutes (int): When using `"mode": "notify,dfu"`, specify an interval for notifying the host.
         mode (str): The AUX mode. Must be one of the following:
         ms (int): The delay in milliseconds before sending a buffer of `max` size.
@@ -256,7 +256,7 @@ def dfu(card, mode=None, name=None, off=None, on=None, seconds=None, start=None,
 
     Args:
         card (Notecard): The current Notecard object.
-        mode (str): The `mode` argument allows you to control whether a Notecard's `AUX` pins (default) or `ALTDFU` pins are used for Notecard Outboard Firmware Update. This argument is only supported on Notecards that have `ALTDFU` pins, which includes all versions of Notecard Cell+WiFi, non-legacy versions of Notecard Cellular, and Notecard WiFi v2.
+        mode (str): The `mode` argument allows you to control whether a Notecard's `AUX` pins (default) or `ALT_DFU` pins are used for Notecard Outboard Firmware Update. This argument is only supported on Notecards that have `ALT_DFU` pins, which includes all versions of Notecard Cell+WiFi, non-legacy versions of Notecard Cellular, and Notecard WiFi v2.
         name (str): One of the supported classes of host MCU. Supported MCU classes are `"esp32"`, `"stm32"`, `"stm32-bi"`, `"mcuboot"` (added in v5.3.1), and `"-"`, which resets the configuration. The "bi" in `"stm32-bi"` stands for "boot inverted", and the `"stm32-bi"` option should be used on STM32 family boards where the hardware boot pin is assumed to be active low, instead of active high. Supported MCUs can be found on the Notecarrier F datasheet.
         off (bool): Set to `true` to disable Notecard Outboard Firmware Update from occurring.
         on (bool): Set to `true` to enable Notecard Outboard Firmware Update.
@@ -685,7 +685,7 @@ def temp(card, minutes=None, status=None, stop=None, sync=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        minutes (int): If specified, creates a templated `temp.qo` file that gathers Notecard temperature value at the specified minutes interval. When using card.aux track mode, the sensor temperature, pressure, and humidity is also included with each Note._
+        minutes (int): If specified, creates a templated `_temp.qo` file that gathers Notecard temperature value at the specified minutes interval. When using card.aux track mode, the sensor temperature, pressure, and humidity is also included with each Note.
         status (str): Overrides `minutes` with a voltage-variable value. For example: `"usb:15;high:30;normal:60;720"`. See Voltage-Variable Sync Behavior for more information on configuring these values.
         stop (bool): If set to `true`, the Notecard will stop logging the temperature value at the interval specified with the `minutes` parameter (see above).
         sync (bool): If set to `true`, the Notecard will immediately sync any pending `_temp.qo` Notes created with the `minutes` parameter (see above).
@@ -860,7 +860,7 @@ def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None
 
     Args:
         card (Notecard): The current Notecard object.
-        alert (bool): When enabled and the `usb` argument is set to `true`, the Notecard will add an entry to the `health.qo` Notefile when USB power is connected or disconnected.
+        alert (bool): When enabled and the `usb` argument is set to `true`, the Notecard will add an entry to the `_health.qo` Notefile when USB power is connected or disconnected.
         calibration (float): The offset, in volts, to account for the forward voltage drop of the diode used between the battery and Notecard in either Blues- or customer-designed Notecarriers.
         hours (int): The number of hours to analyze, up to 720 (30 days).
         mode (str): Used to set voltage thresholds based on how the Notecard will be powered, and which can be used to configure voltage-variable Notecard behavior. Each value is shorthand that assigns a battery voltage reading to a given device state like `high`, `normal`, `low`, and `dead`. In addition to the named presets below, a custom semicolon-separated shorthand string may be provided using any combination of the `usb`, `high`, `normal`, `low`, and `dead` states (e.g. `"usb:4.6;high:4.2;normal:3.6;low:0"`). NOTE: Setting voltage thresholds is not supported on the Notecard XP.
