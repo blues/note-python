@@ -141,6 +141,7 @@ library with:
 - [RaspberryPi](examples/notecard-basics/rpi_example.py)
 - [CircuitPython](examples/notecard-basics/cpy_example.py)
 - [MicroPython](examples/notecard-basics/mpy_example.py)
+- [Notecard Outboard Firmware Update](examples/outboard-dfu/circuit-python/code.py)
 
 ## Contributing
 
