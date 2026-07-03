@@ -17,6 +17,9 @@ import time
 import board
 import digitalio
 import notecard
+from notecard import card as card_helper
+from notecard import dfu as dfu_helper
+from notecard import hub as hub_helper
 
 # The unique Product Identifier for your device. Claim one in a Notehub project.
 productUID = "com.your-company.your-project"
@@ -37,29 +40,17 @@ def configure_outboard_dfu(card):
     Notecard's shared AUX pins, so card.dfu uses mode "aux" and card.aux is set
     to "off" to free those pins for DFU.
     """
-    req = {"req": "hub.set"}
-    req["product"] = productUID
-    req["mode"] = "continuous"
-    req["sn"] = "circuitpython-notecard"
-    card.Transaction(req)
+    hub_helper.set(card, product=productUID, mode="continuous",
+                   sn="circuitpython-notecard")
 
     # Enable Outboard Firmware Update and tell the Notecard the host MCU type.
-    req = {"req": "card.dfu"}
-    req["name"] = "stm32"
-    req["on"] = True
-    req["mode"] = "aux"
-    card.Transaction(req)
+    card_helper.dfu(card, name="stm32", on=True, mode="aux")
 
     # Free the AUX pins so they can be used for Outboard Firmware Update.
-    req = {"req": "card.aux"}
-    req["mode"] = "off"
-    card.Transaction(req)
+    card_helper.aux(card, mode="off")
 
     # Enable host DFU and report the running firmware version to Notehub.
-    req = {"req": "dfu.status"}
-    req["on"] = True
-    req["version"] = FIRMWARE_VERSION
-    card.Transaction(req)
+    dfu_helper.status(card, on=True, version=FIRMWARE_VERSION)
 
 
 def main():
