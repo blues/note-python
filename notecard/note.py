@@ -188,7 +188,7 @@ def template(card, file, body=None, delete=None, format=None, length=None, port=
 
 
 @validate_card_object
-def update(card, file, note, body=None, payload=None, verify=None):
+def update(card, file, note, body=None, payload=None, sync=None, verify=None):
     """Update a Note in a DB Notefile by its ID, replacing the existing `body` and/or `payload`.
 
     Args:
@@ -197,6 +197,7 @@ def update(card, file, note, body=None, payload=None, verify=None):
         file (str): The name of the DB Notefile that contains the Note to update.
         note (str): The unique Note ID.
         payload (str): A base64-encoded binary payload. A Note must have either a `body` or `payload`, and can have both.
+        sync (bool): Set to `true` to sync the Notefile immediately after updating the Note. Only the specified Notefile is guaranteed to sync.
         verify (bool): If set to `true` and using a templated Notefile, the Notefile will be written to flash immediately, rather than being cached in RAM and written to flash later.
 
     Returns:
@@ -211,6 +212,8 @@ def update(card, file, note, body=None, payload=None, verify=None):
         req["note"] = note
     if payload:
         req["payload"] = payload
+    if sync is not None:
+        req["sync"] = sync
     if verify is not None:
         req["verify"] = verify
     return card.Transaction(req)
