@@ -19,7 +19,7 @@ def gps(card, off=None, on=None):
     Args:
         card (Notecard): The current Notecard object.
         off (bool): When `true`, a paired Starnote will use its own GPS/GNSS location. This is the default configuration.
-        on (bool): When `true`, a Starnote will use the GPS/GNSS location from its paired Notecard, instead of its own GPS/GNSS location.
+        on (bool): When `true`, a Starnote will use the location known to its paired Notecard, instead of the Starnote's own GPS/GNSS module.
 
     Returns:
         dict: The result of the Notecard request.
