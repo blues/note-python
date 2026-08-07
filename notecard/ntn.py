@@ -14,12 +14,12 @@ from notecard.validators import validate_card_object
 
 @validate_card_object
 def gps(card, off=None, on=None):
-    """Determine whether a Notecard should override a paired Starnote's GPS/GNSS location with its own GPS/GNSS location. The paired Starnote uses its own GPS/GNSS location by default.
+    """On a Notecard paired with a Starnote, this controls whether the Starnote uses a location known to the paired Notecard instead of acquiring one with its own GPS/GNSS module. It does not, by default. On Notecard for Skylo, the satellite radio and the GPS/GNSS are part of the same module. This request controls whether the Notecard uses a known location (typically a fixed location set with `card.location.mode`), instead of acquiring a new location for NTN use.
 
     Args:
         card (Notecard): The current Notecard object.
-        off (bool): When `true`, a paired Starnote will use its own GPS/GNSS location. This is the default configuration.
-        on (bool): When `true`, a Starnote will use the location known to its paired Notecard, instead of the Starnote's own GPS/GNSS module.
+        off (bool): When `true`, the Notecard does not supply its location to the NTN module. This is the default configuration.
+        on (bool): When `true`, the Notecard supplies its location to the NTN module. If the Notecard does not yet know its location, none is supplied, and this setting has no effect until a location becomes available.
 
     Returns:
         dict: The result of the Notecard request.
