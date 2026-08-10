@@ -51,7 +51,7 @@ def log(card, alert=None, sync=None, text=None):
 
 @validate_card_object
 def set(card, align=None, details=None, duration=None, host=None, inbound=None, mode=None, off=None, on=None, outbound=None, product=None, seconds=None, sn=None, sync=None, umin=None, uoff=None, uperiodic=None, version=None, vinbound=None, voutbound=None):
-    r"""Use hub.set request is the primary method for controlling the Notecard's Notehub connection and sync behavior.
+    """Use hub.set request is the primary method for controlling the Notecard's Notehub connection and sync behavior.
 
     Args:
         card (Notecard): The current Notecard object.
@@ -62,7 +62,7 @@ def set(card, align=None, details=None, duration=None, host=None, inbound=None, 
         inbound (int): The max wait time, in minutes, to sync inbound data from Notehub. Explicit syncs (e.g. using `hub.sync`) do not affect this cadence. When in `periodic` or `continuous` mode this argument is required, otherwise the Notecard will function as if it is in `minimum` mode as it pertains to syncing behavior. Use `-1` to reset the value back to its default of `0`. A value of `0` means that the Notecard will never sync inbound data unless explicitly told to do so (e.g. using `hub.sync`).
         mode (str): The Notecard's synchronization mode. NOTE: The Notecard must be in `periodic` or `continuous` mode to use the onboard GPS module.
         off (bool): Set to `true` to manually instruct the Notecard to resume periodic mode after a web transaction has completed.
-        on (bool): If in `periodic` mode, used to temporarily switch the Notecard to `continuous` mode to perform a web transaction.\n\nIgnored if the Notecard is already in `continuous` mode or if the Notecard is NOT performing a web transaction.
+        on (bool): If in `periodic` mode, used to temporarily switch the Notecard to `continuous` mode to perform a web transaction. Ignored if the Notecard is already in `continuous` mode or if the Notecard is NOT performing a web transaction.
         outbound (int): The max wait time, in minutes, to sync outbound data from the Notecard. Explicit syncs (e.g. using `hub.sync`) do not affect this cadence. When in `periodic` or `continuous` mode this argument is required, otherwise the Notecard will function as if it is in `minimum` mode as it pertains to syncing behavior. Use `-1` to reset the value back to its default of `0`. A value of `0` means that the Notecard will never sync outbound data unless explicitly told to do so (e.g. using `hub.sync`).
         product (str): A Notehub-managed unique identifier that is used to match Devices with Projects. This string is used during a device's auto-provisioning to find the Notehub Project that, once provisioned, will securely manage the device and its data.
         seconds (int): If in `periodic` mode and using `on` above, the number of seconds to run in continuous mode before switching back to periodic mode. If not set, a default of 300 seconds is used. Ignored if the Notecard is already in continuous mode.
