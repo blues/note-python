@@ -586,18 +586,21 @@ def random(card, count=None, mode=None):
 
 
 @validate_card_object
-def power(card, minutes=None, reset=None):
+def power(card, hours=None, minutes=None, reset=None):
     """Use `card.power` API is used to configure a connected Mojo device or to manually request power consumption readings in firmware.
 
     Args:
         card (Notecard): The current Notecard object.
-        minutes (int): How often, in minutes, Notecard should log power consumption in a `_log.qo` Note. The default value is `720` (12 hours).
+        hours (int): How often, in hours, Notecard should log power consumption in a `_log.qo` Note. Provided as a convenience alternative to `minutes`. If both `hours` and `minutes` are provided, the resulting cadence is the sum of the two.
+        minutes (int): How often, in minutes, Notecard should log power consumption in a `_log.qo` Note. The default value is `720` (12 hours). May be combined with `hours`, in which case the two values are added together.
         reset (bool): Set to `true` to reset the power consumption counters back to 0.
 
     Returns:
         dict: The result of the Notecard request.
     """
     req = {"req": "card.power"}
+    if hours is not None:
+        req["hours"] = hours
     if minutes is not None:
         req["minutes"] = minutes
     if reset is not None:
@@ -737,14 +740,15 @@ def trace(card, mode=None):
 
 
 @validate_card_object
-def transport(card, allow=None, method=None, seconds=None, umin=None):
+def transport(card, allow=None, method=None, seconds=None, set=None, umin=None):
     """Specify the connectivity protocol to prioritize on the Notecard Cell+WiFi, or when using NTN mode with Starnote and a compatible Notecard.
 
     Args:
         card (Notecard): The current Notecard object.
-        allow (bool): Set to `true` to allow adding Notes to non-compact Notefiles while connected over a non-terrestrial network. See Define NTN vs non-NTN Templates.
+        allow (bool): Set to `true` to allow adding Notes to templated Notefiles that have no `port` while connected over a non-terrestrial network. See Define NTN vs non-NTN Templates.
         method (str): The connectivity method to enable on the Notecard.
         seconds (int): The amount of time (in seconds) a Notecard will spend on any fallback transport before retrying the first transport specified in the `method`. The default is `3600` or 60 minutes.
+        set (bool): Set to `true` to apply the `allow` argument without also changing the transport `method`.
         umin (bool): Set to `true` to force a longer network transport timeout when using Wideband Notecards.
 
     Returns:
@@ -757,6 +761,8 @@ def transport(card, allow=None, method=None, seconds=None, umin=None):
         req["method"] = method
     if seconds is not None:
         req["seconds"] = seconds
+    if set is not None:
+        req["set"] = set
     if umin is not None:
         req["umin"] = umin
     return card.Transaction(req)
@@ -855,7 +861,7 @@ def version(card):
 
 
 @validate_card_object
-def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None, off=None, offset=None, on=None, set=None, sync=None, usb=None, vmax=None, vmin=None):
+def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None, now=None, off=None, offset=None, on=None, set=None, sync=None, usb=None, vmax=None, vmin=None):
     """Provide the current VMODEM_P voltage level on the Notecard, and provides information about historical voltage trends. When used with the mode argument, configures voltage thresholds based on how the device is powered.
 
     Args:
@@ -865,14 +871,15 @@ def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None
         hours (int): The number of hours to analyze, up to 720 (30 days).
         mode (str): Used to set voltage thresholds based on how the Notecard will be powered, and which can be used to configure voltage-variable Notecard behavior. Each value is shorthand that assigns a battery voltage reading to a given device state like `high`, `normal`, `low`, and `dead`. In addition to the named presets below, a custom semicolon-separated shorthand string may be provided using any combination of the `usb`, `high`, `normal`, `low`, and `dead` states (e.g. `"usb:4.6;high:4.2;normal:3.6;low:0"`). NOTE: Setting voltage thresholds is not supported on the Notecard XP.
         name (str): Specifies an environment variable to override application default timing values.
+        now (bool): By default, the returned `value` is an average of the voltage readings taken over the previous 15 minutes, which smooths out momentary fluctuations. Set to `true` to return the instantaneous voltage reading instead.
         off (bool): Disable historic voltage trend calculations.
         offset (int): Number of hours to move into the past before starting analysis.
         on (bool): Enable historic voltage trend calculations.
         set (bool): Used along with `calibration`, set to `true` to specify a new calibration value.
         sync (bool): When enabled and the `usb` argument is set to `true`, the Notecard will perform a sync when USB power is connected or disconnected.
         usb (bool): When enabled, the Notecard will monitor for changes to USB power state.
-        vmax (float): Ignore voltage readings above this level when performing calculations.
-        vmin (float): Ignore voltage readings below this level when performing calculations.
+        vmax (float): Ignore voltage readings above this level when performing calculations. Defaults to the maximum voltage the Notecard's components are rated for.
+        vmin (float): Ignore voltage readings below this level when performing calculations. Defaults to the minimum voltage the Notecard's components are rated for.
 
     Returns:
         dict: The result of the Notecard request.
@@ -888,6 +895,8 @@ def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None
         req["mode"] = mode
     if name:
         req["name"] = name
+    if now is not None:
+        req["now"] = now
     if off is not None:
         req["off"] = off
     if offset is not None:
