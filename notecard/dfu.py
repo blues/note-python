@@ -43,12 +43,12 @@ def status(card, err=None, name=None, off=None, on=None, status=None, stop=None,
         card (Notecard): The current Notecard object.
         err (str): If `err` text is provided along with `"stop":true`, this sets the host DFU to an error state with the specified string.
         name (str): Determines which type of firmware update status to view. The value can be `"user"` (default), which gets the status of MCU host firmware updates, or `"card"`, which gets the status of Notecard firmware updates.
-        off (bool): `true` to disable firmware downloads from Notehub.
-        on (bool): `true` to allow firmware downloads from Notehub.
-        status (str): When setting `stop` to `true`, an optional string synchronized to Notehub, which can be used for informational or diagnostic purposes.
-        stop (bool): `true` to clear DFU state and delete the local firmware image from the Notecard.
+        off (bool): `true` to disable firmware downloads from Notehub. This setting persists across Notecard restarts. If both `on` and `off` are provided in the same request, `off` takes precedence.
+        on (bool): `true` to allow firmware downloads from Notehub. Downloads are enabled by default, and this setting persists across Notecard restarts. Enabling downloads here does not guarantee that a download will proceed. It can still be deferred by the `_fw_download_disabled` and `_fw_download_window_mins` environment variables, or by the `vvalue` voltage gate below.
+        status (str): When setting `stop` to `true`, an optional string synchronized to Notehub, which can be used for informational or diagnostic purposes. If `stop` is `true` and no `status` is provided, the Notecard reports `successful firmware update`.
+        stop (bool): `true` to end the current DFU. The Notecard exits DFU operating mode and marks the update `completed`, or `error` if an `err` string is also provided.
         version (str): Version information on the host firmware to pass to Notehub. You may pass a simple version number string (e.g. `"1.0.0.0"`), or an object with detailed information about the firmware image (recommended). If you provide an object it must take the following form. `{"org":"my-organization","product":"My Product","description":"A description of the image","version":"1.2.4","built":"Jan 01 2025 01:02:03","ver_major":1,"ver_minor":2,"ver_patch":4,"ver_build": 5,"builder":"The Builder"}` Code to help you generate a version with the correct formatting is available in Enabling Notecard Outboard Firmware Update.
-        vvalue (str): A voltage-variable string that controls, by Notecard voltage, whether or not DFU is enabled. Use a boolean `1` (on) or `0` (off) for each source/voltage level: `usb:<1/0>;high:<1/0>;normal:<1/0>;low:<1/0>;dead:0`.
+        vvalue (str): A voltage-variable string that controls, by Notecard voltage, whether or not DFU is enabled. Use a boolean `1` (on) or `0` (off) for each source/voltage level: `usb:<1/0>;high:<1/0>;normal:<1/0>;low:<1/0>;dead:0`. The default is `usb:1;high:1;normal:1;low:0;dead:0`.
 
     Returns:
         dict: The result of the Notecard request.

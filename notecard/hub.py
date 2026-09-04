@@ -55,7 +55,7 @@ def set(card, align=None, details=None, duration=None, host=None, inbound=None, 
 
     Args:
         card (Notecard): The current Notecard object.
-        align (bool): Use `true` to align syncs on a regular time-periodic cycle.
+        align (bool): Use `true` to align syncs on a regular time-periodic cycle. The cycle is anchored to the Notecard's boot time, not to a wall-clock time.
         details (str): When using Notecard LoRa you can use this argument to provide information about an alternative LoRaWAN server or service you would like the Notecard to use. The argument you provide must be a JSON object with three keys, "deveui", "appeui", and "appkey", all of which are hexadecimal strings with no leading 0x. For example: `{"deveui":"0080E11500088B37","appeui":"6E6F746563617264","appkey":"00088B37"}` The LoRaWAN details you send to a Notecard become part of its permanent configuration, and survive factory resets. You can reset a Notecard's LoRaWAN details to its default values by providing a `"-"` for the details argument.
         duration (int): When in `continuous` mode, the amount of time, in minutes, of each session (the minimum allowed value is `15`). When this time elapses, the Notecard gracefully ends the current session and starts a new one in order to sync session-specific data to Notehub.
         host (str): The URL of the Notehub service. Use `"-"` to reset to the default value.
