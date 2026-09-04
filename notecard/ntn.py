@@ -13,6 +13,20 @@ from notecard.validators import validate_card_object
 
 
 @validate_card_object
+def config(card):
+    """Return the configuration and identity of the satellite (NTN) module: the network it is provisioned for, its modem, its SKU and ordering code, and the firmware it is running.
+
+    Args:
+        card (Notecard): The current Notecard object.
+
+    Returns:
+        dict: The result of the Notecard request.
+    """
+    req = {"req": "ntn.config"}
+    return card.Transaction(req)
+
+
+@validate_card_object
 def gps(card, off=None, on=None):
     """On a Notecard paired with a Starnote, this controls whether the Starnote uses a location known to the paired Notecard instead of acquiring one with its own GPS/GNSS module. It does not, by default. On Notecard for Skylo, the satellite radio and the GPS/GNSS are part of the same module. This request controls whether the Notecard uses a known location (typically a fixed location set with `card.location.mode`), instead of acquiring a new location for NTN use.
 
