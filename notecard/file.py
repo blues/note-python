@@ -13,16 +13,19 @@ from notecard.validators import validate_card_object
 
 
 @validate_card_object
-def changesPending(card):
+def changesPending(card, files=None):
     """Return info about file changes that are pending upload to Notehub.
 
     Args:
         card (Notecard): The current Notecard object.
+        files (list): One or more files to obtain pending change information from. Omit to return pending changes for all Notefiles.
 
     Returns:
         dict: The result of the Notecard request.
     """
     req = {"req": "file.changes.pending"}
+    if files:
+        req["files"] = files
     return card.Transaction(req)
 
 
@@ -33,7 +36,7 @@ def changes(card, files=None, tracker=None):
     Args:
         card (Notecard): The current Notecard object.
         files (list): One or more files to obtain change information from. Omit to return changes for all Notefiles.
-        tracker (str): ID of a change tracker to use to determine changes to Notefiles.
+        tracker (str): ID of a change tracker to use to determine changes to Notefiles. Must be accompanied by a `files` argument.
 
     Returns:
         dict: The result of the Notecard request.
