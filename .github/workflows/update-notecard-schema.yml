@@ -22,10 +22,24 @@ jobs:
     timeout-minutes: 15
     env:
       # The `secrets` context is unavailable in a step-level `if:`, so the
-      # auto-merge steps test this instead.
+      # App-token step tests this instead.
       SCHEMA_SYNC_APP_ID: ${{ secrets.SCHEMA_SYNC_APP_ID }}
     steps:
+      # Generated BEFORE checkout so the branch push, the PR and auto-merge all
+      # use the App rather than GITHUB_TOKEN. A PR opened by GITHUB_TOKEN has its
+      # CI run parked in `action_required` and never starts on its own -- every
+      # past schema PR sat that way until someone pressed the button by hand.
+      - name: Generate App Token
+        id: app-token
+        if: ${{ env.SCHEMA_SYNC_APP_ID != '' }}
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.SCHEMA_SYNC_APP_ID }}
+          private-key: ${{ secrets.SCHEMA_SYNC_PRIVATE_KEY }}
+
       - uses: actions/checkout@v7
+        with:
+          token: ${{ steps.app-token.outputs.token || github.token }}
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v7
@@ -96,12 +110,17 @@ jobs:
         id: pr
         if: steps.changes.outputs.has_changes == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
         run: |
           set -euo pipefail
 
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "${{ steps.app-token.outputs.token }}" ]; then
+            git config --global user.name "blues-hub-automation[bot]"
+            git config --global user.email "271024864+blues-hub-automation[bot]@users.noreply.github.com"
+          else
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          fi
 
           # run_attempt keeps a re-run from colliding with the branch the first
           # attempt already pushed.
@@ -121,34 +140,22 @@ jobs:
 
           echo "branch=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
 
-      # The PR is opened by GITHUB_TOKEN, which cannot approve a PR; the
-      # SCHEMA_SYNC app is a different actor, so its approval is not a
-      # self-approval and satisfies main's 1-review rule. `--auto` then holds the
-      # merge until the required status checks pass, so `build / ci-gate` must be
-      # required on main or this merges as soon as the approval lands.
-      - name: Generate App Token
-        id: app-token
-        if: ${{ steps.changes.outputs.has_changes == 'true' && steps.changes.outputs.automerge_safe == 'true' && env.SCHEMA_SYNC_APP_ID != '' }}
-        uses: actions/create-github-app-token@v3
-        with:
-          app-id: ${{ secrets.SCHEMA_SYNC_APP_ID }}
-          private-key: ${{ secrets.SCHEMA_SYNC_PRIVATE_KEY }}
-
-      - name: Approve and enable auto-merge
-        if: ${{ steps.app-token.outputs.token != '' }}
+      # Arms auto-merge; GitHub holds the merge until the required status checks
+      # pass. The App cannot approve its own PR and GITHUB_TOKEN is not allowed
+      # to approve at all, so main's 1-review rule still needs a human -- unless
+      # that rule is moved to a ruleset that this App bypasses.
+      - name: Enable auto-merge
+        if: ${{ steps.pr.outputs.branch != '' && steps.changes.outputs.automerge_safe == 'true' && steps.app-token.outputs.token != '' }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           PR_BRANCH: ${{ steps.pr.outputs.branch }}
         run: |
           set -euo pipefail
 
-          gh pr review "$PR_BRANCH" --approve \
-            --body "Automated schema sync confined to notecard/. Merging once CI is green."
-
-          # Non-fatal: leaving the PR open and approved is the right outcome if
-          # auto-merge is off or main has no required status checks.
+          # Non-fatal: leaving the PR open is the right outcome if auto-merge is
+          # off or main has no required status checks.
           if ! gh pr merge "$PR_BRANCH" --auto --squash; then
-            echo "::warning::Could not enable auto-merge. Check Settings -> General -> 'Allow auto-merge' and that main requires status checks. The PR is approved and can be merged by hand."
+            echo "::warning::Could not enable auto-merge. Check Settings -> General -> 'Allow auto-merge' and that main requires status checks. The PR can be merged by hand."
           fi
 
       - name: Report skipped auto-merge
