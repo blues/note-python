@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-filelock = "==3.24.3"
+filelock = "==3.32.7"
 
 [dev-packages]
 python-periphery = "==2.4.2"
