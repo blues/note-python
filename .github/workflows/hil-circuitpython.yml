@@ -2,18 +2,14 @@
 
 name: HIL-circuitpython
 
-on:
-  pull_request:
-    branches: [ main ]
-    paths:
-      # This is quite a big job so run only when files affecting it change.
-      - .github/workflows/hil-circuitpython.yml
-      - examples/notecard-basics/cpy_example.py
-      - test/hitl/**
-      - test/scripts/usbmount
-      - test/scripts/check_cpy*.*
-      - notecard/**
+# TEMPORARILY DISABLED (2026-09): the self-hosted HIL rig is offline -- runs
+# queued for weeks without a runner ever claiming them. The steps below are
+# fine; this is a hardware problem. To re-enable, restore the two triggers
+# commented out in the `on:` block once a runner with these labels is online:
+#   self-hosted, linux, circuitpython, swan-3.0, notecard-serial
+# Do NOT make these required status checks; `build / ci-gate` is the gate.
 
+on:
   workflow_dispatch:
     inputs:
       flash_device:
@@ -21,12 +17,27 @@ on:
         type: boolean
         default: true
 
-  schedule:
-    - cron: '30 4 * * 1'
+#  pull_request:
+#    branches: [ main ]
+#    paths:
+#      # This is quite a big job so run only when files affecting it change.
+#      - .github/workflows/hil-circuitpython.yml
+#      - examples/notecard-basics/cpy_example.py
+#      - test/hitl/**
+#      - test/scripts/usbmount
+#      - test/scripts/check_cpy*.*
+#      - notecard/**
+#
+#  schedule:
+#    - cron: '30 4 * * 1'
+
+permissions:
+  contents: read
 
 jobs:
   test:
     runs-on: [self-hosted, linux, circuitpython, swan-3.0, notecard-serial]
+    timeout-minutes: 45
     defaults:
       run:
         shell: bash
