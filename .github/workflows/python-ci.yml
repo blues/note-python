@@ -72,10 +72,15 @@ jobs:
       - name: Test with pytest
         run: |
           pipenv run coverage run -m pytest
+      # One leg only. `coveralls --service=github` derives its job id from
+      # GITHUB_RUN_ID, which is identical across the matrix, so five legs submit
+      # as the same job for the same commit and Coveralls 422s all but one --
+      # intermittently failing the build (PR #185). Coverage is the same on every
+      # version, so publishing from one is no loss.
       - name: Publish to Coveralls
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: ${{ inputs.coveralls }}
+        if: ${{ inputs.coveralls && matrix.python-version == '3.12' }}
         run: |
           pipenv run coveralls --service=github
 
