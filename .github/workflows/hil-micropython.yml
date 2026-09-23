@@ -1,15 +1,13 @@
 name: HIL-micropython
 
-on:
-  pull_request:
-    branches: [ main ]
-    paths:
-      - .github/workflows/hil-micropython.yml
-      - test/hitl/**
-      - notecard/**
-      - examples/notecard-basics/mpy_example.py
-      - test/scripts/check_mpy*.*
+# TEMPORARILY DISABLED (2026-09): the self-hosted HIL rig is offline -- runs
+# queued for weeks without a runner ever claiming them. The steps below are
+# fine; this is a hardware problem. To re-enable, restore the two triggers
+# commented out in the `on:` block once a runner with these labels is online:
+#   self-hosted, linux, espressif_esp32, notecard-serial, micropython
+# Do NOT make these required status checks; `build / ci-gate` is the gate.
 
+on:
   workflow_dispatch:
     inputs:
       flash_device:
@@ -17,9 +15,20 @@ on:
         type: boolean
         default: true
 
-  schedule:
-    - cron: '15 4 * * 1'
+#  pull_request:
+#    branches: [ main ]
+#    paths:
+#      - .github/workflows/hil-micropython.yml
+#      - test/hitl/**
+#      - notecard/**
+#      - examples/notecard-basics/mpy_example.py
+#      - test/scripts/check_mpy*.*
+#
+#  schedule:
+#    - cron: '15 4 * * 1'
 
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -29,6 +38,7 @@ jobs:
       - ${{ matrix.MPY_BOARD }}
       - notecard-serial
       - micropython
+    timeout-minutes: 45
     defaults:
       run:
         shell: bash

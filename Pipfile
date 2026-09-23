@@ -1,24 +1,28 @@
+# Lock with the OLDEST supported interpreter: pipenv resolves markers against the
+# interpreter doing the locking, so locking on 3.14 drops backports that 3.10 needs
+# (typing-extensions, tomli, importlib-metadata, zipp) and CI fails on 3.10 only.
+#   pipenv lock --python 3.10
+
 [[source]]
 url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
 [packages]
-filelock = ">=3.24.3"
+filelock = "==3.32.7"
 
 [dev-packages]
-python-periphery = "==2.3.0"
-pyserial = "==3.4"
-pyyaml = "==6.0.1"
-flake8 = "==6.1.0"
-pytest = "==9.0.3"
-pydocstyle = "==5.0.2"
-coveralls = "==3.3.1"
-ddtrace = ">=4.8.2"
-pytest-cov = "*"
-build = "*"
-twine = "*"
-pre-commit = "*"
-exceptiongroup = "*"  # Python 3.10 compatibility with pytest
-doxypypy = "*"  # For generating API documentation
-requests = "*"
+python-periphery = "==2.4.2"
+pyserial = "==3.5"
+pyyaml = "==6.0.3"
+flake8 = "==7.3.0"
+pytest = "==9.1.1"
+pydocstyle = "==6.3.0"
+coveralls = "==4.1.0"
+pytest-cov = "==7.1.0"
+build = "==1.6.1"
+twine = "==7.0.0"
+pre-commit = "==4.6.2"
+exceptiongroup = "==1.3.1"  # Python 3.10 compatibility with pytest
+doxypypy = "==0.8.8.7"  # For generating API documentation
+requests = "==2.34.2"
