@@ -5,6 +5,9 @@ name: Manual Trigger Test
 
 on: workflow_dispatch
 
+permissions:
+  contents: read
+
 jobs:
   build:
     uses: ./.github/workflows/python-ci.yml

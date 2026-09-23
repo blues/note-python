@@ -1,0 +1,9 @@
+# Labels for the self-hosted hardware-in-the-loop rigs; without these every HIL
+# `runs-on` is reported as an unknown label.
+self-hosted-runner:
+  labels:
+    - circuitpython
+    - swan-3.0
+    - notecard-serial
+    - micropython
+    - espressif_esp32

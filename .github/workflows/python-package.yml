@@ -10,6 +10,15 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Permissions can only be reduced across a `uses:` boundary, never elevated,
+# so this is the ceiling for python-ci.yml.
+permissions:
+  contents: read
+
 jobs:
   build:
     uses: ./.github/workflows/python-ci.yml

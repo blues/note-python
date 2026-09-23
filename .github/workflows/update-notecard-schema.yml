@@ -1,4 +1,9 @@
 name: Update Notecard Fluent API from upstream schema
+
+# Triggered by blues/notecard-schema's update-hook.yml, which dispatches BY FILE
+# NAME and passes --field upstream_commit=<sha>. Neither this file's name nor
+# that input can change without changing the hook first.
+
 on:
   workflow_dispatch:
     inputs:
@@ -7,16 +12,40 @@ on:
         required: false
         type: string
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   update-notecard-api:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      # The `secrets` context is unavailable in a step-level `if:`, so the
+      # App-token step tests this instead.
+      SCHEMA_SYNC_APP_ID: ${{ secrets.SCHEMA_SYNC_APP_ID }}
     steps:
+      # Generated BEFORE checkout so the branch push, the PR and auto-merge all
+      # use the App rather than GITHUB_TOKEN. A PR opened by GITHUB_TOKEN has its
+      # CI run parked in `action_required` and never starts on its own -- every
+      # past schema PR sat that way until someone pressed the button by hand.
+      - name: Generate App Token
+        id: app-token
+        if: ${{ env.SCHEMA_SYNC_APP_ID != '' }}
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.SCHEMA_SYNC_APP_ID }}
+          private-key: ${{ secrets.SCHEMA_SYNC_PRIVATE_KEY }}
+
       - uses: actions/checkout@v7
+        with:
+          token: ${{ steps.app-token.outputs.token || github.token }}
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
-          python-version: 3.12
+          python-version: '3.12'
+          cache: 'pipenv'
 
       - name: Install pipenv
         run: |
@@ -35,30 +64,101 @@ jobs:
       - name: Check for changes
         id: changes
         run: |
-          if git diff --quiet; then
-            echo "has_changes=false" >> $GITHUB_OUTPUT
+          set -euo pipefail
+
+          # Not `git diff --quiet`: that only sees modifications to tracked
+          # files, so a brand-new generated module went undetected and no PR
+          # was opened.
+          status="$(git status --porcelain)"
+
+          if [ -z "$status" ]; then
+            echo "No changes."
+            {
+              echo "has_changes=false"
+              echo "automerge_safe=false"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Working tree changes:"
+          echo "$status"
+
+          # notecard/ is the generator's output directory and the only thing
+          # committed below; anything else is unintended.
+          inside="$(echo "$status" | grep -E '^.. notecard/' || true)"
+          outside="$(echo "$status" | grep -vE '^.. notecard/' || true)"
+
+          if [ -n "$outside" ]; then
+            echo "::warning::Generator touched paths outside notecard/; these will NOT be committed and auto-merge is disabled for this run:"
+            echo "$outside"
+          fi
+
+          if [ -n "$inside" ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
           else
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "::warning::Changes exist but none under notecard/; no PR will be opened."
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [ -z "$outside" ]; then
+            echo "automerge_safe=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "automerge_safe=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create Pull Request with GitHub CLI
+        id: pr
         if: steps.changes.outputs.has_changes == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          set -euo pipefail
 
-          BRANCH_NAME="update-notecard-api-${{ github.run_number }}"
-          git checkout -b $BRANCH_NAME
+          if [ -n "${{ steps.app-token.outputs.token }}" ]; then
+            git config --global user.name "blues-hub-automation[bot]"
+            git config --global user.email "271024864+blues-hub-automation[bot]@users.noreply.github.com"
+          else
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          fi
 
-          git add .
+          # run_attempt keeps a re-run from colliding with the branch the first
+          # attempt already pushed.
+          BRANCH_NAME="update-notecard-api-${{ github.run_number }}-${{ github.run_attempt }}"
+          git checkout -b "$BRANCH_NAME"
+
+          git add notecard/
           git commit -m "Update Notecard API from upstream schema changes (${{ inputs.upstream_commit || 'forced' }})"
 
-          git push origin $BRANCH_NAME
+          git push origin "$BRANCH_NAME"
 
           gh pr create \
             --title "Auto-update: API changes from upstream" \
             --body "Automated PR to update API based on upstream schema changes (${{ inputs.upstream_commit || 'forced' }})" \
             --base main \
-            --head $BRANCH_NAME
+            --head "$BRANCH_NAME"
+
+          echo "branch=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
+
+      # Arms auto-merge; GitHub holds the merge until the required status checks
+      # pass. The App cannot approve its own PR and GITHUB_TOKEN is not allowed
+      # to approve at all, so main's 1-review rule still needs a human -- unless
+      # that rule is moved to a ruleset that this App bypasses.
+      - name: Enable auto-merge
+        if: ${{ steps.pr.outputs.branch != '' && steps.changes.outputs.automerge_safe == 'true' && steps.app-token.outputs.token != '' }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR_BRANCH: ${{ steps.pr.outputs.branch }}
+        run: |
+          set -euo pipefail
+
+          # Non-fatal: leaving the PR open is the right outcome if auto-merge is
+          # off or main has no required status checks.
+          if ! gh pr merge "$PR_BRANCH" --auto --squash; then
+            echo "::warning::Could not enable auto-merge. Check Settings -> General -> 'Allow auto-merge' and that main requires status checks. The PR can be merged by hand."
+          fi
+
+      - name: Report skipped auto-merge
+        if: ${{ steps.changes.outputs.has_changes == 'true' && steps.changes.outputs.automerge_safe != 'true' }}
+        run: |
+          echo "::notice::PR opened but auto-merge was skipped: the generator changed paths outside notecard/. Review and merge by hand."

@@ -36,6 +36,3 @@ Repository = "https://github.com/blues/note-python"
 packages = ["notecard"]
 
 [tool.setuptools_scm]
-
-[tool.pytest.ini_options]
-addopts = "--ignore=test/hitl/"
