@@ -28,7 +28,7 @@ def config(card):
 
 @validate_card_object
 def gps(card, off=None, on=None):
-    """On a Notecard paired with a Starnote, this controls whether the Starnote uses a location known to the paired Notecard instead of acquiring one with its own GPS/GNSS module. It does not, by default. On Notecard for Skylo, the satellite radio and the GPS/GNSS are part of the same module. This request controls whether the Notecard uses a known location (typically a fixed location set with `card.location.mode`), instead of acquiring a new location for NTN use.
+    """On a Notecard paired with a Starnote, this controls whether the Notecard supplies a location it already knows to the Starnote for satellite use. It does not, by default. On Notecard for Skylo, the satellite radio and the GPS/GNSS are part of the same module. This request controls whether the Notecard uses a known location (typically a fixed location set with `card.location.mode`), instead of acquiring a new location for NTN use.
 
     Args:
         card (Notecard): The current Notecard object.
