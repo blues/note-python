@@ -433,13 +433,15 @@ def locationTrack(card, file=None, heartbeat=None, hours=None, payload=None, sta
 
 
 @validate_card_object
-def monitor(card, count=None, mode=None, usb=None):
+def monitor(card, count=None, mode=None, off=None, on=None, usb=None):
     """When a Notecard is in monitor mode, this API is used to configure the general-purpose `AUX1`-`AUX4` pins to test and monitor Notecard activity.
 
     Args:
         card (Notecard): The current Notecard object.
-        count (int): The number of pulses to send to the overridden AUX pin LED. Set this value to `0` to return the LED to its default behavior.
+        count (int): The number of pulses to send to the overridden AUX pin LED. To return the LED to its default behavior, use `"off": true` along with the `mode` of the LED.
         mode (str): Can be set to one of `green`, `red` or `yellow` to temporarily override the behavior of an AUX pin LED. See Using Monitor Mode for additional details.
+        off (bool): Set to `true`, along with a `mode`, to clear an override and return that AUX pin LED to its default behavior.
+        on (bool): Set to `true`, along with a `mode`, to turn that AUX pin LED on continuously.
         usb (bool): Set to `true` to configure LED behavior so that it is only active when the Notecard is connected to USB power.
 
     Returns:
@@ -450,6 +452,10 @@ def monitor(card, count=None, mode=None, usb=None):
         req["count"] = count
     if mode:
         req["mode"] = mode
+    if off is not None:
+        req["off"] = off
+    if on is not None:
+        req["on"] = on
     if usb is not None:
         req["usb"] = usb
     return card.Transaction(req)

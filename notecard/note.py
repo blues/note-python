@@ -22,7 +22,7 @@ def add(card, binary=None, body=None, file=None, full=None, key=None, limit=None
         body (dict): A JSON object to be enqueued. A Note must have either a `body` or a `payload`, and can have both.
         file (str): The name of the Notefile. On Notecard LoRa this argument is required. On all other Notecards this field is optional and defaults to `data.qo` if not provided. When using this request on the Notecard the Notefile name must end in one of: `.qo` for a queue outgoing (Notecard to Notehub) with plaintext transport `.qos` for a queue outgoing with encrypted transport `.db` for a bidirectionally synchronized database with plaintext transport `.dbs` for a bidirectionally synchronized database with encrypted transport `.dbx` for a local-only database
         full (bool): If set to `true`, and the Note is using a Notefile Template, the Note will bypass usage of omitempty and retain `null`, `0`, `false`, and empty string `""` values.
-        key (str): The name of an environment variable in your Notehub.io project that contains the contents of a public key. Used when encrypting the Note body for transport.
+        key (str): The name of an environment variable in your Notehub project that contains the contents of a public key. Used when encrypting the Note body for transport. Note body encryption is not supported on Notecard for LoRa.
         limit (bool): If set to `true`, the Note will not be created if Notecard is in a penalty box.
         live (bool): If `true`, bypasses saving the Note to flash on the Notecard. Required to be set to `true` if also using `"binary":true`.
         max (int): Defines the maximum number of queued Notes permitted in the specified Notefile (`"file"`). Any Notes added after this value will be rejected. When used with `"sync":true`, a sync will be triggered when the number of pending Notes matches the `max` value.
@@ -129,7 +129,7 @@ def get(card, decrypt=None, delete=None, deleted=None, file=None, note=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        decrypt (bool): `true` to decrypt encrypted inbound Notefiles.
+        decrypt (bool): `true` to decrypt encrypted inbound Notefiles. Notefile decryption is not supported on Notecard for LoRa.
         delete (bool): `true` to delete the Note after retrieving it.
         deleted (bool): `true` to allow retrieval of a deleted Note.
         file (str): The Notefile name must end in `.qi` (for plaintext transport), `.qis` (for encrypted transport), `.db` or `.dbx` (for local-only DB Notefiles).
