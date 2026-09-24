@@ -477,3 +477,37 @@ class TestI2C:
         card.unlock()
 
         card.unlock_fn.assert_called()
+
+    # debug_fn tests.
+    def test_init_with_custom_debug_fn(self):
+        custom_debug_fn = MagicMock()
+
+        with patch('notecard.notecard.OpenI2C.Reset'):
+            card = notecard.OpenI2C(MagicMock(), 0, 0, debug=True, debug_fn=custom_debug_fn)
+
+        assert card._debug_fn == custom_debug_fn
+        assert card._debug is True
+
+    def test_init_with_default_debug_fn(self):
+        with patch('notecard.notecard.OpenI2C.Reset'):
+            card = notecard.OpenI2C(MagicMock(), 0, 0, debug=True)
+
+        assert card._debug_fn == print
+        assert card._debug is True
+
+    def test_reset_uses_custom_debug_fn(self, arrange_reset_test):
+        custom_debug_fn = MagicMock()
+        card = arrange_reset_test()
+        card._debug = True
+        card._debug_fn = custom_debug_fn
+        # Mock _read to return successful reset sequence
+        card._read = MagicMock(side_effect=[(0, b'\r'), (0, b'\n'), (0, b'')])
+
+        with patch('notecard.notecard.has_timed_out', side_effect=TrueOnNthIteration(3)):
+            card.Reset()
+
+        # Verify the custom debug function was called
+        custom_debug_fn.assert_called()
+        # Check that at least one call contains the reset message
+        call_args_list = [call[0][0] for call in custom_debug_fn.call_args_list]
+        assert any('Resetting Notecard I2C communications.' in str(arg) for arg in call_args_list)
