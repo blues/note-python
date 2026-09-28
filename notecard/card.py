@@ -325,7 +325,7 @@ def led(card, mode=None, off=None, on=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        mode (str): Used to specify the color of the LED to turn on or off. Note: Notecard LoRa does not support monochromatic LED or RGB modes, only NeoPixels.
+        mode (str): Used to specify the color of the LED to turn on or off. Note: Notecard for LoRa does not support monochromatic LED or RGB modes, only NeoPixels.
         off (bool): Set to `true` to turn the specified LED or NeoPixel off.
         on (bool): Set to `true` to turn the specified LED or NeoPixel on.
 
@@ -385,7 +385,7 @@ def locationMode(card, delete=None, lat=None, lon=None, max=None, minutes=None, 
 
 @validate_card_object
 def location(card):
-    """Retrieve the last known location of the Notecard and the time at which it was acquired. Use card.location.mode to configure location settings. This request will return the cell tower location or triangulated location of the most recent session if a GPS/GNSS location is not available. On Notecard LoRa this request can only return a location set through the card.location.mode request's `"fixed"` mode.
+    """Retrieve the last known location of the Notecard and the time at which it was acquired. Use card.location.mode to configure location settings. This request will return the cell tower location or triangulated location of the most recent session if a GPS/GNSS location is not available. On Notecard for LoRa this request can only return a location set through the card.location.mode request's `"fixed"` mode.
 
     Args:
         card (Notecard): The current Notecard object.
@@ -656,7 +656,7 @@ def sleep(card, mode=None, off=None, on=None, seconds=None):
 
 @validate_card_object
 def restore(card, connected=None, delete=None):
-    """Perform a factory reset on the Notecard and restarts. Sending this request without either of the optional arguments below will only reset the Notecard's file system, thus forcing a re-sync of all Notefiles from Notehub. On Notecard LoRa there is no option to retain configuration settings, and providing `"delete": true` is required. The Notecard LoRa retains LoRaWAN configuration after factory resets.
+    """Perform a factory reset on the Notecard and restarts. Sending this request without either of the optional arguments below will only reset the Notecard's file system, thus forcing a re-sync of all Notefiles from Notehub. On Notecard for LoRa there is no option to retain configuration settings, and providing `"delete": true` is required. The Notecard for LoRa retains LoRaWAN configuration after factory resets.
 
     Args:
         card (Notecard): The current Notecard object.
@@ -746,7 +746,7 @@ def trace(card, mode=None):
 
 
 @validate_card_object
-def transport(card, allow=None, method=None, seconds=None, set=None, umin=None):
+def transport(card, allow=None, method=None, seconds=None, set=None, umin=None, uoff=None):
     """Specify the connectivity protocol to prioritize on the Notecard Cell+WiFi, or when using NTN mode with Starnote and a compatible Notecard.
 
     Args:
@@ -756,6 +756,7 @@ def transport(card, allow=None, method=None, seconds=None, set=None, umin=None):
         seconds (int): The amount of time (in seconds) a Notecard will spend on any fallback transport before retrying the first transport specified in the `method`. The default is `3600` or 60 minutes.
         set (bool): Set to `true` to apply the `allow` argument without also changing the transport `method`.
         umin (bool): Set to `true` to force a longer network transport timeout when using Wideband Notecards.
+        uoff (bool): Set to `true` to turn off the longer network transport timeout set with `umin`.
 
     Returns:
         dict: The result of the Notecard request.
@@ -771,6 +772,8 @@ def transport(card, allow=None, method=None, seconds=None, set=None, umin=None):
         req["set"] = set
     if umin is not None:
         req["umin"] = umin
+    if uoff is not None:
+        req["uoff"] = uoff
     return card.Transaction(req)
 
 
@@ -867,7 +870,7 @@ def version(card):
 
 
 @validate_card_object
-def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None, now=None, off=None, offset=None, on=None, set=None, sync=None, usb=None, vmax=None, vmin=None):
+def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None, now=None, off=None, offset=None, on=None, reset=None, set=None, sync=None, usb=None, vmax=None, vmin=None):
     """Provide the current VMODEM_P voltage level on the Notecard, and provides information about historical voltage trends. When used with the mode argument, configures voltage thresholds based on how the device is powered.
 
     Args:
@@ -881,6 +884,7 @@ def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None
         off (bool): Disable historic voltage trend calculations.
         offset (int): Number of hours to move into the past before starting analysis.
         on (bool): Enable historic voltage trend calculations.
+        reset (bool): Set to `true` to clear a calibration value previously set with `set` and `calibration`, restoring the default calibration.
         set (bool): Used along with `calibration`, set to `true` to specify a new calibration value.
         sync (bool): When enabled and the `usb` argument is set to `true`, the Notecard will perform a sync when USB power is connected or disconnected.
         usb (bool): When enabled, the Notecard will monitor for changes to USB power state.
@@ -909,6 +913,8 @@ def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None
         req["offset"] = offset
     if on is not None:
         req["on"] = on
+    if reset is not None:
+        req["reset"] = reset
     if set is not None:
         req["set"] = set
     if sync is not None:
