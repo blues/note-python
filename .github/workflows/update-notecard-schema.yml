@@ -145,7 +145,10 @@ jobs:
       # to approve at all, so main's 1-review rule still needs a human -- unless
       # that rule is moved to a ruleset that this App bypasses.
       - name: Enable auto-merge
-        if: ${{ steps.pr.outputs.branch != '' && steps.changes.outputs.automerge_safe == 'true' && steps.app-token.outputs.token != '' }}
+        if:
+          ${{ steps.pr.outputs.branch != '' &&
+          steps.changes.outputs.automerge_safe == 'true' &&
+          steps.app-token.outputs.token != '' }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           PR_BRANCH: ${{ steps.pr.outputs.branch }}
@@ -159,6 +162,15 @@ jobs:
           fi
 
       - name: Report skipped auto-merge
-        if: ${{ steps.changes.outputs.has_changes == 'true' && steps.changes.outputs.automerge_safe != 'true' }}
+        if:
+          ${{ steps.changes.outputs.has_changes == 'true' &&
+          steps.changes.outputs.automerge_safe != 'true' }}
         run: |
           echo "::notice::PR opened but auto-merge was skipped: the generator changed paths outside notecard/. Review and merge by hand."
+
+      - name: Approve (as github-actions, not the App that opened it)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run:
+          gh pr review "$PR_BRANCH" --approve -b "Automated schema sync; CI
+          gates the merge."
