@@ -43,7 +43,7 @@ def get(card, name=None, names=None, time=None):
         card (Notecard): The current Notecard object.
         name (str): The name of the environment variable (case-insensitive). Omit to return all environment variables known to the Notecard.
         names (list): A list of one or more variables to retrieve, by name (case-insensitive).
-        time (int): Request a modified environment variable or variables from the Notecard, but only if modified after the time provided.
+        time (int): Use to fetch variables only when something has changed. Pass the `time` from a previous `env.get` or `env.modified` response. If no environment variable has changed since then, the request returns an `{env-not-modified}` error.
 
     Returns:
         dict: The result of the Notecard request.
@@ -64,7 +64,7 @@ def modified(card, time=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        time (int): Request whether the Notecard has detected an environment variable change since a known epoch time.
+        time (int): The `time` from a previous `env.modified` or `env.get` response. If no environment variable has changed since then, the request returns an `{env-not-modified}` error instead of a new `time`.
 
     Returns:
         dict: The result of the Notecard request.
