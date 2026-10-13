@@ -57,10 +57,10 @@ def get(card, binary=None, body=None, content=None, file=None, max=None, name=No
         body (dict): The JSON body to send with the request.
         content (str): The MIME type of the body or payload of the response. Default is `application/json`.
         file (str): The name of a local-only Database Notefile (.dbx) where the response will be stored when the web request is executed as a queued web transaction (e.g. if the request is made when Notecard is not in continuous mode and not online). If `file` is not specified, queued web transaction responses are discarded. This argument is not used when the Notecard is in `continuous` mode and online, as responses in that case are returned directly to the host.
-        max (int): Used along with `binary:true` and `offset`, sent as a URL parameter to the remote endpoint. Represents the number of bytes to retrieve from the binary payload segment.
+        max (int): Used along with `binary:true` and `offset`. Represents the number of bytes to retrieve from the binary payload segment. Notehub requests this byte range from the remote endpoint with an HTTP `Range` header (`Range: bytes=<offset>-<offset+max-1>`), so the endpoint must support range requests.
         name (str): A web URL endpoint relative to the host configured in the Proxy Route. URL parameters may be added to this argument as well (e.g. `/getLatest?id=1`).
         note (str): The unique Note ID within the local-only Database Notefile (.dbx) specified by the `file` argument (see above). Used with queued web transactions to identify a specific Note where the response will be stored.
-        offset (int): Used along with `binary:true` and `max`, sent as a URL parameter to the remote endpoint. Represents the number of bytes to offset the binary payload from 0 when retrieving binary data from the remote endpoint.
+        offset (int): Used along with `binary:true` and `max`. Represents the number of bytes to offset the binary payload from 0 when retrieving binary data from the remote endpoint. Notehub sends `offset` and `max` to the endpoint as an HTTP `Range` header, not as URL parameters.
         route (str): Alias for a Proxy Route in Notehub.
         seconds (int): If specified, overrides the default 90 second timeout.
 
