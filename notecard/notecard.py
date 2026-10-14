@@ -111,10 +111,11 @@ class Notecard:
 
     def __init__(self, debug=False):
         """Initialize the Notecard object."""
+        self.__version__ = self._fetch_version()
         self._user_agent_app = None
         self._user_agent_sent = False
         self._user_agent = {
-            'agent': 'note-python',
+            'agent': f'note-python {self.__version__}'.strip(),
             'os_name': sys.implementation.name,
             'os_platform': sys.platform,
             'os_version': sys.version
@@ -128,6 +129,22 @@ class Notecard:
         self._last_request_seq_number = 0
         self._card_supports_crc = False
         self._reset_required = True
+
+    def _fetch_version(self):
+        """Fetch the version of the note-python library."""
+        try:
+            # Check development version
+            import tomllib
+            with open('pyproject.toml', 'rb') as f:
+                data = tomllib.load(f)
+            return data['project']['version']
+        except Exception:
+            # Check installed version
+            try:
+                import importlib.metadata
+                return importlib.metadata.version('note-python')
+            except Exception:
+                return ''
 
     def _crc_add(self, req_string, seq_number):
         """Add a CRC field to the request.
