@@ -349,3 +349,38 @@ class TestSerial:
         card.unlock()
 
         lock_handle_mock.release.assert_called_once()
+
+    # debug_fn tests.
+    def test_init_with_custom_debug_fn(self):
+        custom_debug_fn = MagicMock()
+
+        with patch('notecard.notecard.OpenSerial.Reset'):
+            card = notecard.OpenSerial(MagicMock(), debug=True, debug_fn=custom_debug_fn)
+
+        assert card._debug_fn == custom_debug_fn
+        assert card._debug is True
+
+    def test_init_with_default_debug_fn(self):
+        with patch('notecard.notecard.OpenSerial.Reset'):
+            card = notecard.OpenSerial(MagicMock(), debug=True)
+
+        assert card._debug_fn == print
+        assert card._debug is True
+
+    def test_reset_uses_custom_debug_fn(self, arrange_reset_test):
+        custom_debug_fn = MagicMock()
+        card = arrange_reset_test()
+        card._debug = True
+        card._debug_fn = custom_debug_fn
+        card._available = MagicMock(side_effect=[True, True, False])
+        card._read_byte = MagicMock(side_effect=[b'\r', b'\n', None])
+
+        with patch('notecard.notecard.has_timed_out',
+                   side_effect=TrueOnNthIteration(2)):
+            card.Reset()
+
+        # Verify the custom debug function was called
+        custom_debug_fn.assert_called()
+        # Check that at least one call contains the reset message
+        call_args_list = [call[0][0] for call in custom_debug_fn.call_args_list]
+        assert any('Resetting Notecard serial communications.' in str(arg) for arg in call_args_list)
