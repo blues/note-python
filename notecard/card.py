@@ -660,7 +660,7 @@ def restore(card, connected=None, delete=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        connected (bool): Set to `true` to reset the Notecard on Notehub. This will delete and deprovision the Notecard from Notehub the next time the Notecard connects. This also removes any Notefile templates used by this device. Conversely, if `connected` is `false` (or omitted), the Notecard's settings and data will be restored from Notehub the next time the Notecard connects to the previously used Notehub project.
+        connected (bool): Set to `true` to also reset the device's record on Notehub. The next time the Notecard connects to Notehub with the same `ProductUID` it had when this request was sent, Notehub deletes the device's environment variables, Notefiles, Notefile templates, and fleet memberships, and the device continues in the project as if newly added. This does not remove the device from the project, its events are kept, and it can lift a block placed on the device in Notehub.
         delete (bool): Set to `true` to reset most Notecard configuration settings. Note that this does not reset stored WiFi credentials or the alternate I2C address (if previously set) so the Notecard can still contact the network after a reset. The Notecard will be unable to sync with Notehub until the `ProductUID` is set again.
 
     Returns:
