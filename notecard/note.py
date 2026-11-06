@@ -27,9 +27,9 @@ def add(card, binary=None, body=None, file=None, full=None, key=None, limit=None
         live (bool): If `true`, bypasses saving the Note to flash on the Notecard. Required to be set to `true` if also using `"binary":true`.
         max (int): Defines the maximum number of queued Notes permitted in the specified Notefile (`"file"`). Any Notes added after this value will be rejected. When used with `"sync":true`, a sync will be triggered when the number of pending Notes matches the `max` value.
         note (str): If the Notefile has a `.db/.dbs/.dbx` extension, specifies a unique Note ID. If `note` string is `"?"`, then a random unique Note ID is generated and returned as `{"note":"xxx"}`. If this argument is provided for a `.qo` Notefile, an error is returned.
-        payload (str): A base64-encoded binary payload. A Note must have either a `body` or a `payload`, and can have both. Payloads are limited to 256 bytes.
+        payload (str): A base64-encoded binary payload. A Note must have either a `body` or a `payload`, and can have both. Payloads are limited to 256 bytes, except in outbound Notefiles (`.qo`/`.qos`) that have a Note template.
         sync (bool): Set to `true` to sync immediately. Only applies to outgoing Notecard requests, and only guarantees syncing the specified Notefile. Auto-syncing incoming Notes from Notehub is set on the Notecard with `{"req": "hub.set", "mode":"continuous", "sync": true}`.
-        verify (bool): If set to `true` and using a templated Notefile, the Notefile will be written to flash immediately, rather than being cached in RAM and written to flash later.
+        verify (bool): If set to `true`, the Notefile is written to flash immediately, rather than being cached in RAM and written to flash later, so the Note survives a sudden power loss or restart before it syncs. Use it only for Notes you can't afford to lose, since frequent flash writes add time, power use, and flash wear.
 
     Returns:
         dict: The result of the Notecard request.
@@ -108,7 +108,7 @@ def delete(card, file, note, verify=None):
         card (Notecard): The current Notecard object.
         file (str): The Notefile from which to delete a Note. Must be a Notefile with a `.db` or `.dbx` extension.
         note (str): The Note ID of the Note to delete.
-        verify (bool): If set to `true` and using a templated Notefile, the Notefile will be written to flash immediately, rather than being cached in RAM and written to flash later.
+        verify (bool): If set to `true`, the Notefile is written to flash immediately, rather than being cached in RAM and written to flash later, so the deletion survives a sudden power loss or restart. Use it only for deletions you can't afford to lose, since frequent flash writes add time, power use, and flash wear.
 
     Returns:
         dict: The result of the Notecard request.
@@ -198,7 +198,7 @@ def update(card, file, note, body=None, payload=None, sync=None, verify=None):
         note (str): The unique Note ID.
         payload (str): A base64-encoded binary payload. A Note must have either a `body` or `payload`, and can have both.
         sync (bool): Set to `true` to sync the Notefile immediately after updating the Note. Only the specified Notefile is guaranteed to sync.
-        verify (bool): If set to `true` and using a templated Notefile, the Notefile will be written to flash immediately, rather than being cached in RAM and written to flash later.
+        verify (bool): If set to `true`, the Notefile is written to flash immediately, rather than being cached in RAM and written to flash later, so the update survives a sudden power loss or restart. Use it only for updates you can't afford to lose, such as stored settings, since frequent flash writes add time, power use, and flash wear.
 
     Returns:
         dict: The result of the Notecard request.

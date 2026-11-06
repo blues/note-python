@@ -404,7 +404,7 @@ def locationTrack(card, file=None, heartbeat=None, hours=None, payload=None, sta
     Args:
         card (Notecard): The current Notecard object.
         file (str): The Notefile in which to store tracked location data. See the `_track.qo` Notefile's documentation for details on the format of the data captured.
-        heartbeat (bool): When `start` is `true`, set to `true` to capture a tracking Note on a fixed interval even when no motion has been detected. The interval is configured with the `hours` field below.
+        heartbeat (bool): When `start` is `true`, set to `true` to capture a tracking Note on a fixed interval even when no motion has been detected. The interval is configured with the `hours` field below. A heartbeat Note records the Notecard's last-known location without activating GPS to obtain a new fix.
         hours (int): When `heartbeat` is `true`, the interval at which to capture a heartbeat tracking Note. A positive value sets the interval in hours (e.g. `2` captures a Note every two hours). To configure an interval shorter than one hour, pass a negative integer whose absolute value is the number of minutes (e.g. `-30` captures a Note every 30 minutes).
         payload (str): A base64-encoded binary payload to be included in the next `_track.qo` Note. See the guide on Sampling at Predefined Intervals for more details.
         start (bool): Set to `true` to start Notefile tracking.
@@ -752,7 +752,7 @@ def transport(card, allow=None, method=None, seconds=None, set=None, umin=None, 
     Args:
         card (Notecard): The current Notecard object.
         allow (bool): Set to `true` to allow adding Notes to templated Notefiles that have no `port` while connected over a non-terrestrial network. See Define NTN vs non-NTN Templates.
-        method (str): The connectivity method to enable on the Notecard.
+        method (str): The connectivity method to enable on the Notecard. See Connection Retry and Fallback Behaviors for when the Notecard falls back to the next transport and when it retries the preferred one.
         seconds (int): The amount of time (in seconds) a Notecard will spend on any fallback transport before retrying the first transport specified in the `method`. The default is `3600` or 60 minutes.
         set (bool): Set to `true` to apply the `allow` argument without also changing the transport `method`.
         umin (bool): Set to `true` to force a longer network transport timeout when using Wideband Notecards.
