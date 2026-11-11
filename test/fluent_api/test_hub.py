@@ -60,7 +60,7 @@ from notecard import hub
         (
             hub.signal,
             'hub.signal',
-            {'seconds': 30},
+            {},
             None
         ),
         (
