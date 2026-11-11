@@ -46,10 +46,12 @@
 
 ## DFU Commands
 
+`from notecard import dfu`
+
 | Notecard API | Python Library API |
 | ------------ | ------------------ |
-| `dfu.get`    | NOT IMPLEMENTED    |
-| `dfu.set`    | NOT IMPLEMENTED    |
+| `dfu.get`    | dfu.get            |
+| `dfu.status` | dfu.status         |
 
 ## Env Commands
 
@@ -61,7 +63,7 @@
 | `env.get`      | env.get            |
 | `env.modified` | env.modified       |
 | `env.set`      | env.set            |
-| `env.template` | NOT IMPLEMENTED    |
+| `env.template` | env.template       |
 
 ## File Commands
 
@@ -72,7 +74,7 @@
 | `file.changes`         | file.changes        |
 | `file.delete`          | file.delete         |
 | `file.stats`           | file.stats          |
-| `file.changes.pending` | file.pendingChanges |
+| `file.changes.pending` | file.changesPending |
 
 ## Hub Commands
 
@@ -106,24 +108,29 @@
 
 | Notecard API | Python Library API |
 | ------------ | ------------------ |
-| `ntn.gps`    | NOT IMPLEMENTED    |
-| `ntn.reset`  | NOT IMPLEMENTED    |
-| `ntn.status` | NOT IMPLEMENTED    |
+| `ntn.config` | ntn.config         |
+| `ntn.gps`    | ntn.gps            |
+| `ntn.reset`  | ntn.reset          |
+| `ntn.status` | ntn.status         |
 
 ## Var Commands
 
+`from notecard import var`
+
 | Notecard API | Python Library API |
 | ------------ | ------------------ |
-| `var.delete` | NOT IMPLEMENTED    |
-| `var.get`    | NOT IMPLEMENTED    |
-| `var.set`    | NOT IMPLEMENTED    |
+| `var.delete` | var.delete         |
+| `var.get`    | var.get            |
+| `var.set`    | var.set            |
 
 ## Web Commands
 
+`from notecard import web`
+
 | Notecard API | Python Library API |
 | ------------ | ------------------ |
-| `web.get`    | NOT IMPLEMENTED    |
-| `web.post`   | NOT IMPLEMENTED    |
-| `web.put`    | NOT IMPLEMENTED    |
-| `web.delete` | NOT IMPLEMENTED    |
-| `web`        | NOT IMPLEMENTED    |
+| `web.get`    | web.get            |
+| `web.post`   | web.post           |
+| `web.put`    | web.put            |
+| `web.delete` | web.delete         |
+| `web`        | web.web            |
