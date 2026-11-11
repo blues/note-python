@@ -1,0 +1,29 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "url": "https://context7.com/blues/note-python",
+  "public_key": "pk_nVFOrz6sC1j4Aqx8A32xw",
+  "projectTitle": "note-python: Python library for Blues Notecard",
+  "description": "Python library for communicating with Blues Notecard over Serial or I2C from CPython (desktop and Raspberry Pi), MicroPython, and CircuitPython. It sends Notecard API requests as Python dicts and includes optional fluent helper modules (card, hub, note, env, file, and others) generated from the Notecard API schema.",
+  "excludeFolders": [
+    ".github",
+    "docs",
+    "test",
+    "mpy_board",
+    "scripts"
+  ],
+  "excludeFiles": [
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md"
+  ],
+  "rules": [
+    "Install with pip install note-python but import it as notecard. On MicroPython and CircuitPython, copy the repo's notecard directory to lib/notecard on the device instead of using pip.",
+    "On Linux and macOS CPython, import notecard requires the python-periphery package even for Serial, but note-python does not declare it as a dependency. Install it, plus pyserial for Serial ports.",
+    "Create the port and pass it in: notecard.OpenSerial(port) with serial.Serial, busio.UART, or machine.UART; notecard.OpenI2C(port, 0, 0) with periphery.I2C, busio.I2C, or machine.I2C (0, 0 selects address 0x17 and the default max transfer).",
+    "nCard.Transaction(req) sends a dict with a \"req\" key and returns the response dict. Notecard errors arrive in the response's \"err\" field, not as exceptions; Transaction raises an Exception only when transport or I/O fails.",
+    "Call fluent helpers with the Notecard object first and other arguments by keyword: hub.set(nCard, product=productUID, mode=\"continuous\"); hub.set's second positional parameter is align. Don't name the Notecard object card; it shadows the card module.",
+    "Fluent helper names camelCase the rest of the request (card.location.mode is card.locationMode, file.changes.pending is file.changesPending). Arguments that are Python keywords take a trailing underscore: hub.sync(nCard, in_=True).",
+    "Copy Notecard request and argument names exactly from the Notecard API reference; do not invent requests, arguments, or response fields.",
+    "Before expecting data in Notehub, set the Notehub project's ProductUID on the Notecard with the \"product\" argument of hub.set.",
+    "When the Blues Expert MCP server is connected, check generated Notecard JSON requests with its api_validate tool before using them."
+  ]
+}
