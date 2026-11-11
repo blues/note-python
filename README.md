@@ -121,7 +121,7 @@ port = busio.I2C(board.SCL, board.SDA)
 nCard = notecard.OpenI2C(port, 0, 0, debug=True)
 
 productUID = "com.blues.brandon.tester"
-rsp = hub.set(nCard, productUID, mode="continuous", sync=True)
+rsp = hub.set(nCard, product=productUID, mode="continuous", sync=True)
 
 print(rsp) # {}
 ```
