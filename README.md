@@ -50,7 +50,7 @@ consult the [examples](examples/) directory for platform-specific guidance.
 import serial
 port = serial.Serial("/dev/serial0", 9600)
 
-card = notecard.OpenSerial(port)
+nCard = notecard.OpenSerial(port)
 ```
 
 #### macOS and Windows
@@ -65,7 +65,7 @@ port = serial.Serial(port="/dev/tty.usbmodemNOTE1",
 # port = serial.Serial(port="COM4",
 #                     baudrate=9600)
 
-card = notecard.OpenSerial(port)
+nCard = notecard.OpenSerial(port)
 ```
 
 
@@ -76,7 +76,7 @@ card = notecard.OpenSerial(port)
 from periphery import I2C
 port = I2C("/dev/i2c-1")
 
-card = notecard.OpenI2C(port, 0, 0)
+nCard = notecard.OpenI2C(port, 0, 0)
 ```
 
 ### Sending Notecard Requests
@@ -94,7 +94,7 @@ object.
 req = {"req": "note.add"}
 req["body"] = {"temp": 18.6}
 
-rsp = card.Transaction(req)
+rsp = nCard.Transaction(req)
 print(rsp) # {"total":1}
 ```
 
