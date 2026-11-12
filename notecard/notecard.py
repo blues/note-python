@@ -109,7 +109,7 @@ class NoOpSerialLock():
 class Notecard:
     """Base Notecard class."""
 
-    def __init__(self, debug=False):
+    def __init__(self, debug=False, debug_fn=print):
         """Initialize the Notecard object."""
         self._user_agent_app = None
         self._user_agent_sent = False
@@ -125,6 +125,7 @@ class Notecard:
             self._user_agent['os_family'] = os.uname().machine
         self._transaction_manager = NoOpTransactionManager()
         self._debug = debug
+        self._debug_fn = debug_fn
         self._last_request_seq_number = 0
         self._card_supports_crc = False
         self._reset_required = True
@@ -176,14 +177,13 @@ class Notecard:
             seq_number_as_int = int(seq_number, 16)
         except ValueError:
             if self._debug:
-                print(f'Received sequence number "{seq_number}" cannot be ' + \
-                      'converted to integer.')
+                self._debug_fn(f'Received sequence number "{seq_number}" cannot be converted to integer.')
             return True
         try:
             crc_as_int = int(crc, 16)
         except ValueError:
             if self._debug:
-                print(f'Received CRC "{crc}" cannot be converted to integer.')
+                self._debug_fn(f'Received CRC "{crc}" cannot be converted to integer.')
             return True
 
         # Remove the 'crc' field from the response.
@@ -200,14 +200,11 @@ class Notecard:
 
         if seq_number_as_int != self._last_request_seq_number:
             if self._debug:
-                print('Sequence number mismatch. Expected ' + \
-                      f'{self._last_request_seq_number}, received ' + \
-                      f'{seq_number_as_int}.')
+                self._debug_fn(f'Sequence number mismatch. Expected {self._last_request_seq_number}, received {seq_number_as_int}.')
             return True
         elif crc_as_int != computed_crc:
             if self._debug:
-                print(f'CRC error. Computed {computed_crc}, received ' + \
-                      f'{crc_as_int}.')
+                self._debug_fn(f'CRC error. Computed {computed_crc}, received {crc_as_int}.')
             return True
 
         return False
@@ -233,7 +230,7 @@ class Notecard:
         # Serialize the JSON request to a string, removing any unnecessary
         # whitespace.
         if self._debug:
-            print(req_string)
+            self._debug_fn(req_string)
 
         req_string += "\n"
 
@@ -280,7 +277,7 @@ class Notecard:
                 timeout_secs = 90
 
         if self._debug:
-            print(f'Using transaction timeout of {timeout_secs} seconds.')
+            self._debug_fn(f'Using transaction timeout of {timeout_secs} seconds.')
 
         return timeout_secs
 
@@ -315,7 +312,7 @@ class Notecard:
                             timeout_secs=timeout_secs)
                     except Exception as e:
                         if self._debug:
-                            print(e)
+                            self._debug_fn(e)
 
                         error = True
                         self.Reset()
@@ -325,7 +322,7 @@ class Notecard:
 
                     if self._crc_error(rsp_bytes):
                         if self._debug:
-                            print('CRC error on response from Notecard.')
+                            self._debug_fn('CRC error on response from Notecard.')
 
                         error = True
                         retries_left -= 1
@@ -336,7 +333,7 @@ class Notecard:
                         rsp_json = json.loads(rsp_bytes)
                     except Exception as e:
                         if self._debug:
-                            print(e)
+                            self._debug_fn(e)
 
                         error = True
                         retries_left -= 1
@@ -346,8 +343,7 @@ class Notecard:
                     if 'err' in rsp_json:
                         if '{io}' in rsp_json['err'] and '{not-supported}' not in rsp_json['err']:
                             if self._debug:
-                                print('Response has error field indicating ' + \
-                                      f'I/O error: {rsp_json}')
+                                self._debug_fn(f'Response has error field indicating I/O error: {rsp_json}')
 
                             error = True
                             retries_left -= 1
@@ -355,9 +351,8 @@ class Notecard:
                             continue
                         elif '{bad-bin}' in rsp_json['err']:
                             if self._debug:
-                                print('Response has error field indicating ' + \
-                                      f'binary I/O error: {rsp_json}')
-                                print('Not eligible for retry.')
+                                self._debug_fn(f'Response has error field indicating binary I/O error: {rsp_json}')
+                                self._debug_fn('Not eligible for retry.')
 
                             error = True
                             break
@@ -380,7 +375,7 @@ class Notecard:
                 except Exception as e:
                     error = True
                     if self._debug:
-                        print(e)
+                        self._debug_fn(e)
 
             self._last_request_seq_number += 1
 
@@ -395,7 +390,7 @@ class Notecard:
             self._transaction_manager.stop()
 
         if self._debug and rsp_json is not None:
-            print(rsp_json)
+            self._debug_fn(rsp_json)
 
         return rsp_json
 
@@ -506,7 +501,7 @@ class OpenSerial(Notecard):
     def Reset(self):
         """Reset the Notecard."""
         if self._debug:
-            print('Resetting Notecard serial communications.')
+            self._debug_fn('Resetting Notecard serial communications.')
 
         # Delay to give the Notecard a chance to process any segment sent prior
         # to the coming reset sequence.
@@ -523,7 +518,7 @@ class OpenSerial(Notecard):
                     self.uart.write(b'\n')
                 except Exception as e:
                     if self._debug:
-                        print(e)
+                        self._debug_fn(e)
                     # Wait CARD_RESET_DRAIN_MS and before trying to send the
                     # newline again.
                     time.sleep(CARD_RESET_DRAIN_MS / 1000)
@@ -548,13 +543,11 @@ class OpenSerial(Notecard):
 
                 if not something_found:
                     if self._debug:
-                        print('Notecard not responding to newline during ' + \
-                              'reset.')
+                        self._debug_fn('Notecard not responding to newline during reset.')
 
                 elif non_control_char_found:
                     if self._debug:
-                        print('Received non-control characters from the ' + \
-                              'Notecard during reset.')
+                        self._debug_fn('Received non-control characters from the Notecard during reset.')
                 else:
                     # If all we got back is newlines, we're in sync with the
                     # Notecard.
@@ -562,7 +555,7 @@ class OpenSerial(Notecard):
                     break
 
                 if self._debug:
-                    print('Retrying reset...')
+                    self._debug_fn('Retrying reset...')
 
                 # Wait CARD_RESET_DRAIN_MS before trying again.
                 time.sleep(CARD_RESET_DRAIN_MS / 1000)
@@ -583,7 +576,7 @@ class OpenSerial(Notecard):
         """Unlock access to the serial bus."""
         self.lock_handle.release()
 
-    def __init__(self, uart_id, debug=False, lock_path=None):
+    def __init__(self, uart_id, debug=False, lock_path=None, debug_fn=print):
         """Initialize the Notecard before a reset.
 
         Args:
@@ -591,8 +584,9 @@ class OpenSerial(Notecard):
             debug: Enable debug output if True.
             lock_path: Optional path for the serial lock file. Defaults to /tmp/serial.lock
                 or the value of NOTECARD_SERIAL_LOCK_PATH environment variable.
+            debug_fn: Function to use for debug output. Defaults to print.
         """
-        super().__init__(debug)
+        super().__init__(debug, debug_fn)
         self._user_agent['req_interface'] = 'serial'
         self._user_agent['req_port'] = str(uart_id)
 
@@ -756,7 +750,7 @@ class OpenI2C(Notecard):
     def Reset(self):
         """Reset the Notecard."""
         if self._debug:
-            print('Resetting Notecard I2C communications.')
+            self._debug_fn('Resetting Notecard I2C communications.')
 
         notecard_ready = False
         try:
@@ -769,7 +763,7 @@ class OpenI2C(Notecard):
                     self._write(b'\n')
                 except Exception as e:
                     if self._debug:
-                        print(e)
+                        self._debug_fn(e)
                     time.sleep(CARD_REQUEST_I2C_NACK_WAIT_MS / 1000)
                     continue
 
@@ -785,7 +779,7 @@ class OpenI2C(Notecard):
                         available, data = self._read(read_len)
                     except Exception as e:
                         if self._debug:
-                            print(e)
+                            self._debug_fn(e)
                         time.sleep(CARD_REQUEST_SEGMENT_DELAY_MS / 1000)
                         continue
 
@@ -808,13 +802,11 @@ class OpenI2C(Notecard):
 
                 if not something_found:
                     if self._debug:
-                        print('Notecard not responding to newline during ' + \
-                              'reset.')
+                        self._debug_fn('Notecard not responding to newline during reset.')
                     time.sleep(.005)
                 elif non_control_char_found:
                     if self._debug:
-                        print('Received non-control characters from the ' + \
-                              'Notecard during reset.')
+                        self._debug_fn('Received non-control characters from the Notecard during reset.')
                 else:
                     # If all we got back is newlines, we're in sync with the
                     # Notecard.
@@ -822,7 +814,7 @@ class OpenI2C(Notecard):
                     break
 
                 if self._debug:
-                    print('Retrying reset...')
+                    self._debug_fn('Retrying reset...')
 
                 # Wait CARD_RESET_DRAIN_MS before trying again.
                 time.sleep(CARD_RESET_DRAIN_MS / 1000)
@@ -888,9 +880,17 @@ class OpenI2C(Notecard):
         """No-op unlock function."""
         pass
 
-    def __init__(self, i2c, address, max_transfer, debug=False):
-        """Initialize the Notecard before a reset."""
-        super().__init__(debug)
+    def __init__(self, i2c, address, max_transfer, debug=False, debug_fn=print):
+        """Initialize the Notecard before a reset.
+
+        Args:
+            i2c: The I2C interface.
+            address: The I2C address of the Notecard.
+            max_transfer: Maximum transfer size.
+            debug: Enable debug output if True.
+            debug_fn: Function to use for debug output. Defaults to print.
+        """
+        super().__init__(debug, debug_fn)
         self._user_agent['req_interface'] = 'i2c'
         self._user_agent['req_port'] = address
 
