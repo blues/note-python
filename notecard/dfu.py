@@ -18,7 +18,7 @@ def get(card, binary=None, length=None, offset=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        binary (bool): If `true`, the Notecard places the firmware data in the binary storage area instead of the response `payload` field, and returns `cobs`, `length`, and `status` fields instead. Read it out with card.binary.get, then clear the area with a `card.binary` request and `delete` set to `true`. Learn more in this guide on Sending and Receiving Large Binary Objects.
+        binary (bool): If `true`, the Notecard places the firmware data in the binary storage area instead of the response `payload` field, and returns `cobs`, `length`, and `status` fields instead. Read it out with card.binary.get, then clear the area with a `card.binary` request and `delete` set to `true`. Learn more in this guide on Sending and Receiving Large Binary Objects. Not available while NTN is the active transport. See Send Binary Data over Cellular or WiFi.
         length (int): The number of bytes of firmware data to read and return to the host, up to a maximum of 8192 per request. Set to `0` to verify that the Notecard is ready to serve firmware data without retrieving any.
         offset (int): The offset to use before performing a read of firmware data.
 

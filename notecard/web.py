@@ -53,7 +53,7 @@ def get(card, binary=None, body=None, content=None, file=None, max=None, name=No
 
     Args:
         card (Notecard): The current Notecard object.
-        binary (bool): If `true`, the Notecard will return the response stored in its binary buffer. Learn more in this guide on Sending and Receiving Large Binary Objects.
+        binary (bool): If `true`, the Notecard will return the response stored in its binary buffer. Learn more in this guide on Sending and Receiving Large Binary Objects. Not available while NTN is the active transport. See Send Binary Data over Cellular or WiFi.
         body (dict): The JSON body to send with the request.
         content (str): The MIME type of the body or payload of the response. Default is `application/json`.
         file (str): The name of a local-only Database Notefile (.dbx) where the response will be stored when the web request is executed as a queued web transaction (e.g. if the request is made when Notecard is not in continuous mode and not online). If `file` is not specified, queued web transaction responses are discarded. This argument is not used when the Notecard is in `continuous` mode and online, as responses in that case are returned directly to the host.
@@ -98,7 +98,7 @@ def post(card, async_=None, binary=None, body=None, content=None, file=None, max
     Args:
         card (Notecard): The current Notecard object.
         async_ (bool): If `true`, the Notecard performs the web request asynchronously, and returns control to the host without waiting for a response from Notehub. This argument only applies when the Notecard is in `continuous` mode and currently online.
-        binary (bool): If `true`, the Notecard will send all the data in the binary buffer to the specified proxy route in Notehub. Learn more in this guide on Sending and Receiving Large Binary Objects.
+        binary (bool): If `true`, the Notecard will send all the data in the binary buffer to the specified proxy route in Notehub. Learn more in this guide on Sending and Receiving Large Binary Objects. Not available while NTN is the active transport. See Send Binary Data over Cellular or WiFi.
         body (dict): The JSON body to send with the request.
         content (str): The MIME type of the body or payload of the response. Default is `application/json`.
         file (str): The name of a local-only Database Notefile (.dbx) where the response will be stored when the web request is executed as a queued web transaction (e.g. if the request is made when Notecard is not in continuous mode and not online). If `file` is not specified, queued web transaction responses are discarded. This argument is not used when the Notecard is in `continuous` mode and online, as responses in that case are returned directly to the host.
@@ -157,7 +157,7 @@ def put(card, async_=None, binary=None, body=None, content=None, file=None, max=
     Args:
         card (Notecard): The current Notecard object.
         async_ (bool): If `true`, the Notecard performs the web request asynchronously, and returns control to the host without waiting for a response from Notehub. This argument only applies when the Notecard is in `continuous` mode and currently online.
-        binary (bool): If `true`, the Notecard will send all the data in the binary buffer to the specified proxy route in Notehub. Learn more in this guide on Sending and Receiving Large Binary Objects.
+        binary (bool): If `true`, the Notecard will send all the data in the binary buffer to the specified proxy route in Notehub. Learn more in this guide on Sending and Receiving Large Binary Objects. Not available while NTN is the active transport. See Send Binary Data over Cellular or WiFi.
         body (dict): The JSON body to send with the request.
         content (str): The MIME type of the body or payload of the response. Default is `application/json`.
         file (str): The name of a local-only Database Notefile (.dbx) where the response will be stored when the web request is executed as a queued web transaction (e.g. if the request is made when Notecard is not in continuous mode and not online). If `file` is not specified, queued web transaction responses are discarded. This argument is not used when the Notecard is in `continuous` mode and online, as responses in that case are returned directly to the host.

@@ -18,7 +18,7 @@ def add(card, binary=None, body=None, file=None, full=None, key=None, limit=None
 
     Args:
         card (Notecard): The current Notecard object.
-        binary (bool): If `true`, the Notecard will send all the data in the binary buffer to Notehub. Learn more in this guide on Sending and Receiving Large Binary Objects.
+        binary (bool): If `true`, the Notecard will send all the data in the binary buffer to Notehub. Learn more in this guide on Sending and Receiving Large Binary Objects. Not available while NTN is the active transport. See Send Binary Data over Cellular or WiFi.
         body (dict): A JSON object to be enqueued. A Note must have either a `body` or a `payload`, and can have both.
         file (str): The name of the Notefile. On Notecard for LoRa this argument is required. On all other Notecards this field is optional and defaults to `data.qo` if not provided. When using this request on the Notecard the Notefile name must end in one of: `.qo` for a queue outgoing (Notecard to Notehub) with plaintext transport `.qos` for a queue outgoing with encrypted transport `.db` for a bidirectionally synchronized database with plaintext transport `.dbs` for a bidirectionally synchronized database with encrypted transport `.dbx` for a local-only database
         full (bool): If set to `true`, and the Note is using a Notefile Template, the Note will bypass usage of omitempty and retain `null`, `0`, `false`, and empty string `""` values.
