@@ -406,7 +406,7 @@ def locationTrack(card, file=None, heartbeat=None, hours=None, payload=None, sta
         file (str): The Notefile in which to store tracked location data. See the `_track.qo` Notefile's documentation for details on the format of the data captured.
         heartbeat (bool): When `start` is `true`, set to `true` to capture a tracking Note on a fixed interval even when no motion has been detected. The interval is configured with the `hours` field below. A heartbeat Note records the Notecard's last-known location without activating GPS to obtain a new fix.
         hours (int): When `heartbeat` is `true`, the interval at which to capture a heartbeat tracking Note. A positive value sets the interval in hours (e.g. `2` captures a Note every two hours). To configure an interval shorter than one hour, pass a negative integer whose absolute value is the number of minutes (e.g. `-30` captures a Note every 30 minutes).
-        payload (str): A base64-encoded binary payload to be included in the next `_track.qo` Note. See the guide on Sampling at Predefined Intervals for more details.
+        payload (str): A base64-encoded binary payload to attach to the next `_track.qo` Note of the current journey. Notecard ignores it unless tracking is on and a journey is in progress, and discards it if the journey ends before that Note is added. See the guide on Sampling at Predefined Intervals for more details.
         start (bool): Set to `true` to start Notefile tracking.
         stop (bool): Set to `true` to stop Notefile tracking.
         sync (bool): Set to `true` to perform an immediate sync to the Notehub each time a new Note is added.
@@ -597,8 +597,8 @@ def power(card, hours=None, minutes=None, reset=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        hours (int): How often, in hours, Notecard should log power consumption in a `_log.qo` Note. Provided as a convenience alternative to `minutes`. If both `hours` and `minutes` are provided, the resulting cadence is the sum of the two.
-        minutes (int): How often, in minutes, Notecard should log power consumption in a `_log.qo` Note. The default value is `720` (12 hours). May be combined with `hours`, in which case the two values are added together.
+        hours (int): How often, in hours, Notecard should log power consumption in a `_log.qo` Note. Provided as a convenience alternative to `minutes`. If both `hours` and `minutes` are provided, the resulting cadence is the sum of the two. Notecard only adds these Notes when the `_log` environment variable is `1`, `on`, `all`, or a list that includes `power`, so none are added by default.
+        minutes (int): How often, in minutes, Notecard should log power consumption in a `_log.qo` Note. The default value is `720` (12 hours). May be combined with `hours`, in which case the two values are added together. Notecard only adds these Notes when the `_log` environment variable is `1`, `on`, `all`, or a list that includes `power`, so none are added by default.
         reset (bool): Set to `true` to reset the power consumption counters back to 0.
 
     Returns:
@@ -694,7 +694,7 @@ def temp(card, minutes=None, status=None, stop=None, sync=None):
 
     Args:
         card (Notecard): The current Notecard object.
-        minutes (int): If specified, creates a templated `_temp.qo` file that gathers Notecard temperature value at the specified minutes interval. When using card.aux track mode, the sensor temperature, pressure, and humidity is also included with each Note.
+        minutes (int): If specified, creates a templated `_temp.qo` Notefile that records the Notecard's temperature at the specified interval in minutes. If the Notecard detects a BME280 or ENS210 sensor on its I2C bus, or a BME280 connected to its AUX pins using card.aux track mode, each Note uses the sensor's temperature instead and includes humidity readings. Notes from BME280 sensors also include pressure readings.
         status (str): Overrides `minutes` with a voltage-variable value. For example: `"usb:15;high:30;normal:60;720"`. See Voltage-Variable Sync Behavior for more information on configuring these values.
         stop (bool): If set to `true`, the Notecard will stop logging the temperature value at the interval specified with the `minutes` parameter (see above).
         sync (bool): If set to `true`, the Notecard will immediately sync any pending `_temp.qo` Notes created with the `minutes` parameter (see above).
@@ -752,7 +752,7 @@ def transport(card, allow=None, method=None, seconds=None, set=None, umin=None, 
     Args:
         card (Notecard): The current Notecard object.
         allow (bool): Set to `true` to allow adding Notes to templated Notefiles that have no `port` while connected over a non-terrestrial network. See Define NTN vs non-NTN Templates.
-        method (str): The connectivity method to enable on the Notecard. See Connection Retry and Fallback Behaviors for when the Notecard falls back to the next transport and when it retries the preferred one.
+        method (str): The connectivity method to enable on the Notecard. See Connection Retry and Fallback Behaviors for when the Notecard falls back to the next transport and when it retries the preferred one. If the new value changes the transport (for example, from `wifi` to `cell`), the Notecard closes any open Notehub session and uses the new transport on its next connection.
         seconds (int): The amount of time (in seconds) a Notecard will spend on any fallback transport before retrying the first transport specified in the `method`. The default is `3600` or 60 minutes.
         set (bool): Set to `true` to apply the `allow` argument without also changing the transport `method`.
         umin (bool): Set to `true` to force a longer network transport timeout when using Wideband Notecards.
@@ -875,7 +875,7 @@ def voltage(card, alert=None, calibration=None, hours=None, mode=None, name=None
 
     Args:
         card (Notecard): The current Notecard object.
-        alert (bool): When enabled and the `usb` argument is set to `true`, the Notecard will add an entry to the `_health.qo` Notefile when USB power is connected or disconnected.
+        alert (bool): When enabled and the `usb` argument is set to `true`, the Notecard adds a Note to the `_health.qo` Notefile whenever USB power is connected or disconnected. The Note's `text` field contains `{usb-enabled}` when USB power is connected and `{usb-disabled}` when disconnected.
         calibration (float): The offset, in volts, to account for the forward voltage drop of the diode used between the battery and Notecard in either Blues- or customer-designed Notecarriers.
         hours (int): The number of hours to analyze, up to 720 (30 days).
         mode (str): Used to set voltage thresholds based on how the Notecard will be powered, and which can be used to configure voltage-variable Notecard behavior. Each value is shorthand that assigns a battery voltage reading to a given device state like `high`, `normal`, `low`, and `dead`. In addition to the named presets below, a custom semicolon-separated shorthand string may be provided using any combination of the `usb`, `high`, `normal`, `low`, and `dead` states (e.g. `"usb:4.6;high:4.2;normal:3.6;low:0"`). NOTE: Setting voltage thresholds is not supported on the Notecard XP.
